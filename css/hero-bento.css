@@ -1,0 +1,270 @@
+/* ============================================================
+   DEVTALKS — SPOTLIGHT BENTO HERO
+   ------------------------------------------------------------
+   The hero is an array of dark glass tiles on a straight,
+   square grid. The page starts almost unlit; the cursor (or, on
+   a phone, the tilt of the device) is the stage spotlight, and
+   tiles light up as it passes over them — a radial wash inside
+   the glass, a neon rim on the edge, and a lift toward the
+   viewer. The depth is in the lighting, not in a skewed layout:
+   the grid itself sits flat and level.
+
+   Everything that moves is a transform or an opacity, so the
+   compositor does the work and layout is never touched. The
+   positions are measured once on load and again on resize.
+
+   All of it is scoped to .hero--bento, so the other index pages
+   are untouched by this file.
+   ============================================================ */
+
+.hero--bento{
+  min-height:100svh;
+  display:flex; align-items:center;
+  padding:calc(var(--nav-h, 76px) + 22px) 0 44px;
+  overflow:hidden;
+}
+.hero--bento .hero__canvas{ display:none; }
+
+/* the veil is what keeps the stage dark before the spotlight arrives */
+.hero--bento .hero__veil{
+  background:
+    radial-gradient(120% 90% at 50% 0%, rgba(236,105,27,.10), transparent 60%),
+    linear-gradient(180deg, rgba(0,0,0,.30), rgba(0,0,0,.72));
+}
+
+/* ---- the grid ----
+   The perspective stays, because it is what makes a lit tile actually come
+   toward the viewer when the script raises its translateZ. The plane itself
+   is not rotated — the grid is square and level. */
+.bento{
+  width:min(1320px, 92vw);
+  margin:0 auto;
+  perspective:1700px;
+  perspective-origin:50% 45%;
+}
+.bento__plane{
+  display:grid;
+  gap:clamp(12px, 1.3vw, 20px);
+  transform-style:preserve-3d;
+  grid-template-columns:repeat(12, 1fr);
+  grid-template-areas:
+    "title title title title title title title spk   spk   spk   spk   spk"
+    "title title title title title title title spk   spk   spk   spk   spk"
+    "title title title title title title title tick  tick  tick  tick  tick"
+    "cnt   cnt   cnt   cnt   meta  meta  meta  stack stack stack stack stack";
+}
+
+/* ---- a tile ---- */
+.bt{
+  position:relative;
+  grid-area:var(--area);
+  border-radius:clamp(14px, 1.3vw, 20px);
+  border:1px solid rgba(255,255,255,.075);
+  background:
+    linear-gradient(152deg, rgba(255,255,255,.045), rgba(255,255,255,.004) 46%,
+                    rgba(0,0,0,.28));
+  -webkit-backdrop-filter:blur(12px); backdrop-filter:blur(12px);
+  box-shadow:0 26px 50px -30px rgba(0,0,0,.95), inset 0 1px 0 rgba(255,255,255,.07);
+  overflow:hidden;
+  transform-style:preserve-3d;
+  transform:translateZ(0);
+  /* only the tile under the light gets promoted; see js/hero-bento.js */
+  transition:border-color .35s var(--ease), box-shadow .35s var(--ease);
+}
+.bt.is-lit{ border-color:rgba(236,105,27,.32); }
+
+.bt--title{ --area:title; }
+.bt--spk  { --area:spk;   }
+.bt--tick { --area:tick;  }
+.bt--cnt  { --area:cnt;   }
+.bt--meta { --area:meta;  }
+.bt--stack{ --area:stack; }
+
+/* the spotlight wash inside the glass — a fixed gradient that the script
+   simply slides about, so nothing repaints */
+.bt__glow{
+  position:absolute; top:0; left:0;
+  width:560px; height:560px; margin:-280px 0 0 -280px;
+  border-radius:50%;
+  background:radial-gradient(circle closest-side,
+    rgba(255,164,86,.30) 0%, rgba(236,105,27,.17) 38%,
+    rgba(236,105,27,.05) 62%, transparent 76%);
+  opacity:0; pointer-events:none;
+  transform:translate3d(0,0,0);
+}
+
+/* the neon rim */
+.bt__rim{
+  position:absolute; inset:0;
+  border-radius:inherit;
+  box-shadow:
+    inset 0 0 0 1px rgba(247,169,60,.55),
+    inset 0 0 26px -6px rgba(236,105,27,.55),
+    0 0 44px -14px rgba(236,105,27,.75);
+  opacity:0; pointer-events:none;
+}
+
+.bt__in{
+  position:relative; z-index:2;
+  height:100%;
+  padding:clamp(16px, 1.6vw, 26px);
+  display:flex; flex-direction:column;
+}
+.bt__label{
+  font-family:var(--mono); font-size:.6rem; letter-spacing:.22em;
+  text-transform:uppercase; color:var(--mute-2);
+  display:flex; align-items:center; gap:8px;
+  margin:0 0 12px;
+}
+.bt__label b{ color:var(--red); font-weight:600; }
+
+/* ---- tile 1: the title ---- */
+.hero--bento .hero__title{ font-size:clamp(3.1rem, 8.4vw, 7.4rem); margin:0; }
+.hero--bento .hero__theme{ font-size:clamp(1rem, 2vw, 1.35rem); margin-top:.5em; }
+.hero--bento .hero__tag{ max-width:46ch; margin-top:1em; }
+.hero--bento .hero__actions{ margin-top:auto; padding-top:26px; }
+.bt--title .bt__in{ justify-content:flex-start; }
+
+/* Content that should hang off the bottom of its tile says so; the speaker
+   block sits straight under its label instead, because a portrait floating in
+   the middle of a tall tile looks like a mistake. */
+.bt--tick  .bttick{     margin-top:auto; }
+.bt--cnt   .count{      margin-top:auto; }
+.bt--meta  .hero__meta{ margin-top:auto; }
+.bt--stack .btstack{    margin-top:auto; }
+
+/* ---- tile 2: next speaker ---- */
+.btspk{ display:flex; gap:14px; align-items:center; margin-top:4px; }
+.btspk__img{
+  width:74px; height:74px; flex:none;
+  border-radius:14px; overflow:hidden;
+  border:1px solid rgba(255,255,255,.12);
+  background:linear-gradient(150deg, #241309, #0C0705);
+  display:grid; place-content:center;
+}
+.btspk__img img{ width:100%; height:100%; object-fit:cover; display:block; }
+.btspk__ini{ font-family:var(--display); font-size:1.5rem; color:rgba(255,255,255,.28); }
+.btspk__name{ font-family:var(--display); font-size:clamp(1.15rem,2.2vw,1.5rem);
+              line-height:1.02; text-transform:uppercase; }
+.btspk__role{ font-size:.78rem; color:var(--mute); margin-top:.3em; }
+.btspk__talk{
+  margin-top:14px; padding-top:12px;
+  border-top:1px solid rgba(255,255,255,.08);
+  font-size:.92rem; line-height:1.4; color:#E9E9E9;
+}
+
+/* ---- tile 3: live ticker ---- */
+.bttick{ margin-top:14px; display:flex; align-items:baseline; gap:10px; }
+.bttick__n{
+  font-family:var(--display); font-size:clamp(2rem, 4.4vw, 3rem);
+  line-height:.9; font-variant-numeric:tabular-nums;
+}
+.bttick__u{ font-family:var(--mono); font-size:.62rem; letter-spacing:.2em;
+            text-transform:uppercase; color:var(--mute-2); }
+.bttick__live{
+  display:inline-flex; align-items:center; gap:6px;
+  font-family:var(--mono); font-size:.55rem; letter-spacing:.2em;
+  text-transform:uppercase; color:var(--red);
+}
+.bttick__live i{
+  width:6px; height:6px; border-radius:50%; background:var(--red);
+  box-shadow:0 0 0 0 rgba(236,105,27,.7);
+  animation:btpulse 2.1s var(--ease) infinite;
+}
+@keyframes btpulse{
+  0%{ box-shadow:0 0 0 0 rgba(236,105,27,.6); }
+  70%{ box-shadow:0 0 0 9px rgba(236,105,27,0); }
+  100%{ box-shadow:0 0 0 0 rgba(236,105,27,0); }
+}
+.bttick__feed{
+  margin-top:auto; padding-top:12px; overflow:hidden; height:1.35em;
+  font-family:var(--mono); font-size:.66rem; letter-spacing:.06em; color:var(--mute);
+}
+.bttick__feed span{ display:block; transition:transform .5s var(--ease), opacity .5s var(--ease); }
+
+/* ---- tile 4: tech stack ---- */
+.btstack{ display:flex; flex-wrap:wrap; gap:10px; margin-top:16px; }
+.btstack span{
+  width:42px; height:42px; display:grid; place-content:center;
+  border-radius:11px;
+  border:1px solid rgba(255,255,255,.1);
+  background:rgba(255,255,255,.028);
+  transform:translateZ(18px);
+}
+.btstack svg{ width:20px; height:20px; display:block; }
+.btstack svg *{ stroke:var(--hero-b, #F7A93C); }
+
+/* ---- tile 5/6: countdown and meta ---- */
+.hero--bento .count{ margin:16px 0 0; gap:8px; }
+.hero--bento .count__cell{ padding:10px 6px; }
+.hero--bento .hero__meta{ display:block; margin-top:16px; }
+.hero--bento .hero__meta i{ display:none; }
+.hero--bento .hero__meta span{ display:block; line-height:1.7; }
+
+/* ---- the hint, which retires once the spotlight has been found ---- */
+.bento__hint{
+  position:absolute; left:50%; bottom:22px; transform:translateX(-50%);
+  font-family:var(--mono); font-size:.58rem; letter-spacing:.22em;
+  text-transform:uppercase; color:var(--mute-2);
+  display:flex; align-items:center; gap:10px;
+  transition:opacity .6s var(--ease);
+  z-index:4;
+}
+.bento__hint.is-gone{ opacity:0; pointer-events:none; }
+.bento__hint button{
+  font:inherit; letter-spacing:inherit; text-transform:inherit;
+  color:var(--red); background:none; cursor:pointer;
+  border:1px solid rgba(236,105,27,.4); border-radius:999px;
+  padding:6px 12px;
+}
+
+/* ---- narrow screens ----
+   Two columns all the way down, with tighter type and padding. A single
+   column would make the hero three screens tall, and a hero the reader has
+   to scroll through is not a hero. */
+@media (max-width:900px){
+  .hero--bento{ min-height:0; padding:calc(var(--nav-h, 76px) + 8px) 0 22px; }
+  .bento{ width:92vw; }
+  .bento__plane{
+    gap:10px;
+    grid-template-columns:repeat(2, 1fr);
+    grid-template-areas:
+      "title title"
+      "spk   spk"
+      "cnt   cnt"
+      "tick  stack"
+      "meta  meta";
+  }
+  .bt__in{ padding:13px; }
+  .bt__label{ margin-bottom:8px; font-size:.55rem; }
+  .hero--bento .hero__title{ font-size:clamp(2.4rem, 10vw, 3.6rem); }
+  .hero--bento .hero__theme{ font-size:.9rem; margin-top:.35em; }
+  .hero--bento .hero__tag{ font-size:.9rem; margin-top:.65em; }
+  .hero--bento .hero__actions{ padding-top:14px; }
+  .btspk{ gap:11px; }
+  .btspk__img{ width:50px; height:50px; border-radius:10px; }
+  .btspk__name{ font-size:1.05rem; }
+  .btspk__role{ font-size:.72rem; }
+  .btspk__talk{ margin-top:9px; padding-top:8px; font-size:.84rem; }
+  .hero--bento .count{ margin-top:8px; gap:6px; }
+  .hero--bento .count__cell{ padding:7px 3px; }
+  .hero--bento .hero__meta{ margin-top:8px; }
+  .hero--bento .hero__meta span{ line-height:1.5; font-size:.84rem; }
+  .bttick{ margin-top:8px; }
+  .bttick__n{ font-size:2.1rem; }
+  .btstack{ gap:6px; margin-top:8px; }
+  .btstack span{ width:32px; height:32px; border-radius:9px; }
+  .btstack svg{ width:16px; height:16px; }
+  .bttick__feed{ display:none; }
+  .bento__hint{ bottom:4px; }
+}
+
+/* ---- Reduced motion: the stage is simply lit, and stays lit ---- */
+@media (prefers-reduced-motion:reduce){
+  .bt{ transform:none !important; }
+  .bt__glow{ opacity:.5 !important; transform:none !important;
+             top:50%; left:50%; }
+  .bt__rim{ opacity:.35 !important; }
+  .bttick__live i{ animation:none; }
+  .bento__hint{ display:none; }
+}

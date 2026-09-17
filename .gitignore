@@ -1,0 +1,22 @@
+# Nothing here is part of the site. Everything below stays on your machine
+# instead of being tracked in the repo.
+
+# Working files and agent config
+.claude/
+.agent/
+.cursor/
+.impeccable/
+skills/
+.playwright-mcp/
+
+# 14MB of intermediate exports
+Claude outputs/
+
+# 22MB of design reference renders — regenerate from pdf/ if you need them
+*.pdf
+pdf/
+
+# Editor / OS noise
+.DS_Store
+Thumbs.db
+node_modules/

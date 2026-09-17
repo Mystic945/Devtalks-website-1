@@ -1,0 +1,143 @@
+/* ============================================================
+   DEVTALKS — MOTION LAYER  (paper edition only)
+   ------------------------------------------------------------
+   Loads after css/paper.css. Styles for the moving parts the
+   paper edition adds:
+
+     1. the 3D doodle constellation behind the bento grid
+     2. registration — cards arriving as you scroll
+     3. the speaker card magnify
+
+   Every element's DEFAULT state here is its finished state, so
+   a script that never runs leaves a correct, static page rather
+   than a blank one.
+   ============================================================ */
+
+/* ============================================================
+   1 · THE DOODLE CONSTELLATION
+   ------------------------------------------------------------
+   Sits behind .hero__veil (z-index -1), so the printed dot
+   screen and the spot-colour blooms still read on top of it,
+   and the frosted tiles blur it along with everything else.
+   ============================================================ */
+/* One rule for all three fields. js/doodle-field.js creates the canvas and
+   inserts it as the section's first child. */
+.doodle-field{
+  position:absolute; inset:0;
+  z-index:0;
+  width:100%; height:100%;
+  display:block;
+  opacity:0;
+  transition:opacity 1.2s cubic-bezier(.16,1,.3,1);
+  pointer-events:none;
+}
+.doodle-field.is-on{ opacity:1; }
+
+/* The hero's field goes behind .hero__veil, so the spot-colour blooms and
+   the frosted tiles both read on top of it. */
+.hero__doodles{ z-index:-2; }
+
+/* Content has to sit above its field. */
+.sec--about > .wrap,
+.sec--speakers > .wrap{ position:relative; z-index:1; }
+
+/* On a phone the grid fills more of the screen, so the field is pulled
+   back a little — but only a little. It is meant to read. */
+@media (max-width:700px){
+  .doodle-field.is-on{ opacity:.88; }
+}
+
+/* ============================================================
+   2 · REGISTRATION
+   ------------------------------------------------------------
+   js/flow.js writes transform, opacity and filter on these as
+   they cross the fold. The declared state is the settled one.
+   ============================================================ */
+/* No will-change here. js/flow.js sets it while a card is actually
+   travelling and clears it the moment the card lands — a permanent hint on
+   16 elements is 16 layers the compositor holds for a 600ms animation. */
+[data-flow]{
+  transform-style:preserve-3d;
+}
+
+/* ============================================================
+   3 · THE SPEAKER CARD
+   ------------------------------------------------------------
+   There used to be a hover magnify here: a wrapper that scaled
+   the card to 1.07. It is gone. Scaling a card that js/bento.js
+   is already tilting every frame, inside an element js/flow.js
+   is writing a registration transform to, gave the compositor
+   three transforms on three nested elements to reconcile and
+   the card jittered under the cursor.
+
+   The card still answers the pointer — it tilts, and its ink
+   drop deepens with the tilt (see .spk.is-tilting in
+   css/paper.css). One transform, one owner.
+   ============================================================ */
+.spk-flow{ position:relative; }
+
+.spk{
+  overflow:hidden;              /* the portrait keeps to the panel */
+  transition:box-shadow .45s cubic-bezier(.16,1,.3,1),
+             border-color .3s ease;
+}
+.spk__img{ overflow:hidden; }
+
+/* A tilted card is the one in front; let it sit above its neighbours. */
+.speakers{ isolation:isolate; }
+.spk-flow:hover{ z-index:5; }
+
+/* ============================================================
+   REDUCED MOTION
+   ------------------------------------------------------------
+   The constellation and the composition stay. Only the movement
+   goes: no drift, no travel.
+   ============================================================ */
+@media (prefers-reduced-motion:reduce){
+  .doodle-field{ transition:none; }
+
+  [data-flow]{
+    opacity:1 !important;
+    transform:none !important;
+    filter:none !important;
+    will-change:auto;
+  }
+
+}
+
+/* ============================================================
+   5 · THE SECTIONS THAT CARRY A FIELD
+   ------------------------------------------------------------
+   About and Speakers run the same animated field as the hero
+   (js/doodle-field.js), so they have to clip it and stack their
+   own content above it. This replaced a static SVG scatter that
+   only drifted on scroll — the same marks now behave the same
+   way wherever you meet them.
+   ============================================================ */
+.sec--speakers,
+.sec--about{ position:relative; overflow:hidden; }
+
+/* ============================================================
+   6 · ACTION PANELS — the converging speed lines
+   ------------------------------------------------------------
+   One <svg class="rays"> per panel, stretched to the panel box
+   and clipped by it. The polygons taper to a vanishing point,
+   which is what separates impact from hatching.
+   ============================================================ */
+.rays{
+  position:absolute; inset:0;
+  width:100%; height:100%;
+  z-index:0;
+  pointer-events:none;
+}
+.rays polygon{ fill:var(--black); }
+
+/* ============================================================
+   7 · THE SCHEDULE
+   ------------------------------------------------------------
+   Used to be comic panels (js/comic-panels.js built .sched--comic,
+   one row per panel, a rays SVG behind the list). That script is
+   unlinked now — the schedule is a vertical timeline instead, in
+   css/paper-hover-timeline.css. Nothing here targets .sched--comic
+   any more; re-link the script and this file no longer applies.
+   ============================================================ */

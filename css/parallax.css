@@ -1,0 +1,66 @@
+/* ============================================================
+   DEVTALKS — PARALLAX LAYER
+   ------------------------------------------------------------
+   Two effects, both driven by js/parallax.js:
+
+     1. Speaker media drifts inside its clipped card
+     2. The marquee band responds to scroll velocity
+
+   Everything here only sets up the geometry. Nothing animates
+   from CSS, so if the JS never runs the page is simply static
+   and correct — no element is left mid-transform.
+   ============================================================ */
+
+/* ---- 1. Speaker media drift ----------------------------------
+   The media is taller than its frame; the slack is what the
+   script slides. 118% gives 18% of travel, ±9% either side of
+   centre — under the threshold where moving images start to
+   read as a glitch rather than as depth.                        */
+
+/* .spk is a column flexbox, so the image frame inherits flex-shrink:1 and gets
+   squashed out of its 1/1 aspect-ratio — 264x153 instead of 264x264 at desktop
+   width. Harmless with the initials tiles, but it would crop real headshots
+   badly. flex:none restores the square.
+   This affects the other index pages too; it is scoped here so their layout
+   is left exactly as it is. Lift it into style.css when you want it everywhere. */
+.spk__img{ flex:none; }
+
+.spk__img{ contain:paint; }           /* clip + isolate: no repaint outside the card */
+
+.spk__img > img,
+.spk__img > .spk__ini{
+  position:absolute;
+  left:0; width:100%;
+  height:118%; top:-9%;
+  transform:translate3d(0,0,0);       /* own layer from the start, no mid-scroll promotion */
+}
+
+/* Promoted only while the card is near the viewport. Leaving
+   will-change on eight images permanently costs GPU memory on a
+   phone for no benefit. */
+.spk__img.is-live > img,
+.spk__img.is-live > .spk__ini{ will-change:transform; }
+
+
+/* ---- 2. Marquee -----------------------------------------------
+   The CSS keyframe loop is the fallback. Once the script takes
+   over it adds .is-js and drives the transform itself, so the
+   two never fight. */
+
+.marquee__track.is-js{
+  animation:none;
+  will-change:transform;
+}
+
+
+/* ---- Reduced motion -------------------------------------------
+   Media sits centred and still; the marquee stops. */
+@media (prefers-reduced-motion:reduce){
+  .spk__img > img,
+  .spk__img > .spk__ini{
+    height:100%; top:0;
+    transform:none !important;
+    will-change:auto;
+  }
+  .marquee__track{ animation:none; transform:none !important; }
+}

@@ -1,0 +1,97 @@
+/* ============================================================
+   DEVTALKS — THREE-SPEAKER LAYOUT + UNFOLD REVEAL
+   ------------------------------------------------------------
+   With three speakers instead of eight, each card can carry real
+   weight: a tall portrait, a readable name, the talk title given
+   room. The grid drops to three columns on desktop and one on a
+   phone — never two, because a 2+1 row looks like someone
+   dropped out.
+
+   The reveal (js/unfold.js) is scroll-driven: each card starts
+   small and turned away, then unfolds flat as it rises into
+   view. Transform and opacity only, so it composites on the GPU
+   and never touches layout.
+   ============================================================ */
+
+/* ---- The grid ---- */
+.speakers{
+  grid-template-columns:1fr;
+  gap:clamp(22px, 5vw, 40px);
+  perspective:none;                    /* each card owns its own vanishing point */
+}
+@media (min-width:900px){
+  .speakers{ grid-template-columns:repeat(3,1fr); gap:clamp(18px,2.4vw,32px); }
+}
+
+/* ---- The card ---- */
+.spk{
+  border-radius:20px;
+  background:linear-gradient(180deg, var(--ink-2), #0C0705);
+  transform-origin:50% 60%;
+  /* unfold.js writes transform here; the tilt effect is disabled on this
+     page so nothing else competes for the property */
+}
+@media (hover:hover){
+  .spk:hover{ border-color:rgba(236,105,27,.55); }
+}
+
+/* Portrait crop — a 4:5 frame reads as a person, 1:1 reads as a thumbnail */
+.spk__img{ aspect-ratio:4/5; }
+
+.spk__no{
+  top:14px; left:16px;
+  font-size:.68rem; letter-spacing:.2em;
+}
+
+.spk__body{ padding:clamp(18px,2vw,24px) clamp(18px,2vw,24px) clamp(22px,2.4vw,28px); }
+
+.spk__name{
+  font-size:clamp(1.35rem, 3.4vw, 1.9rem);
+  line-height:1.02;
+  margin-bottom:.35em;
+}
+.spk__role{
+  font-size:.82rem;
+  margin-bottom:1.1em;
+}
+.spk__talk{
+  font-size:clamp(.92rem, 2.4vw, 1.02rem);
+  line-height:1.4;
+  font-weight:500;
+  color:#EDEDED;
+  -webkit-line-clamp:3;
+  padding-top:1em;
+}
+.spk__more{
+  right:16px; bottom:18px;
+  width:34px; height:34px;
+}
+/* On touch there is no hover, so the affordance has to be permanent */
+@media (hover:none){
+  .spk__more{ opacity:1; transform:none; }
+}
+
+/* ---- Unfold: the state before the card has been reached ----
+   Set here rather than in JS so the card is never briefly flat
+   before the script runs. js/unfold.js clears it as you scroll. */
+.spk[data-unfold]{
+  opacity:.28;
+  transform:perspective(1500px) translate3d(-6%,34px,0) rotateY(-24deg) rotateX(6deg) scale(.72);
+  will-change:transform, opacity;
+}
+.spk[data-unfold].is-settled{
+  will-change:auto;                    /* released once it stops moving */
+}
+
+/* Without JS, or with reduced motion, the cards are simply there. */
+.no-js .spk[data-unfold],
+.spk[data-unfold].is-static{
+  opacity:1; transform:none; will-change:auto;
+}
+
+@media (prefers-reduced-motion:reduce){
+  .spk[data-unfold]{ opacity:1 !important; transform:none !important; will-change:auto; }
+}
+
+/* ---- About section copy sized for three, not eight ---- */
+.sec--about .big{ max-width:22ch; }
