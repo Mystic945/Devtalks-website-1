@@ -775,3 +775,223 @@ main{
   }
   .bt__glow{ opacity:.34 !important; }
 }
+
+/* ============================================================
+   WHAT YOU GET — the hero's pass-inclusions tile
+   ------------------------------------------------------------
+   Replaced eight decorative stack icons with three lines that
+   say something. Rendered by js/live-stage.js from PERKS.
+   ============================================================ */
+.btperks{
+  margin-top:auto;
+  display:grid;
+  gap:clamp(8px,1vw,12px);
+}
+.btperk{
+  display:flex; align-items:center; gap:11px;
+  min-width:0;
+}
+.btperk__i{
+  flex:none;
+  width:36px; height:36px;
+  display:grid; place-content:center;
+  border:1.5px solid var(--ink-line);
+  border-radius:10px;
+  background:rgba(255,253,249,.45);
+}
+.btperk__i svg{ width:19px; height:19px; display:block; }
+.btperk__i svg *{ stroke:var(--spot-ink); }
+
+.btperk__t{
+  min-width:0;
+  font-size:.86rem; font-weight:600; line-height:1.2;
+  color:var(--black);
+}
+.btperk__t em{
+  display:block;
+  font-style:normal; font-weight:400;
+  font-size:.68rem; letter-spacing:.01em;
+  color:var(--mute);
+  margin-top:.25em;
+}
+
+/* The speaker tile while a talk is actually running. */
+.bt--spk.is-live{ border-color:var(--black); }
+.bt--spk.is-live .btspk__name{ color:var(--black); }
+
+@media (max-width:900px){
+  .btperk__i{ width:30px; height:30px; border-radius:8px; }
+  .btperk__i svg{ width:16px; height:16px; }
+  .btperk__t{ font-size:.78rem; }
+  .btperk__t em{ font-size:.62rem; }
+}
+
+/* ============================================================
+   WHAT THE DAY GIVES YOU — the about section's offers
+   ------------------------------------------------------------
+   Sits where three hand-written notes used to be. Every line is
+   a real row in the run of show; js/live-stage.js renders it
+   from OFFERS so the two cannot drift apart silently.
+   ============================================================ */
+.offers__h{
+  font-family:var(--display);
+  font-weight:400;
+  font-size:clamp(1.05rem,2.4vw,1.35rem);
+  text-transform:uppercase;
+  letter-spacing:.01em;
+  color:var(--black);
+  margin:0 0 1.1em;
+}
+.offers{ display:grid; gap:14px; }
+
+.offer{
+  display:flex; gap:14px;
+  padding:16px 18px;
+  border:2px solid var(--black);
+  border-radius:14px;
+  background:var(--paper-2);
+  box-shadow:var(--drop-sm);
+}
+.offer__n{
+  flex:none;
+  font-family:var(--mono);
+  font-size:.62rem; font-weight:600;
+  letter-spacing:.12em;
+  color:var(--spot-ink);
+  padding-top:.25em;
+}
+.offer__t{
+  display:block;
+  font-size:.95rem; font-weight:700;
+  color:var(--black);
+  margin-bottom:.3em;
+}
+.offer__b{
+  display:block;
+  font-size:.86rem; line-height:1.5;
+  color:var(--rule);
+}
+
+@media (min-width:1100px){
+  .offers{ grid-template-columns:1fr; }
+}
+@media (max-width:700px){
+  .offer{ padding:14px 15px; gap:11px; box-shadow:2px 2px 0 var(--black); }
+}
+
+/* ============================================================
+   THE REEL — vertical cards running across the page
+   ------------------------------------------------------------
+   One CSS keyframe on one element. js/reel.js prints the cards
+   twice and the track slides exactly -50%, so the second copy
+   is under the cursor when the first finishes and the seam
+   never shows. --reel-time is written by the script from the
+   card count, so adding a card lengthens the loop instead of
+   speeding it up.
+
+   To run the strip the other way, swap the two keyframe
+   percentages — or set animation-direction:reverse here.
+   ============================================================ */
+.sec--reel{
+  position:relative;
+  overflow:hidden;
+  padding-bottom:clamp(56px,8vw,96px);
+}
+.sec--reel .sec__head{ margin-bottom:clamp(26px,4vw,44px); }
+
+.reel{
+  position:relative;
+  width:100%;
+  /* The strip is full-bleed: it should run off both edges of the page,
+     not sit inside the text column. */
+  -webkit-mask-image:linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+  mask-image:linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+}
+
+.reel__track{
+  display:flex;
+  gap:clamp(14px,2vw,24px);
+  width:max-content;
+  padding:6px 0 10px;            /* room for the flat drop under each card */
+  animation:reel-run var(--reel-time, 33s) linear infinite;
+  will-change:transform;
+}
+@keyframes reel-run{
+  from{ transform:translate3d(0,0,0); }
+  to  { transform:translate3d(-50%,0,0); }
+}
+
+/* Hovering the strip holds it, so a card can actually be looked at. */
+@media (hover:hover) and (pointer:fine){
+  .reel:hover .reel__track{ animation-play-state:paused; }
+}
+
+/* ---- a card ---- */
+.reel__card{
+  flex:none;
+  margin:0;
+  width:clamp(168px,20vw,248px);
+}
+.reel__frame{
+  position:relative;
+  aspect-ratio:9/16;
+  overflow:hidden;
+  border:3px solid var(--black);
+  border-radius:16px;
+  background:var(--paper-2);
+  box-shadow:var(--drop);
+}
+.reel__v{
+  width:100%; height:100%;
+  object-fit:cover;
+  display:block;
+}
+
+/* ---- the empty slot ----
+   A real state rather than a broken one: it reads as a frame waiting for
+   footage, which is exactly what it is. */
+.reel__slot{
+  position:absolute; inset:0;
+  display:grid;
+  place-content:center;
+  justify-items:center;
+  gap:14px;
+  background:
+    repeating-linear-gradient(135deg,
+      rgba(57,55,50,.05) 0 10px, transparent 10px 20px),
+    var(--paper-2);
+}
+.reel__play{
+  display:block;
+  width:clamp(38px,5vw,52px);
+  color:var(--spot-ink);
+  opacity:.65;
+}
+.reel__play svg{ width:100%; height:auto; display:block; }
+.reel__n{
+  font-family:var(--mono);
+  font-size:.62rem; font-weight:600;
+  letter-spacing:.2em;
+  color:var(--mute);
+}
+
+.reel__cap{
+  margin-top:.8em;
+  font-size:.82rem;
+  color:var(--rule);
+}
+
+@media (max-width:700px){
+  .reel__frame{ border-width:2px; border-radius:13px; box-shadow:3px 3px 0 var(--black); }
+}
+
+/* Reduced motion: the strip stops and becomes a row you scroll yourself. */
+@media (prefers-reduced-motion:reduce){
+  .reel{
+    overflow-x:auto;
+    -webkit-mask-image:none; mask-image:none;
+    scroll-snap-type:x mandatory;
+  }
+  .reel__track{ animation:none; will-change:auto; }
+  .reel__card{ scroll-snap-align:center; }
+}

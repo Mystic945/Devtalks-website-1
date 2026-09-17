@@ -101,6 +101,57 @@ const SPEAKERS = [
   }
 ];
 
+/* ---------- WHAT THE PASS INCLUDES ----------
+   The three lines in the hero's "What you get" tile. Keep it to three —
+   the tile is small and this is the glanceable version. Everything here
+   is also promised somewhere else on the page (ticket perks, the run of
+   show), so nothing new is being claimed here.
+------------------------------------------------------------------ */
+const PERKS = [
+  { icon: "play", label: "Talk recordings",   note: "Every pass" },
+  { icon: "cup",  label: "Lunch & chai",      note: "Included" },
+  { icon: "mic",  label: "Meet the speakers", note: "Q&A after every talk" }
+];
+
+/* ---------- WHAT THE DAY OFFERS ----------
+   The fuller version, in the "What is DevTalks" section. Each of these is
+   a real row in the SCHEDULE below — if you change the run of show, change
+   these too.
+------------------------------------------------------------------ */
+const OFFERS = [
+  { title: "Three long-form talks",
+    body:  "Twenty-five minutes each. One speaker, one idea, start to finish." },
+  { title: "Q&A after every talk",
+    body:  "Twenty minutes with the person who actually built the thing." },
+  { title: "All three on stage",
+    body:  "The speakers come back together to close the day and take questions." },
+  { title: "Demo floor & booths",
+    body:  "Student projects and sponsor teams on the ground floor all afternoon." }
+];
+
+/* ---------- THE REEL ----------
+   Vertical clips that run across the page in one continuous strip.
+
+   Each entry can be:
+     src    a video file in assets/reels/ (mp4, h.264, muted, ~6-12s).
+            Vertical, 9:16 — a phone recording is exactly right.
+     poster a still to show before the video decodes, or on its own if
+            you only have a photo. Also 9:16.
+     label  the caption printed under the card.
+
+   Leave src and poster empty and the card renders as a numbered slot,
+   so the strip animates correctly before any footage exists. Fill them
+   in and nothing else has to change.
+------------------------------------------------------------------ */
+const REELS = [
+  { src: "", poster: "", label: "" },
+  { src: "", poster: "", label: "" },
+  { src: "", poster: "", label: "" },
+  { src: "", poster: "", label: "" },
+  { src: "", poster: "", label: "" },
+  { src: "", poster: "", label: "" }
+];
+
 /* ---------- SCHEDULE ---------- */
 const SCHEDULE = [
   { time: "09:15", title: "Doors open & registration",      who: "Volunteer desk, main foyer", kind: "break" },

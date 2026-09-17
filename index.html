@@ -189,7 +189,7 @@
         <div class="bt__glow" aria-hidden="true"></div>
         <div class="bt__rim" aria-hidden="true"></div>
         <div class="bt__in">
-          <p class="bt__label"><b>05</b> On the table</p>
+          <p class="bt__label"><b>05</b> What you get</p>
           <div class="btstack" id="btStack"></div>
         </div>
       </article>
@@ -218,10 +218,10 @@
 
     <div class="about__grid">
       <p class="about__copy" data-reveal id="aboutIntro"></p>
+      <!-- Filled from OFFERS in js/data-3.js by js/live-stage.js -->
       <div class="about__notes" data-reveal>
-        <div class="note"><b>No panels.</b><span>Single speaker, single idea, twenty-five minutes each.</span></div>
-        <div class="note"><b>No sales decks.</b><span>Speakers are briefed: teach something, don't pitch something.</span></div>
-        <div class="note"><b>Open to everyone.</b><span>Any college, any branch, any year. Professionals welcome too.</span></div>
+        <h3 class="offers__h">What the day gives you</h3>
+        <div class="offers" id="offerList"></div>
       </div>
     </div>
 
@@ -324,10 +324,28 @@
 </section>
 
 <!-- ══════════════ FAQ ══════════════ -->
+<!-- ══════════════ REEL ══════════════ -->
+<!-- Vertical cards running across the page. Cards come from REELS in
+     js/data-3.js; empty entries render as numbered slots, so the strip
+     animates before any footage exists. See js/reel.js. -->
+<section class="sec sec--reel" id="reel">
+  <div class="wrap">
+    <div class="sec__head">
+      <p class="eyebrow" data-reveal><em>07</em> On the floor</p>
+      <h2 class="big" data-split>The reel</h2>
+      <p class="sec__sub" data-reveal>Moments from the day, as they happen.</p>
+    </div>
+  </div>
+
+  <div class="reel" data-reveal>
+    <div class="reel__track" id="reelTrack"></div>
+  </div>
+</section>
+
 <section class="sec sec--faq" id="faq">
   <div class="wrap">
     <div class="sec__head">
-      <p class="eyebrow" data-reveal><em>07</em> Before you ask</p>
+      <p class="eyebrow" data-reveal><em>08</em> Before you ask</p>
       <h2 class="big" data-split>FAQ</h2>
     </div>
     <div class="faq" id="faqList"></div>
@@ -413,6 +431,8 @@
 <script src="js/doodle-art.js"></script>
 <script src="js/register.js"></script>
 <script src="js/doodle-field.js"></script>
+<script src="js/live-stage.js"></script>
+<script src="js/reel.js"></script>
 <script src="js/flow.js"></script>
 <script src="js/footer-reveal.js"></script>
 </body>
