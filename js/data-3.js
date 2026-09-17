@@ -1,11 +1,12 @@
 /* ============================================================
    DEVTALKS — CONTENT FILE (three-speaker edition)
    ------------------------------------------------------------
-   Used ONLY by index-3speakers.html. The other pages still read
-   js/data.js, so editing this file changes nothing anywhere else.
+   Read by index.html, the site's only page. js/data.js (the
+   eight-speaker version) is unused now — it belonged to the
+   variant pages this repo used to carry.
 
    This is the ONLY file most people need to edit.
-   Change the text below and that page updates.
+   Change the text below and the page updates.
    Do not remove the commas, quotes or curly braces.
    ============================================================ */
 

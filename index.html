@@ -4,8 +4,11 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>DevTalks 2026 — Ideas Worth Building</title>
+<!-- PAPER EDITION — the site's only page.
+     Palette: #0b0b0b black · #f3eee4 paper · #ff5a1f orange
+              #a29d94 grey · #393732 line -->
 <meta name="description" content="DevTalks 2026 — a day of short, idea-dense talks from people who actually shipped the thing. 14 November 2026, Pune." />
-<meta name="theme-color" content="#0A0A0A" />
+<meta name="theme-color" content="#F3EEE4" />
 
 <!-- Social preview (replace assets/og.jpg with a 1200x630 image) -->
 <meta property="og:title" content="DevTalks 2026 — Ideas Worth Building" />
@@ -15,19 +18,44 @@
 
 <!-- Fonts are bundled in /fonts — no internet required -->
 <link rel="stylesheet" href="css/fonts.css" />
-<link rel="stylesheet" href="css/style.css" />
+<link rel="stylesheet" href="css/style-devkraft.css" />
+<link rel="stylesheet" href="css/doors.css" />
+<link rel="stylesheet" href="css/parallax.css" />
+<link rel="stylesheet" href="css/bento.css" />
+<link rel="stylesheet" href="css/hero-bento.css" />
+<!-- The palette layer. Loads last; re-inks everything above it. -->
+<link rel="stylesheet" href="css/paper.css" />
+<!-- The motion layer: doodle constellation, registration, magnify, center flow. -->
+<link rel="stylesheet" href="css/motion.css" />
+<!-- Speaker hover-reveal cards + schedule timeline. Loads last. -->
+<link rel="stylesheet" href="css/paper-hover-timeline.css" />
 </head>
 
 <body>
 
-<!-- ══════════════ PRELOADER ══════════════ -->
-<div class="loader" id="loader" aria-hidden="true">
-  <div class="loader__inner">
-    <div class="loader__mark">DEV<span>TALKS</span></div>
-    <div class="loader__bar"><i id="loaderBar"></i></div>
-    <div class="loader__num"><span id="loaderNum">0</span><small>%</small></div>
+<!-- ══════════════ AUDITORIUM DOORS ══════════════ -->
+<div class="doors" id="doors" aria-hidden="true">
+  <div class="door door--l">
+    <div class="door__mark">
+      <span class="door__word">DEV<span>TALKS</span></span>
+    </div>
   </div>
+  <div class="door door--r">
+    <div class="door__mark">
+      <span class="door__word">DEV<span>TALKS</span></span>
+    </div>
+  </div>
+  <div class="doors__glow"></div>
+  <div class="doors__seam"></div>
 </div>
+<script>
+  /* Runs before first paint: if the doors already played this session,
+     hide them immediately so there is no flash of a closed door. */
+  try {
+    if (sessionStorage.getItem('devtalks-doors-seen') === '1')
+      document.getElementById('doors').classList.add('is-gone');
+  } catch (e) {}
+</script>
 
 
 
@@ -71,39 +99,104 @@
 <main id="top">
 
 <!-- ══════════════ HERO ══════════════ -->
-<section class="hero" id="hero">
+<section class="hero hero--bento" id="hero">
+  <!-- main.js always calls DevTalksHero.init(#heroCanvas); js/hero-bento.js
+       answers "no WebGL hero here" and this stays hidden. -->
   <canvas class="hero__canvas" id="heroCanvas" aria-hidden="true"></canvas>
+
   <div class="hero__veil" aria-hidden="true"></div>
 
-  <div class="hero__body">
+  <!-- ══ THE BENTO GRID ══
+       Dark glass tiles on a tilted plane. The cursor is the stage spotlight;
+       on a phone, the tilt of the handset moves it instead. -->
+  <div class="bento" id="bentoGrid">
+    <div class="bento__plane">
 
+      <!-- 01 · the title -->
+      <article class="bt bt--title" data-bt>
+        <div class="bt__glow" aria-hidden="true"></div>
+        <div class="bt__rim" aria-hidden="true"></div>
+        <div class="bt__in">
+          <p class="bt__label"><b>01</b> The event</p>
+          <h1 class="hero__title">
+            <span class="line"><span>DEV</span></span>
+            <span class="line"><span>TALKS<b id="heroYear">26</b></span></span>
+          </h1>
+          <p class="hero__theme" data-split id="heroTheme">Ideas Worth Building</p>
+          <p class="hero__tag" id="heroTag"></p>
+          <div class="hero__actions">
+            <a href="#tickets" class="btn" data-magnetic id="heroCta">Get tickets</a>
+            <a href="#speakers" class="btn btn--ghost" data-magnetic>See speakers</a>
+          </div>
+        </div>
+      </article>
 
-    <h1 class="hero__title">
-      <span class="line"><span>DEV</span></span>
-      <span class="line"><span>TALKS<b id="heroYear">26</b></span></span>
-    </h1>
+      <!-- 02 · next guest speaker -->
+      <article class="bt bt--spk" data-bt>
+        <div class="bt__glow" aria-hidden="true"></div>
+        <div class="bt__rim" aria-hidden="true"></div>
+        <div class="bt__in">
+          <p class="bt__label"><b>02</b> Next on stage</p>
+          <div id="btSpeaker"></div>
+        </div>
+      </article>
 
-    <p class="hero__theme" data-split id="heroTheme">Ideas Worth Building</p>
-    <p class="hero__tag" data-reveal id="heroTag"></p>
+      <!-- 03 · live member ticker -->
+      <article class="bt bt--tick" data-bt>
+        <div class="bt__glow" aria-hidden="true"></div>
+        <div class="bt__rim" aria-hidden="true"></div>
+        <div class="bt__in">
+          <p class="bt__label"><span class="bttick__live"><i></i>Live</span> Registrations</p>
+          <div class="bttick">
+            <span class="bttick__n" id="btTickN">0</span>
+            <span class="bttick__u">seats claimed</span>
+          </div>
+          <div class="bttick__feed" id="btTickFeed" aria-hidden="true"></div>
+        </div>
+      </article>
 
-    <div class="hero__meta" data-reveal>
-      <span id="heroDate"></span>
-      <i></i>
-      <span id="heroVenue"></span>
+      <!-- 04 · countdown -->
+      <article class="bt bt--cnt" data-bt>
+        <div class="bt__glow" aria-hidden="true"></div>
+        <div class="bt__rim" aria-hidden="true"></div>
+        <div class="bt__in">
+          <p class="bt__label"><b>03</b> Doors open in</p>
+          <div class="count" id="count">
+            <div class="count__cell"><strong id="cd-d">00</strong><small>days</small></div>
+            <div class="count__cell"><strong id="cd-h">00</strong><small>hrs</small></div>
+            <div class="count__cell"><strong id="cd-m">00</strong><small>min</small></div>
+            <div class="count__cell"><strong id="cd-s">00</strong><small>sec</small></div>
+          </div>
+        </div>
+      </article>
+
+      <!-- 05 · date and venue -->
+      <article class="bt bt--meta" data-bt>
+        <div class="bt__glow" aria-hidden="true"></div>
+        <div class="bt__rim" aria-hidden="true"></div>
+        <div class="bt__in">
+          <p class="bt__label"><b>04</b> When &amp; where</p>
+          <div class="hero__meta">
+            <span id="heroDate"></span>
+            <i></i>
+            <span id="heroVenue"></span>
+          </div>
+        </div>
+      </article>
+
+      <!-- 06 · what gets talked about -->
+      <article class="bt bt--stack" data-bt>
+        <div class="bt__glow" aria-hidden="true"></div>
+        <div class="bt__rim" aria-hidden="true"></div>
+        <div class="bt__in">
+          <p class="bt__label"><b>05</b> On the table</p>
+          <div class="btstack" id="btStack"></div>
+        </div>
+      </article>
+
     </div>
 
-    <div class="hero__actions" data-reveal>
-      <a href="#tickets" class="btn" data-magnetic id="heroCta">Get tickets</a>
-      <a href="#speakers" class="btn btn--ghost" data-magnetic>See speakers</a>
-    </div>
-
-    <!-- Countdown -->
-    <div class="count" id="count" data-reveal>
-      <div class="count__cell"><strong id="cd-d">00</strong><small>days</small></div>
-      <div class="count__cell"><strong id="cd-h">00</strong><small>hrs</small></div>
-      <div class="count__cell"><strong id="cd-m">00</strong><small>min</small></div>
-      <div class="count__cell"><strong id="cd-s">00</strong><small>sec</small></div>
-    </div>
+    <p class="bento__hint">Move your cursor to light the stage</p>
   </div>
 
   <div class="hero__scroll" aria-hidden="true"><span>SCROLL</span><i></i></div>
@@ -120,13 +213,13 @@
     <p class="eyebrow" data-reveal><em>01</em> What is DevTalks</p>
 
     <h2 class="big" data-split id="aboutHeadline">
-      Eight people who built something real, explaining exactly how — in eighteen minutes each.
+      Three people who built something real, explaining exactly how — in twenty-five minutes each.
     </h2>
 
     <div class="about__grid">
       <p class="about__copy" data-reveal id="aboutIntro"></p>
       <div class="about__notes" data-reveal>
-        <div class="note"><b>No panels.</b><span>Single speaker, single idea, hard stop at 18 minutes.</span></div>
+        <div class="note"><b>No panels.</b><span>Single speaker, single idea, twenty-five minutes each.</span></div>
         <div class="note"><b>No sales decks.</b><span>Speakers are briefed: teach something, don't pitch something.</span></div>
         <div class="note"><b>Open to everyone.</b><span>Any college, any branch, any year. Professionals welcome too.</span></div>
       </div>
@@ -142,7 +235,7 @@
     <div class="sec__head">
       <p class="eyebrow" data-reveal><em>02</em> The line-up</p>
       <h2 class="big" data-split>Speakers</h2>
-      <p class="sec__sub" data-reveal>Tap a card for the full bio and talk description.</p>
+      <p class="sec__sub" data-reveal>Three speakers, one stage. Hover a card to bring it forward, then tap it for the full bio.</p>
     </div>
     <div class="speakers" id="speakerGrid"></div>
   </div>
@@ -200,14 +293,6 @@
       <p class="sec__sub" data-reveal>DevTalks runs on sponsor support — it's what keeps student passes at ₹199.</p>
     </div>
     <div class="sponsors" id="sponsorWall"></div>
-
-    <div class="cta" data-reveal>
-      <div>
-        <h3>Put your brand in front of 600 builders.</h3>
-        <p>Title, gold, silver and community tiers, plus booth-only options. We'll send the deck within a day.</p>
-      </div>
-      <a class="btn" id="sponsorCta" data-magnetic>Become a partner</a>
-    </div>
   </div>
 </section>
 
@@ -261,32 +346,50 @@
 </main>
 
 <!-- ══════════════ FOOTER ══════════════ -->
-<footer class="foot">
+<!-- The reveal footer: it sits behind the page and is uncovered as the
+     content scrolls off the end (js/footer-reveal.js). -->
+<footer class="foot" id="siteFoot">
+  <div class="foot__glow" aria-hidden="true"></div>
+
   <div class="wrap">
-    <div class="foot__top">
-      <div>
-        <div class="foot__mark">DEV<span>TALKS</span></div>
-        <p class="foot__by"><span id="footCollege"></span></p>
-      </div>
-      <div class="foot__cols">
-        <div>
-          <h4>Event</h4>
-          <a href="#about">About</a><a href="#speakers">Speakers</a><a href="#schedule">Schedule</a><a href="#venue">Venue</a>
-        </div>
-        <div>
-          <h4>Join</h4>
-          <a href="#tickets">Tickets</a><a id="footSponsor">Sponsor us</a><a id="footContact">Contact</a><a href="#faq">FAQ</a>
-        </div>
-        <div>
-          <h4>Follow</h4>
-          <div class="foot__socials" id="footSocials"></div>
-        </div>
-      </div>
+    <div class="foot__head">
+      <a href="#top" class="foot__mark">DEV<span>TALKS</span><b>26</b></a>
+      <p class="foot__legal">&copy; <span id="year"></span> DevTalks. All rights reserved.</p>
     </div>
+
+    <nav class="foot__cols" aria-label="Footer">
+      <div>
+        <h4>Event</h4>
+        <a href="#about">About</a>
+        <a href="#speakers">Speakers</a>
+        <a href="#schedule">Schedule</a>
+        <a href="#venue">Venue</a>
+      </div>
+      <div>
+        <h4>Attend</h4>
+        <a href="#tickets">Tickets</a>
+        <a href="#faq">FAQ</a>
+        <a id="footContact">Contact</a>
+      </div>
+      <div>
+        <h4>Partners</h4>
+        <a href="#sponsors">Sponsors</a>
+        <a id="footSponsor">Become a sponsor</a>
+      </div>
+      <div>
+        <h4>Follow</h4>
+        <div class="foot__socials" id="footSocials"></div>
+      </div>
+    </nav>
+
     <div class="foot__bar">
-      <span>&copy; <span id="year"></span> DevTalks. All rights reserved.</span>
+      <p class="foot__by"><span id="footCollege"></span></p>
+      <a href="#top" class="foot__up">Back to top</a>
     </div>
   </div>
+
+  <!-- js/main.js parallaxes .foot__huge unconditionally; leaving it in the
+       DOM and hidden keeps that from logging a missing-target warning. -->
   <div class="foot__huge" aria-hidden="true">DEVTALKS</div>
 </footer>
 
@@ -296,8 +399,21 @@
 <script src="vendor/three.min.js"></script>
 <script src="vendor/gsap.min.js"></script>
 <script src="vendor/ScrollTrigger.min.js"></script>
-<script src="js/data.js"></script>
-<script src="js/hero.js"></script>
+<script src="js/data-3.js"></script>
+<script src="js/hero-bento.js"></script>
+<script src="js/doors.js"></script>
 <script src="js/main.js"></script>
+<script src="js/parallax.js"></script>
+<script src="js/bento.js"></script>
+<!-- Paper-edition motion. Order matters: bento.js builds the topic badges,
+     register.js restructures the cards, then flow.js measures what is left.
+     js/comic-panels.js (comic-panel schedule) is unlinked in favour of the
+     vertical timeline in css/paper-hover-timeline.css — still on disk,
+     add the <script> back to restore the panels. -->
+<script src="js/doodle-art.js"></script>
+<script src="js/register.js"></script>
+<script src="js/doodle-field.js"></script>
+<script src="js/flow.js"></script>
+<script src="js/footer-reveal.js"></script>
 </body>
 </html>

@@ -1,8 +1,7 @@
 /* ============================================================
    DEVTALKS — SPEAKER HOVER-REVEAL + SCHEDULE TIMELINE
    ------------------------------------------------------------
-   Paper edition only. Loads after css/motion.css and re-treats
-   two sections without touching any other index-*.html.
+   Loads after css/motion.css and re-treats two sections.
 
      SPEAKERS   the glass-tilt slab becomes a full-bleed portrait
                 card; hovering one dims and softens its neighbours.
@@ -15,13 +14,12 @@
                 "hover and focus own their transforms cleanly from
                 here on"), so this never fights either of them.
                 The old tilt is turned off with one rule below
-                rather than by editing js/bento.js, which every
-                other index-*.html still uses as-is.
+                rather than by editing js/bento.js.
 
      SCHEDULE   the comic-panel run-of-show becomes a vertical
                 timeline: a spine with a node per row. Pairs with
                 removing the <script src="js/comic-panels.js">
-                line from index-paper.html — add it back (it is
+                line from index.html — add it back (it is
                 still on disk, untouched) to restore the panels.
    ============================================================ */
 
