@@ -2,7 +2,7 @@
    DEVTALKS — THE REEL  (paper edition only)
    ------------------------------------------------------------
    A strip of vertical 9:16 cards running continuously across
-   the page, above the FAQ.
+   the page, above the FAQ. Clicking one opens it large.
 
    EMPTY BY DESIGN
    REELS in js/data-3.js ships with six blank entries, so the
@@ -18,9 +18,19 @@
    one element: the compositor owns it and the main thread never
    sees a frame of it.
 
-   Duration scales with the number of cards, so adding a
-   seventh does not make the strip run faster — each card
-   crosses the screen at the same speed either way.
+   Only the FIRST copy is real. The duplicate is aria-hidden
+   with its buttons taken out of the tab order — focusable
+   content inside aria-hidden is the usual way a marquee breaks
+   a screen reader, and duplicated cards would otherwise be
+   announced and tabbed through twice.
+
+   CLICKING A MOVING TARGET
+   A click only fires when press and release land on the same
+   element, so a card sliding out from under the finger would
+   never register one. The strip therefore pauses on hover AND
+   holds still for the length of a press. That is the same class
+   of bug that killed the speaker-card magnify, handled up front
+   rather than after it is reported.
 
    VIDEO, WHEN IT ARRIVES
    Clips are muted, looping and inline, and an IntersectionObserver
@@ -47,32 +57,101 @@
     .replace(/&/g, '&amp;').replace(/</g, '&lt;')
     .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
-  function card(item, i) {
-    const n = String(i + 1).padStart(2, '0');
-    let media;
+  let list = [], view, stage, capEl, countEl, track, section;
+  let open = -1, lastFocus = null, opener = null;
 
+  /* ══════════════════════════════════════════════════════════
+     The strip
+     ══════════════════════════════════════════════════════════ */
+  function media(item, n, big) {
     if (item.src) {
-      media = '<video class="reel__v" muted loop playsinline preload="none"' +
-              (item.poster ? ' poster="' + esc(item.poster) + '"' : '') +
-              '><source src="' + esc(item.src) + '" type="video/mp4" /></video>';
-    } else if (item.poster) {
-      media = '<img class="reel__v" src="' + esc(item.poster) + '" alt="" loading="lazy" />';
-    } else {
-      // the empty slot — a real state, not a broken one
-      media = '<span class="reel__slot">' +
-                '<span class="reel__play">' + PLAY + '</span>' +
-                '<span class="reel__n">' + n + '</span>' +
-              '</span>';
+      return '<video class="reel__v" muted loop playsinline preload="none"' +
+             (big ? ' controls' : '') +
+             (item.poster ? ' poster="' + esc(item.poster) + '"' : '') +
+             '><source src="' + esc(item.src) + '" type="video/mp4" /></video>';
     }
+    if (item.poster) {
+      return '<img class="reel__v" src="' + esc(item.poster) + '" alt="' + esc(item.label) + '" loading="lazy" />';
+    }
+    return '<span class="reel__slot">' +
+             '<span class="reel__play">' + PLAY + '</span>' +
+             '<span class="reel__n">' + n + '</span>' +
+           '</span>';
+  }
 
-    return '<figure class="reel__card"' + (item.src ? '' : ' data-empty') + '>' +
-             '<div class="reel__frame">' + media + '</div>' +
-             (item.label ? '<figcaption class="reel__cap">' + esc(item.label) + '</figcaption>' : '') +
-           '</figure>';
+  function card(item, i, ghost) {
+    const n = String(i + 1).padStart(2, '0');
+    return '<button type="button" class="reel__card" data-reel="' + i + '"' +
+             (ghost ? ' tabindex="-1" aria-hidden="true"' : '') +
+             ' aria-label="' + esc(item.label || ('Reel ' + n)) + '">' +
+             '<span class="reel__frame">' + media(item, n, false) + '</span>' +
+             (item.label ? '<span class="reel__cap">' + esc(item.label) + '</span>' : '') +
+           '</button>';
+  }
+
+  /* ══════════════════════════════════════════════════════════
+     The viewer
+     ══════════════════════════════════════════════════════════ */
+  function show(i) {
+    if (!list.length) return;
+    open = (i + list.length) % list.length;          // wrap both ways
+    const item = list[open];
+    const n = String(open + 1).padStart(2, '0');
+
+    stage.innerHTML = '<div class="rview__frame">' + media(item, n, true) + '</div>';
+    capEl.textContent = item.label || '';
+    countEl.textContent = n + ' / ' + String(list.length).padStart(2, '0');
+
+    const v = stage.querySelector('video');
+    if (v && !REDUCED) { const p = v.play(); if (p && p.catch) p.catch(() => {}); }
+
+    if (view.getAttribute('aria-hidden') === 'true') {
+      lastFocus = opener || document.activeElement;
+      view.classList.add('is-open');
+      view.setAttribute('aria-hidden', 'false');
+      document.body.classList.add('is-locked');
+      // focus() is a no-op on a visibility:hidden element. The CSS shows the
+      // viewer on the same frame as the class (see the visibility transition
+      // in css/paper.css), but the style has to be flushed before the focus
+      // call can see it. Reading offsetHeight does that synchronously —
+      // rAF would too, except rAF is throttled in a background tab and the
+      // focus would simply never land.
+      void view.offsetHeight;
+      view.querySelector('.rview__x').focus();
+    }
+  }
+
+  function close() {
+    const v = stage.querySelector('video');
+    if (v) v.pause();
+    stage.innerHTML = '';
+    open = -1;
+    view.classList.remove('is-open');
+    view.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('is-locked');
+    if (lastFocus && lastFocus.focus) lastFocus.focus();
+    opener = null;
+  }
+
+  /* ══════════════════════════════════════════════════════════
+     Hold the strip still long enough to be clicked
+     ══════════════════════════════════════════════════════════ */
+  function holdToClick() {
+    let t = null;
+    const hold = () => { clearTimeout(t); track.classList.add('is-held'); };
+    const release = () => { clearTimeout(t); t = setTimeout(() => track.classList.remove('is-held'), 260); };
+
+    track.addEventListener('pointerdown', hold, { passive: true });
+    window.addEventListener('pointerup', release, { passive: true });
+    window.addEventListener('pointercancel', release, { passive: true });
+
+    // keyboard focus moves through the strip too; stop it under the user
+    track.addEventListener('focusin', hold);
+    track.addEventListener('focusout', release);
   }
 
   /* Videos are only worth decoding while the strip is on screen. */
-  function gate(section, track) {
+  function gate() {
     const vids = track.querySelectorAll('video');
     if (!vids.length || !('IntersectionObserver' in window)) return;
 
@@ -90,23 +169,49 @@
   }
 
   function init() {
-    const track = document.getElementById('reelTrack');
-    const section = document.querySelector('.sec--reel');
+    track   = document.getElementById('reelTrack');
+    section = document.querySelector('.sec--reel');
+    view    = document.getElementById('reelView');
+    stage   = document.getElementById('reelStage');
+    capEl   = document.getElementById('reelCap');
+    countEl = document.getElementById('reelCount');
     if (!track || !section) return;
 
-    let list = (typeof REELS !== 'undefined' && REELS.length) ? REELS.slice() : [];
+    list = (typeof REELS !== 'undefined' && REELS.length) ? REELS.slice() : [];
     while (list.length < CONFIG.minCards) list.push({ src: '', poster: '', label: '' });
 
-    const strip = list.map(card).join('');
-
-    // twice, so a -50% slide lands exactly on the seam
-    track.innerHTML = strip + strip;
-    track.setAttribute('aria-hidden', 'true');
+    // real copy, then a ghost copy that no screen reader or tab stop sees
+    track.innerHTML = list.map((it, i) => card(it, i, false)).join('') +
+                      list.map((it, i) => card(it, i, true)).join('');
     track.style.setProperty('--reel-time', (list.length * CONFIG.secondsPerCard).toFixed(1) + 's');
 
     section.classList.toggle('is-empty', list.every(r => !r.src && !r.poster));
-    gate(section, track);
+    holdToClick();
+    gate();
+
+    track.addEventListener('click', (e) => {
+      const btn = e.target.closest('.reel__card');
+      if (!btn) return;
+      // remember the card itself — on a touch tap the button may never
+      // have taken focus, so activeElement would send us back to <body>
+      opener = btn;
+      show(parseInt(btn.getAttribute('data-reel'), 10) || 0);
+    });
+
+    if (!view) return;
+    view.querySelectorAll('[data-rclose]').forEach(el => el.addEventListener('click', close));
+    view.querySelector('[data-rprev]').addEventListener('click', () => show(open - 1));
+    view.querySelector('[data-rnext]').addEventListener('click', () => show(open + 1));
+
+    document.addEventListener('keydown', (e) => {
+      if (view.getAttribute('aria-hidden') === 'true') return;
+      if (e.key === 'Escape')     { e.preventDefault(); close(); }
+      if (e.key === 'ArrowLeft')  { e.preventDefault(); show(open - 1); }
+      if (e.key === 'ArrowRight') { e.preventDefault(); show(open + 1); }
+    });
   }
 
   document.addEventListener('devtalks:content', () => setTimeout(init, 0), { once: true });
+
+  window.DevTalksReel = { open: show, close: close };
 })();

@@ -926,13 +926,31 @@ main{
   .reel:hover .reel__track{ animation-play-state:paused; }
 }
 
+/* A click needs press and release on the SAME element, so the strip holds
+   still for the length of a press. Without this a tap on a phone — where
+   there is no hover to pause it — lands on whichever card slid into place
+   next, or on nothing at all. */
+.reel__track.is-held{ animation-play-state:paused; }
+
 /* ---- a card ---- */
 .reel__card{
   flex:none;
-  margin:0;
+  margin:0; padding:0;
   width:clamp(168px,20vw,248px);
+  display:block;
+  text-align:left;
+  background:none; border:0;
+  cursor:pointer;
+  font:inherit; color:inherit;
+  transition:transform .35s cubic-bezier(.16,1,.3,1);
 }
+@media (hover:hover) and (pointer:fine){
+  .reel__card:hover{ transform:translateY(-6px); }
+}
+.reel__card:focus-visible{ outline-offset:6px; }
+
 .reel__frame{
+  display:block;
   position:relative;
   aspect-ratio:9/16;
   overflow:hidden;
@@ -976,6 +994,7 @@ main{
 }
 
 .reel__cap{
+  display:block;
   margin-top:.8em;
   font-size:.82rem;
   color:var(--rule);
@@ -994,4 +1013,114 @@ main{
   }
   .reel__track{ animation:none; will-change:auto; }
   .reel__card{ scroll-snap-align:center; }
+}
+
+/* ============================================================
+   THE REEL VIEWER — a card opened large
+   ------------------------------------------------------------
+   Same idiom as the speaker modal: scrim, card, close, Escape.
+   The frame keeps its 9:16 and is bounded by viewport HEIGHT
+   rather than width, because a vertical card sized off the
+   width would run off the bottom of a laptop screen.
+   ============================================================ */
+.rview{
+  position:fixed; inset:0; z-index:9300;
+  display:flex; align-items:center; justify-content:center;
+  padding:clamp(16px,3vw,32px);
+  visibility:hidden; opacity:0;
+  /* visibility is a discrete property: transitioned, it flips at the
+     halfway point, so the viewer is still hidden when the open handler
+     tries to move focus into it. Delay the HIDE until the fade is done
+     and let the SHOW happen on the same frame as the class. */
+  transition:opacity .3s ease, visibility 0s linear .3s;
+}
+.rview.is-open{
+  visibility:visible; opacity:1;
+  transition:opacity .3s ease, visibility 0s linear 0s;
+}
+
+.rview__scrim{
+  position:absolute; inset:0;
+  background:rgba(11,11,11,.74);
+}
+
+.rview__inner{
+  position:relative; z-index:1;
+  display:flex; align-items:center; gap:clamp(10px,2vw,22px);
+  flex-wrap:wrap; justify-content:center;
+  transform:translateY(16px) scale(.97);
+  transition:transform .4s cubic-bezier(.16,1,.3,1);
+}
+.rview.is-open .rview__inner{ transform:none; }
+
+.rview__frame{
+  position:relative;
+  aspect-ratio:9/16;
+  height:min(76svh, 620px);
+  overflow:hidden;
+  border:3px solid var(--black);
+  border-radius:18px;
+  background:var(--paper-2);
+  box-shadow:10px 10px 0 var(--black);
+}
+.rview__frame .reel__v{
+  width:100%; height:100%;
+  object-fit:cover;
+  display:block;
+}
+.rview__frame .reel__play{ width:clamp(52px,7vw,72px); }
+.rview__frame .reel__n{ font-size:.72rem; }
+
+/* ---- the controls ---- */
+.rview__x,
+.rview__nav{
+  flex:none;
+  display:grid; place-content:center;
+  width:46px; height:46px;
+  border:2px solid var(--black);
+  border-radius:12px;
+  background:var(--paper-2);
+  color:var(--black);
+  font-size:1.5rem; line-height:1;
+  cursor:pointer;
+  box-shadow:3px 3px 0 var(--black);
+  transition:background .2s ease, transform .2s ease;
+}
+.rview__x:hover,
+.rview__nav:hover{ background:var(--orange); }
+.rview__x:active,
+.rview__nav:active{ transform:translate(2px,2px); box-shadow:1px 1px 0 var(--black); }
+
+.rview__x{
+  position:absolute; top:-14px; right:-14px;
+  z-index:3;
+  border-radius:50%;
+  font-size:1.4rem;
+}
+
+.rview__meta{
+  flex-basis:100%;
+  display:flex; align-items:center; justify-content:center; gap:14px;
+  margin:6px 0 0;
+  font-size:.82rem;
+  color:var(--grey);
+}
+.rview__meta b{
+  font-family:var(--mono);
+  font-size:.7rem; font-weight:600; letter-spacing:.14em;
+  color:var(--paper);
+}
+
+/* On a phone the arrows go under the card — at 46px each they would
+   otherwise eat a third of the frame's width. */
+@media (max-width:640px){
+  .rview__inner{ gap:12px; }
+  .rview__frame{ order:-1; flex-basis:100%; height:min(66svh,520px); margin:0 auto; }
+  .rview__x{ top:-12px; right:8px; }
+  .rview__meta{ order:5; }
+}
+
+@media (prefers-reduced-motion:reduce){
+  .rview, .rview__inner{ transition:none; }
+  .rview__inner{ transform:none; }
 }

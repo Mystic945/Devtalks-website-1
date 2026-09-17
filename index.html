@@ -69,6 +69,7 @@
     <a href="#schedule" data-nav>Schedule</a>
     <a href="#tickets"  data-nav>Tickets</a>
     <a href="#sponsors" data-nav>Sponsors</a>
+    <a href="#reel"     data-nav>Reel</a>
     <a href="#faq"      data-nav>FAQ</a>
   </nav>
 
@@ -88,7 +89,8 @@
     <a href="#tickets"><em>04</em>Tickets</a>
     <a href="#sponsors"><em>05</em>Sponsors</a>
     <a href="#venue"><em>06</em>Venue</a>
-    <a href="#faq"><em>07</em>FAQ</a>
+    <a href="#reel"><em>07</em>Reel</a>
+    <a href="#faq"><em>08</em>FAQ</a>
   </nav>
   <div class="menu__foot">
     <a href="#tickets" class="btn btn--block">Get tickets</a>
@@ -256,6 +258,19 @@
       <p class="modal__bio" id="modalBio"></p>
       <a class="modal__link" id="modalLink" target="_blank" rel="noopener">More about this speaker &rarr;</a>
     </div>
+  </div>
+</div>
+
+<!-- Reel viewer — opened by js/reel.js when a card is clicked. Same
+     idiom as the speaker modal above: scrim, card, close, Escape. -->
+<div class="rview" id="reelView" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Reel">
+  <div class="rview__scrim" data-rclose></div>
+  <div class="rview__inner">
+    <button class="rview__x" data-rclose aria-label="Close">&times;</button>
+    <button class="rview__nav rview__nav--prev" data-rprev aria-label="Previous reel">&#8249;</button>
+    <div class="rview__stage" id="reelStage"></div>
+    <button class="rview__nav rview__nav--next" data-rnext aria-label="Next reel">&#8250;</button>
+    <p class="rview__meta"><span id="reelCap"></span><b id="reelCount"></b></p>
   </div>
 </div>
 
