@@ -170,39 +170,28 @@ const SCHEDULE = [
   { time: "16:00", title: "Doors close",                    who: "",                           kind: "break" }
 ];
 
-/* ---------- TICKETS ---------- */
-const TICKETS = [
-  {
-    name:     "Student",
-    price:    "₹199",
-    strike:   "₹349",
-    note:     "Valid college ID required at entry",
-    featured: false,
-    perks:    ["Full-day access", "Lunch & chai", "Event lanyard", "Talk recordings"],
-    cta:      "Get student pass",
-    url:      ""
-  },
-  {
-    name:     "Early Bird",
-    price:    "₹399",
-    strike:   "₹599",
-    note:     "First 150 passes only",
-    featured: true,
-    perks:    ["Everything in Student", "Reserved front rows", "DevTalks tee", "Speaker meet & greet"],
-    cta:      "Grab early bird",
-    url:      ""
-  },
-  {
-    name:     "Professional",
-    price:    "₹899",
-    strike:   "",
-    note:     "For working professionals & alumni",
-    featured: false,
-    perks:    ["Everything in Early Bird", "Networking lunch table", "Sponsor floor access", "Printed programme"],
-    cta:      "Book professional",
-    url:      ""
-  }
-];
+/* ---------- THE PASS ----------
+   DevTalks is free. One pass, rendered as the ticket in the Tickets
+   section by js/ticket.js. Date, time and venue come from SITE above,
+   so they only ever need changing in one place.
+
+   url: where "Get your free pass" goes. Leave empty to use
+   SITE.registerUrl — paste your Google Form / Luma / Konfhub link there.
+------------------------------------------------------------------ */
+const PASS = {
+  tag:       "Free entry",
+  kind:      "General pass",
+  price:     "Free",
+  priceNote: "No charge. Just register.",
+  chip:      "600 seats · registration required",
+  cta:       "Get your free pass",
+  fine:      "Free for everyone. Seats are capped by the hall.",
+  url:       ""
+};
+
+/* The old paid tiers. js/main.js still renders this list into #tierGrid,
+   so it stays defined — empty — rather than being deleted. */
+const TICKETS = [];
 
 /* ---------- SPONSORS ---------- */
 const SPONSORS = [
@@ -251,8 +240,8 @@ const FAQS = [
     a: "Because twenty-five minutes plus a real Q&A beats eight rushed slots. Fewer speakers means each one can actually go deep, and you get to ask them something afterwards."
   },
   {
-    q: "Is the pass transferable or refundable?",
-    a: "Passes are non-refundable but transferable. Mail us at least 48 hours before the event with the new attendee's name and we'll update the list."
+    q: "Can I transfer my pass?",
+    a: "Yes. Mail us at least 48 hours before the event with the new attendee's name and we'll update the list."
   },
   {
     q: "Will the talks be recorded?",

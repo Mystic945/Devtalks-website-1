@@ -292,10 +292,14 @@
     <div class="sec__head">
       <p class="eyebrow" data-reveal><em>04</em> Registration</p>
       <h2 class="big" data-split>Tickets</h2>
-      <p class="sec__sub" data-reveal>One pass, full day, lunch included. Seats are capped by the hall.</p>
+      <p class="sec__sub" data-reveal>Free to attend. One pass, full day, lunch included. Seats are capped by the hall.</p>
     </div>
-    <div class="tiers" id="tierGrid"></div>
-    <p class="tickets__fine" data-reveal>Passes are non-refundable but transferable. Student passes require a valid college ID at the entry desk.</p>
+
+    <!-- The pass, rendered from PASS + SITE in js/data-3.js by js/ticket.js -->
+    <div class="pass" id="ticket" data-reveal></div>
+
+    <!-- js/main.js still writes the (now empty) TICKETS list here. -->
+    <div class="tiers" id="tierGrid" hidden></div>
   </div>
 </section>
 
@@ -305,7 +309,7 @@
     <div class="sec__head">
       <p class="eyebrow" data-reveal><em>05</em> Backed by</p>
       <h2 class="big" data-split>Partners</h2>
-      <p class="sec__sub" data-reveal>DevTalks runs on sponsor support — it's what keeps student passes at ₹199.</p>
+      <p class="sec__sub" data-reveal>DevTalks runs on sponsor support — it's what keeps the day free to attend.</p>
     </div>
     <div class="sponsors" id="sponsorWall"></div>
   </div>
@@ -435,6 +439,7 @@
 <script src="js/data-3.js"></script>
 <script src="js/hero-bento.js"></script>
 <script src="js/doors.js"></script>
+<script src="js/ticket.js"></script>
 <script src="js/main.js"></script>
 <script src="js/parallax.js"></script>
 <script src="js/bento.js"></script>

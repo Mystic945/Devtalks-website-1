@@ -1124,3 +1124,222 @@ main{
   .rview, .rview__inner{ transition:none; }
   .rview__inner{ transform:none; }
 }
+
+/* ============================================================
+   THE TICKET — one free pass, as an admission stub
+   ------------------------------------------------------------
+   Rendered by js/ticket.js from PASS + SITE. Black stock with
+   the spot colour for the stub, the same pairing the footer
+   uses, so the two dark surfaces on the page read as a set.
+
+   Colour checks on black: paper 17:1, grey 7.3:1, orange 6.3:1
+   — orange is fine as TYPE here, which it never is on paper.
+   On the orange stub, black sits at 6.3:1.
+
+   The two notches are circles painted in the page's paper
+   colour at the perforation. A mask would cut real holes, but a
+   mask also clips the box-shadow, and the glow is half the look.
+   ============================================================ */
+.pass{ --stub:104px; --notch:30px; --r:18px; }
+
+.ticket{
+  position:relative;
+  display:grid;
+  grid-template-columns:var(--stub) 1fr;
+  max-width:1000px;
+  margin:0 auto;
+  border-radius:var(--r);
+  background:var(--black);
+  color:var(--paper);
+  box-shadow:
+    0 34px 80px -28px rgba(255,90,31,.62),
+    0 0 110px -40px rgba(255,90,31,.45);
+}
+
+/* the punched notches at the tear line */
+.ticket::before,
+.ticket::after{
+  content:'';
+  position:absolute;
+  left:calc(var(--stub) - var(--notch) / 2);
+  width:var(--notch); height:var(--notch);
+  border-radius:50%;
+  background:var(--paper);
+  z-index:2;
+}
+.ticket::before{ top:calc(var(--notch) / -2); }
+.ticket::after { bottom:calc(var(--notch) / -2); }
+
+/* ---- the stub ---- */
+.ticket__stub{
+  display:flex;
+  flex-direction:column-reverse;       /* the pass sits low, the price high */
+  align-items:center;
+  justify-content:space-between;
+  padding:28px 0;
+  background:var(--orange);
+  color:var(--black);
+  border-radius:var(--r) 0 0 var(--r);
+  border-right:2px dashed rgba(11,11,11,.55);   /* the perforation */
+}
+.stub__pass,
+.stub__price{
+  writing-mode:vertical-rl;
+  transform:rotate(180deg);            /* read bottom-to-top, like a real stub */
+}
+.stub__pass small,
+.stub__pass b{ display:block; }
+.stub__pass small{
+  font-size:.62rem; font-weight:600;
+  letter-spacing:.24em; text-transform:uppercase;
+  opacity:.72;
+}
+.stub__pass b{
+  font-size:1rem; font-weight:800;
+  letter-spacing:.06em; text-transform:uppercase;
+  margin-left:.35em;
+}
+.stub__price{
+  font-size:1.05rem; font-weight:800;
+  letter-spacing:.14em; text-transform:uppercase;
+}
+
+/* ---- the pass ---- */
+.ticket__body{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  border-radius:0 var(--r) var(--r) 0;
+  overflow:hidden;
+  /* the fine diagonal ruling of printed card stock */
+  background:
+    repeating-linear-gradient(135deg,
+      rgba(243,238,228,.028) 0 1px, transparent 1px 7px),
+    radial-gradient(120% 120% at 100% 0%, rgba(255,90,31,.10), transparent 60%);
+}
+
+.ticket__cell{ padding:clamp(24px,3.6vw,46px); }
+.ticket__cell--price{ border-right:1px dashed rgba(243,238,228,.18); }
+
+.ticket__label{
+  margin:0 0 1em;
+  font-size:.72rem; font-weight:600;
+  letter-spacing:.24em; text-transform:uppercase;
+  color:var(--grey);
+}
+.ticket__price{
+  margin:0;
+  font-family:var(--display);
+  font-size:clamp(3.2rem,7vw,5rem);
+  line-height:.92;
+  text-transform:uppercase;
+  color:var(--paper);
+}
+.ticket__note{
+  margin:.7em 0 1.4em;
+  font-size:.88rem;
+  color:var(--grey);
+}
+.ticket__chip{
+  display:inline-flex; align-items:center; gap:8px;
+  margin:0;
+  padding:7px 13px;
+  border:1.5px solid rgba(255,90,31,.55);
+  border-radius:8px;
+  background:rgba(255,90,31,.08);
+  font-size:.8rem; font-weight:600;
+  color:var(--orange);
+}
+.ticket__chip svg{ width:15px; height:15px; flex:none; }
+
+.ticket__title{
+  margin:0 0 .8em;
+  font-family:var(--display);
+  font-weight:400;
+  font-size:clamp(1.9rem,3.6vw,2.8rem);
+  line-height:1;
+  text-transform:uppercase;
+  color:var(--paper);
+}
+
+/* The site's ink button assumes it sits on paper: a black rule and a black
+   drop. On black stock both vanish and the hover fills black-on-black. So on
+   the ticket it glows instead, and fills paper. */
+.ticket__btn{
+  --bg:var(--orange); --fg:var(--black);
+  border-color:var(--orange);
+  text-transform:uppercase;
+  letter-spacing:.06em;
+  box-shadow:0 12px 30px -10px rgba(255,90,31,.8);
+}
+.ticket__btn::before{ background:var(--paper); }
+.ticket__btn:hover{ color:var(--black); }
+.ticket__btn:active{ box-shadow:0 6px 16px -8px rgba(255,90,31,.8); }
+
+.ticket__fine{
+  margin:1.3em 0 0;
+  font-size:.72rem;
+  letter-spacing:.05em; text-transform:uppercase;
+  color:var(--grey);
+}
+
+/* ---- when / time / where ---- */
+.ticket__meta{
+  grid-column:1 / -1;
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  margin:0;
+  border-top:1px dashed rgba(243,238,228,.18);
+}
+.ticket__meta > div{
+  padding:18px 14px;
+  text-align:center;
+}
+.ticket__meta > div + div{ border-left:1px solid rgba(243,238,228,.10); }
+.ticket__meta dt{
+  position:absolute; width:1px; height:1px;
+  overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap;
+}
+.ticket__meta dd{
+  margin:0;
+  font-size:.76rem; font-weight:700;
+  letter-spacing:.14em; text-transform:uppercase;
+  color:var(--paper);
+}
+
+/* ---- phones: the stub becomes a band across the top ---- */
+@media (max-width:760px){
+  .pass{ --stub-h:68px; }
+
+  .ticket{ grid-template-columns:1fr; }
+
+  .ticket::before,
+  .ticket::after{ top:calc(var(--stub-h) - var(--notch) / 2); bottom:auto; }
+  .ticket::before{ left:calc(var(--notch) / -2); }
+  .ticket::after { left:auto; right:calc(var(--notch) / -2); }
+
+  .ticket__stub{
+    height:var(--stub-h);
+    flex-direction:row;
+    padding:0 26px;
+    border-right:0;
+    border-bottom:2px dashed rgba(11,11,11,.55);
+    border-radius:var(--r) var(--r) 0 0;
+  }
+  .stub__pass,
+  .stub__price{ writing-mode:horizontal-tb; transform:none; }
+  .stub__pass b{ margin-left:0; }
+
+  .ticket__body{
+    grid-template-columns:1fr;
+    border-radius:0 0 var(--r) var(--r);
+  }
+  .ticket__cell--price{
+    border-right:0;
+    border-bottom:1px dashed rgba(243,238,228,.18);
+  }
+  .ticket__meta{ grid-template-columns:1fr; }
+  .ticket__meta > div + div{
+    border-left:0;
+    border-top:1px solid rgba(243,238,228,.10);
+  }
+}
