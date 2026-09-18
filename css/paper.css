@@ -126,10 +126,33 @@ a{ text-underline-offset:.22em; text-decoration-thickness:1.5px; }
 /* ============================================================
    NAV
    ============================================================ */
+/* Stuck nav goes to black glass rather than paper — it bookends the black
+   footer and gives the one piece of chrome that's on screen for the whole
+   visit a stronger ink presence. Padding matches the resting .nav exactly
+   (16px, not the old 11px) so nothing here ever animates a layout property
+   — background/shadow/backdrop-filter are the only things transitioning,
+   all compositor-only. */
 .nav.is-stuck{
-  background:rgba(243,238,228,.88);
-  box-shadow:0 2px 0 var(--black);
+  background:rgba(11,11,11,.86);
+  -webkit-backdrop-filter:blur(14px);
+  backdrop-filter:blur(14px);
+  box-shadow:0 1px 0 rgba(243,238,228,.14);
+  padding-top:16px;
+  padding-bottom:16px;
 }
+.nav.is-stuck .nav__logo{ color:var(--paper); }
+.nav.is-stuck .nav__logo span{ color:var(--orange); }
+.nav.is-stuck .nav__logo b{ color:var(--grey); }
+.nav.is-stuck .nav__links a{ color:var(--grey); }
+.nav.is-stuck .nav__links a:hover,
+.nav.is-stuck .nav__links a.is-active{ color:var(--paper); }
+.nav.is-stuck .burger i{ background:var(--paper); }
+
+.nav__logo,
+.nav__logo span,
+.nav__logo b{ transition:color .3s ease; }
+.burger i{ transition:transform .4s var(--ease), opacity .3s, background-color .3s ease; }
+
 .nav__logo span{ color:var(--spot-ink); }
 .nav__logo b{ color:var(--mute-2); }
 .nav__links a{ color:var(--rule); }
