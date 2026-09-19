@@ -133,9 +133,11 @@ a{ text-underline-offset:.22em; text-decoration-thickness:1.5px; }
    — background/shadow/backdrop-filter are the only things transitioning,
    all compositor-only. */
 .nav.is-stuck{
-  background:rgba(11,11,11,.86);
-  -webkit-backdrop-filter:blur(14px);
-  backdrop-filter:blur(14px);
+  /* Near-opaque instead of frosted: a fixed bar with backdrop-filter has to
+     re-blur whatever slides under it on every scrolled frame. */
+  background:rgba(11,11,11,.95);
+  -webkit-backdrop-filter:none;
+  backdrop-filter:none;
   box-shadow:0 1px 0 rgba(243,238,228,.14);
   padding-top:16px;
   padding-bottom:16px;

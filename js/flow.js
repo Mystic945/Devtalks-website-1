@@ -1,17 +1,21 @@
 /* ============================================================
    DEVTALKS — SCROLL FLOW  (paper edition only)
    ------------------------------------------------------------
-   Three things, all driven by one rAF loop:
+   Two things, both driven by one rAF loop that only runs while the
+   page is moving:
 
-   1. SMOOTHED SCROLL
-      A wheel tick sets a target; the page eases toward it. This
-      smooths the NATIVE scroll position rather than hijacking it
-      with a translated wrapper — window.scrollY stays the real
-      one, so the fixed nav, ScrollTrigger, the spotlight grid
-      and anchor links all keep working exactly as they did.
-      Touch keeps its own native momentum and is left alone.
+   NATIVE SCROLL
+      There used to be a third job here: a wheel handler that took
+      over scrolling and eased the page toward a target. It is
+      gone. It had to call preventDefault on every wheel tick, which
+      pulls scrolling off the browser's compositor thread and onto
+      the main thread, and its easing meant the page trailed the
+      wheel by close to half a second. Scrolling is now the
+      browser's own, so it answers immediately and stays smooth
+      even when the main thread is busy. Anchor links still glide,
+      using the browser's native smooth scroll.
 
-   2. REGISTRATION
+   1. REGISTRATION
       A card entering the viewport arrives slightly out of
       register — offset, soft, a touch small — and settles as it
       reaches reading height. It is continuous, tied to scroll
@@ -19,7 +23,7 @@
       reference feel like one moving sheet instead of a stack of
       separate reveals.
 
-   3. PRESS DRIFT
+   2. PRESS DRIFT
       Scroll velocity leans the speaker row a fraction of a
       degree. It is well under the threshold where it reads as a
       skew; you only notice it stop.
@@ -34,9 +38,6 @@
   'use strict';
 
   const CONFIG = {
-    ease:      0.105,   // how fast the page catches its scroll target
-    wheel:      1.0,    // multiplier on a wheel tick
-    settle:     0.35,   // px below which the smoother hands back to the browser
     enterFrom:  0.86,   // viewport fraction where registration starts
     enterTo:    0.52,   // ...and where the card is fully in register
     rise:        54,    // px a card travels into register
@@ -50,36 +51,10 @@
   const FINE    = window.matchMedia('(hover:hover) and (pointer:fine)').matches;
 
   let cards = [], row = null;
-  let target = 0, current = 0, vel = 0, lean = 0;
-  let raf = null, smoothing = false, locked = false;
+  let current = 0, vel = 0, lean = 0;
+  let raf = null;
 
   const clamp = (v, a, b) => v < a ? a : v > b ? b : v;
-
-  /* ══════════════════════════════════════════════════════════
-     1 · smoothed scroll
-     ══════════════════════════════════════════════════════════ */
-  function maxScroll() {
-    return Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
-  }
-
-  function onWheel(e) {
-    // Let the browser own anything it handles better: pinch-zoom, a
-    // scrollable overlay, a locked body.
-    if (e.ctrlKey || locked) return;
-    if (e.target.closest && e.target.closest('.modal__card, .menu')) return;
-
-    e.preventDefault();
-    if (!smoothing) { current = window.scrollY; smoothing = true; }
-    target = clamp(target + e.deltaY * CONFIG.wheel, 0, maxScroll());
-    kick();
-  }
-
-  /* Anchor links and any programmatic jump have to re-seed the smoother,
-     or the next wheel tick yanks the page back to where it was. */
-  function resync() {
-    if (raf) return;
-    target = current = window.scrollY;
-  }
 
   /* ══════════════════════════════════════════════════════════
      2 + 3 · registration and press drift
@@ -174,25 +149,14 @@
   function frame() {
     raf = requestAnimationFrame(frame);
 
-    if (smoothing) {
-      const prev = current;
-      current += (target - current) * CONFIG.ease;
-      if (Math.abs(target - current) < CONFIG.settle) {
-        current = target;
-        smoothing = false;
-      }
-      window.scrollTo(0, current);
-      vel = current - prev;
-    } else {
-      const now = window.scrollY;
-      vel = now - current;
-      current = target = now;
-    }
+    const now = window.scrollY;
+    vel = now - current;
+    current = now;
 
     register();
 
     // Idle: the page is still and nothing is mid-flight.
-    if (!smoothing && Math.abs(vel) < 0.2 && Math.abs(lean) < 0.02) {
+    if (Math.abs(vel) < 0.2 && Math.abs(lean) < 0.02) {
       const settled = cards.every(c => c.k <= 0.001 || c.k === 1);
       if (settled) { cancelAnimationFrame(raf); raf = null; }
     }
@@ -214,10 +178,11 @@
     }
 
     if (FINE) {
-      // Our own smoothing replaces the browser's, so turn its version off —
-      // two easings on one scroll position fight and stutter.
+      // Wheel scrolling is the browser's own — see the note at the top.
+      // Anchor links glide with the browser's native smooth scroll, which
+      // runs on the compositor; programmatic scrolls stay instant so
+      // ScrollTrigger can measure the page.
       document.documentElement.style.scrollBehavior = 'auto';
-      window.addEventListener('wheel', onWheel, { passive: false });
 
       document.addEventListener('click', (e) => {
         const a = e.target.closest && e.target.closest('a[href^="#"]');
@@ -227,14 +192,12 @@
         const el = document.querySelector(id);
         if (!el) return;
         e.preventDefault();
-        if (!smoothing) { current = window.scrollY; smoothing = true; }
-        target = clamp(window.scrollY + el.getBoundingClientRect().top, 0, maxScroll());
-        kick();
+        window.scrollTo({ top: window.scrollY + el.getBoundingClientRect().top, left: 0, behavior: 'smooth' });
       });
     }
 
-    window.addEventListener('scroll', () => { if (!smoothing) resync(); kick(); }, { passive: true });
-    window.addEventListener('resize', () => { remeasure(); resync(); kick(); }, { passive: true });
+    window.addEventListener('scroll', kick, { passive: true });
+    window.addEventListener('resize', () => { remeasure(); current = window.scrollY; kick(); }, { passive: true });
     window.addEventListener('load', () => { remeasure(); kick(); });
 
     if ('ResizeObserver' in window) {
@@ -244,21 +207,10 @@
         t = setTimeout(() => { remeasure(); kick(); }, 80);
       }).observe(document.body);
     }
-    window.addEventListener('keydown', resync);
-
-    // The mobile menu and the speaker modal lock the body; the smoother
-    // must not fight a locked page.
-    const body = document.body;
-    if ('MutationObserver' in window) {
-      new MutationObserver(() => {
-        const now = body.classList.contains('is-locked');
-        if (now !== locked) { locked = now; resync(); }
-      }).observe(body, { attributes: true, attributeFilter: ['class'] });
-    }
 
     document.addEventListener('visibilitychange', () => {
       if (document.hidden) { cancelAnimationFrame(raf); raf = null; }
-      else { resync(); kick(); }
+      else { current = window.scrollY; kick(); }
     });
 
     kick();

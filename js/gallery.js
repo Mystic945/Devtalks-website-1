@@ -1,28 +1,27 @@
 /* ============================================================
-   DEVTALKS — THE GALLERY  (3D unfurling wall)
+   DEVTALKS — THE GALLERY  (unfurling photo wall)
    ------------------------------------------------------------
-   A black banner pins to the screen and opens from a rounded
-   frame to full-bleed. A wall of photos in four columns swings
-   out of deep 3D and settles as you scroll, the columns sliding
+   A panel pins to the screen and opens from a rounded frame to
+   full-bleed. A wall of photos in four columns zooms up out of
+   the distance and settles as you scroll, the columns sliding
    past each other at different speeds.
 
    One scroll position drives all of it. Progress p runs 0 -> 1
    over the length of the track:
 
-     0    -> .15   the banner opens (clip-path, not width/height,
+     0    -> .15   the panel opens (clip-path, not width/height,
                    so the photos never reflow)
-     .15  -> 1     the wall unfurls: rotateX 25 -> 4, rotateY -45 -> -8,
-                   rotateZ 15 -> 2, translateZ -800 -> 0, and each
-                   column's own vertical drift
+     .15  -> 1     the wall zooms from about 0.56x to 1x, and each
+                   column drifts on its own vertical path
+
+   The wall used to swing out of a tilted 3D pose as well; that is
+   gone, and with it the perspective context and the preserve-3d
+   layers, which were the expensive part. The zoom is the same one
+   the perspective produced, worked out as a plain scale.
 
    The wall is dealt into four columns from GALLERY in
    js/data-3.js and each column is printed twice, so it is long
    enough to travel. The second copy is aria-hidden.
-
-   The transform is written as one string, in the order
-   translateZ, rotateX, rotateY, rotateZ. Rotations in 3D do not
-   commute, so letting GSAP assemble them in its own order would
-   swing the wall on a different path.
 
    Reduced motion, or no GSAP: nothing here runs and css/gallery.css
    shows the finished wall as a single static screen.
@@ -33,7 +32,8 @@
 
   const CONFIG = {
     unfurl: 0.15,     // share of the scroll spent opening the banner
-    scrub:  0.6,      // seconds of smoothing between scroll and motion
+    scrub:  0.12,     // seconds of smoothing between scroll and motion —
+                      // kept short: any more and the wall trails the page
     radius: 48        // banner corner radius, px, while it is a frame
   };
 
@@ -107,12 +107,13 @@
         'px round ' + (CONFIG.radius * k).toFixed(1) + 'px)';
     if (clip !== last.clip) { banner.style.clipPath = clip; last.clip = clip; }
 
-    // -- the wall --
+    // -- the wall zooms up out of the distance --
+    // Pushing a flat wall back by z under a 1000px perspective scales it by
+    // 1000 / (1000 - z). Working that out here gives the same zoom, from
+    // z = -800 (about 0.56x) to z = 0 (1x), without a 3D context.
     const m = seg(p, CONFIG.unfurl, 1);
-    const t = 'translateZ(' + lerp(-800, 0, m).toFixed(1) + 'px) ' +
-              'rotateX(' + lerp(25, 4, m).toFixed(2) + 'deg) ' +
-              'rotateY(' + lerp(-45, -8, m).toFixed(2) + 'deg) ' +
-              'rotateZ(' + lerp(15, 2, m).toFixed(2) + 'deg)';
+    const s = 1000 / (1000 - lerp(-800, 0, m));
+    const t = m >= 1 ? 'none' : 'scale(' + s.toFixed(4) + ')';
     if (t !== last.matrix) { matrix.style.transform = t; last.matrix = t; }
 
     // -- each column's drift, as a percentage of its own height --

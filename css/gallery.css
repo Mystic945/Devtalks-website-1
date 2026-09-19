@@ -1,11 +1,17 @@
 /* ============================================================
-   DEVTALKS — THE GALLERY  (3D unfurling wall)
+   DEVTALKS — THE GALLERY  (unfurling photo wall)
    ------------------------------------------------------------
-   Sits under the reel. A black banner pins to the screen, opens
-   from a rounded frame to full-bleed, then a wall of photos in
-   four columns swings out of deep 3D and settles as you scroll.
+   Sits under the reel. A recessed paper panel pins to the screen,
+   opens from a rounded frame to full-bleed, and a wall of photos
+   in four columns zooms up out of the distance and settles as you
+   scroll, the columns sliding past each other at different speeds.
    js/gallery.js writes every scroll-driven value; this file is
    the finished picture.
+
+   It is printed in the same inks as the rest of the page: paper
+   ground, every photo a comic panel with a black rule and a flat
+   drop, orange on hover. To run it on a black ground instead,
+   change --gal-bg below (and the border colour of .gal__card).
 
    Default state = finished state. With no script (or reduced
    motion) the section is one static screen showing the wall as
@@ -13,21 +19,26 @@
    .is-scrubbed, which is what lengthens the track and hands the
    motion over to scroll.
 
-   Only transform, opacity and clip-path move. will-change is
-   held only while the section is on screen (.is-live).
+   Flat on purpose: only transform, opacity and clip-path move,
+   and there is no 3D context, so every layer here stays a plain
+   2D compositor layer. will-change is held only while the
+   section is on screen (.is-live).
    ============================================================ */
 
 .sec--gallery{ padding-bottom:0; }
 .sec--gallery .sec__head{ margin-bottom:clamp(26px,4vw,44px); }
+.sec--gallery + .sec{ border-top:0; }
 
 /* ---- the scroll track ----
    Tall enough to scrub through. --gal-len is how many screens of scroll
    the unfurl takes; the stage itself is one screen of that. */
 .gal{
   --gal-len:6;
+  --gal-bg:var(--paper-3);
   position:relative;
   height:100vh;
   height:100svh;
+  border-bottom:2px solid var(--black);
 }
 .gal.is-scrubbed{
   height:calc(var(--gal-len) * 100vh);
@@ -43,27 +54,25 @@
   overflow:hidden;
 }
 
-/* The black banner. js/gallery.js animates its clip-path from an inset,
-   rounded frame to none, so the photos inside never resize or reflow. */
+/* The panel. js/gallery.js animates its clip-path from an inset, rounded
+   frame to none, so the photos inside never resize or reflow. */
 .gal__banner{
   position:relative;
   width:100%;
   max-width:1920px;
   height:100%;
-  background:var(--black);
+  background:var(--gal-bg);
   overflow:hidden;
   isolation:isolate;
 }
 
-/* One shared vanishing point for the whole wall. */
 .gal__scene{
   position:absolute; inset:0;
   display:flex; align-items:center; justify-content:center;
-  perspective:1000px;
   pointer-events:none;
 }
 
-/* The wall. Finished pose: the values js/gallery.js ends on. */
+/* The wall. Finished pose: full size, straight on. */
 .gal__matrix{
   flex:none;
   display:flex; align-items:center; justify-content:center;
@@ -71,9 +80,6 @@
   width:120vw;
   height:150vh;
   transform-origin:50% 50%;
-  transform-style:preserve-3d;
-  transform:translateZ(0) rotateX(4deg) rotateY(-8deg) rotateZ(2deg);
-  backface-visibility:hidden;
 }
 @media (min-width:768px){ .gal__matrix{ gap:24px; } }
 
@@ -82,8 +88,8 @@
   min-width:200px;
   display:flex; flex-direction:column;
   gap:16px;
+  padding:0 6px 6px 0;           /* room for each card's flat drop */
   pointer-events:auto;
-  backface-visibility:hidden;
 }
 @media (min-width:768px){ .gal__col{ gap:24px; } }
 
@@ -96,29 +102,36 @@
 .gal.is-live .gal__matrix,
 .gal.is-live .gal__col{ will-change:transform; }
 
-/* ---- a photo ---- */
+/* ---- a photo: a panel with a black rule and a flat drop ---- */
 .gal__card{
   position:relative;
   flex:none;
   width:100%;
   height:200px;
-  background:#111;
-  backface-visibility:hidden;
-  transition:transform .3s ease;
+  overflow:hidden;
+  background:var(--paper-2);
+  border:2px solid var(--black);
+  border-radius:13px;
+  box-shadow:2px 2px 0 var(--black);
+  transition:transform .3s var(--ease), box-shadow .3s var(--ease);
 }
-@media (min-width:640px){ .gal__card{ height:300px; } }
-@media (min-width:768px){ .gal__card{ height:400px; } }
+@media (min-width:640px){
+  .gal__card{ height:300px; border-width:3px; border-radius:16px; box-shadow:var(--drop-sm); }
+}
+@media (min-width:768px){
+  .gal__card{ height:400px; box-shadow:var(--drop); }
+}
 
 .gal__card img{
   display:block;
   width:100%; height:100%;
   object-fit:cover;
-  opacity:.8;
-  transition:opacity .3s ease;
 }
 @media (hover:hover) and (pointer:fine){
-  .gal__card:hover{ transform:scale(1.02); }
-  .gal__card:hover img{ opacity:1; }
+  .gal__card:hover{
+    transform:translate(-2px,-2px);
+    box-shadow:8px 8px 0 var(--orange);
+  }
 }
 
 /* An empty entry: a numbered tile, so the wall works before any photos do. */
@@ -126,17 +139,16 @@
   display:grid; place-content:center;
   width:100%; height:100%;
   background:repeating-linear-gradient(135deg,
-    rgba(243,238,228,.05) 0 10px, transparent 10px 20px);
+    rgba(57,55,50,.06) 0 10px, transparent 10px 20px);
   font-family:var(--mono);
   font-size:.72rem; font-weight:600; letter-spacing:.2em;
-  color:rgba(243,238,228,.4);
+  color:var(--mute);
 }
 
-/* ---- the edges melt into the banner ----
-   Two gradients rather than the big inset box-shadows this look is
-   usually built with: a blurred shadow that size is re-rasterised
-   whenever the layer under it moves; a gradient is free. The stops are
-   capped in vw / svh so a phone is not left with a mostly black screen. */
+/* ---- the edges melt into the panel ----
+   Two gradients, kept short so the wall reads as a wall and not a
+   vignette. They fade to the panel's own colour, so the seam between the
+   photos and the edge of the screen is never visible. */
 .gal__mask{
   position:absolute; inset:0;
   z-index:2;
@@ -144,24 +156,19 @@
 }
 .gal__mask--y{
   background:linear-gradient(to bottom,
-    var(--black) 0,
-    var(--black) min(50px,5svh),
-    rgba(11,11,11,0) min(250px,24svh),
-    rgba(11,11,11,0) calc(100% - min(250px,24svh)),
-    var(--black) calc(100% - min(50px,5svh)),
-    var(--black) 100%);
+    var(--gal-bg) 0,
+    transparent min(150px,15svh),
+    transparent calc(100% - min(150px,15svh)),
+    var(--gal-bg) 100%);
 }
 .gal__mask--x{
   background:linear-gradient(to right,
-    var(--black) 0,
-    var(--black) min(100px,7vw),
-    rgba(11,11,11,0) min(300px,22vw),
-    rgba(11,11,11,0) calc(100% - min(300px,22vw)),
-    var(--black) calc(100% - min(100px,7vw)),
-    var(--black) 100%);
+    var(--gal-bg) 0,
+    transparent min(120px,9vw),
+    transparent calc(100% - min(120px,9vw)),
+    var(--gal-bg) 100%);
 }
 
 @media (prefers-reduced-motion:reduce){
-  .gal__card,
-  .gal__card img{ transition:none; }
+  .gal__card{ transition:none; }
 }
