@@ -29,6 +29,8 @@
 <link rel="stylesheet" href="css/motion.css" />
 <!-- Speaker hover-reveal cards + schedule timeline. Loads last. -->
 <link rel="stylesheet" href="css/paper-hover-timeline.css" />
+<!-- The 3D unfurling gallery under the reel. -->
+<link rel="stylesheet" href="css/gallery.css" />
 </head>
 
 <body>
@@ -70,6 +72,7 @@
     <a href="#tickets"  data-nav>Tickets</a>
     <a href="#sponsors" data-nav>Sponsors</a>
     <a href="#reel"     data-nav>Reel</a>
+    <a href="#gallery"  data-nav>Gallery</a>
     <a href="#faq"      data-nav>FAQ</a>
   </nav>
 
@@ -90,7 +93,8 @@
     <a href="#sponsors"><em>05</em>Sponsors</a>
     <a href="#venue"><em>06</em>Venue</a>
     <a href="#reel"><em>07</em>Reel</a>
-    <a href="#faq"><em>08</em>FAQ</a>
+    <a href="#gallery"><em>08</em>Gallery</a>
+    <a href="#faq"><em>09</em>FAQ</a>
   </nav>
   <div class="menu__foot">
     <a href="#tickets" class="btn btn--block">Get tickets</a>
@@ -361,10 +365,35 @@
   </div>
 </section>
 
+<!-- ══════════════ GALLERY ══════════════ -->
+<!-- A pinned black banner that opens up and unfurls a 3D photo wall as you
+     scroll. Photos come from GALLERY in js/data-3.js; see js/gallery.js. -->
+<section class="sec sec--gallery" id="gallery">
+  <div class="wrap">
+    <div class="sec__head">
+      <p class="eyebrow" data-reveal><em>08</em> In pictures</p>
+      <h2 class="big" data-split>Gallery</h2>
+      <p class="sec__sub" data-reveal>The day in pictures. Keep scrolling — the wall unfolds as you go.</p>
+    </div>
+  </div>
+
+  <div class="gal" id="galTrack">
+    <div class="gal__stage">
+      <div class="gal__banner" id="galBanner">
+        <div class="gal__scene">
+          <div class="gal__mask gal__mask--y"></div>
+          <div class="gal__mask gal__mask--x"></div>
+          <div class="gal__matrix" id="galMatrix" role="group" aria-label="Photo gallery"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <section class="sec sec--faq" id="faq">
   <div class="wrap">
     <div class="sec__head">
-      <p class="eyebrow" data-reveal><em>08</em> Before you ask</p>
+      <p class="eyebrow" data-reveal><em>09</em> Before you ask</p>
       <h2 class="big" data-split>FAQ</h2>
     </div>
     <div class="faq" id="faqList"></div>
@@ -451,6 +480,7 @@
 <script src="js/register.js"></script>
 <script src="js/live-stage.js"></script>
 <script src="js/reel.js"></script>
+<script src="js/gallery.js"></script>
 <script src="js/flow.js"></script>
 <script src="js/footer-reveal.js"></script>
 </body>

@@ -1,0 +1,167 @@
+/* ============================================================
+   DEVTALKS — THE GALLERY  (3D unfurling wall)
+   ------------------------------------------------------------
+   Sits under the reel. A black banner pins to the screen, opens
+   from a rounded frame to full-bleed, then a wall of photos in
+   four columns swings out of deep 3D and settles as you scroll.
+   js/gallery.js writes every scroll-driven value; this file is
+   the finished picture.
+
+   Default state = finished state. With no script (or reduced
+   motion) the section is one static screen showing the wall as
+   it looks when the unfurl is done. js/gallery.js adds
+   .is-scrubbed, which is what lengthens the track and hands the
+   motion over to scroll.
+
+   Only transform, opacity and clip-path move. will-change is
+   held only while the section is on screen (.is-live).
+   ============================================================ */
+
+.sec--gallery{ padding-bottom:0; }
+.sec--gallery .sec__head{ margin-bottom:clamp(26px,4vw,44px); }
+
+/* ---- the scroll track ----
+   Tall enough to scrub through. --gal-len is how many screens of scroll
+   the unfurl takes; the stage itself is one screen of that. */
+.gal{
+  --gal-len:6;
+  position:relative;
+  height:100vh;
+  height:100svh;
+}
+.gal.is-scrubbed{
+  height:calc(var(--gal-len) * 100vh);
+  height:calc(var(--gal-len) * 100svh);
+}
+
+/* ---- the pinned screen ---- */
+.gal__stage{
+  position:sticky; top:0;
+  height:100vh;
+  height:100svh;
+  display:flex; align-items:center; justify-content:center;
+  overflow:hidden;
+}
+
+/* The black banner. js/gallery.js animates its clip-path from an inset,
+   rounded frame to none, so the photos inside never resize or reflow. */
+.gal__banner{
+  position:relative;
+  width:100%;
+  max-width:1920px;
+  height:100%;
+  background:var(--black);
+  overflow:hidden;
+  isolation:isolate;
+}
+
+/* One shared vanishing point for the whole wall. */
+.gal__scene{
+  position:absolute; inset:0;
+  display:flex; align-items:center; justify-content:center;
+  perspective:1000px;
+  pointer-events:none;
+}
+
+/* The wall. Finished pose: the values js/gallery.js ends on. */
+.gal__matrix{
+  flex:none;
+  display:flex; align-items:center; justify-content:center;
+  gap:16px;
+  width:120vw;
+  height:150vh;
+  transform-origin:50% 50%;
+  transform-style:preserve-3d;
+  transform:translateZ(0) rotateX(4deg) rotateY(-8deg) rotateZ(2deg);
+  backface-visibility:hidden;
+}
+@media (min-width:768px){ .gal__matrix{ gap:24px; } }
+
+.gal__col{
+  flex:0 1 22vw;
+  min-width:200px;
+  display:flex; flex-direction:column;
+  gap:16px;
+  pointer-events:auto;
+  backface-visibility:hidden;
+}
+@media (min-width:768px){ .gal__col{ gap:24px; } }
+
+/* Finished parallax offsets, one per column. */
+.gal__col[data-col="0"]{ transform:translateY(-40%); }
+.gal__col[data-col="1"]{ transform:translateY(10%); }
+.gal__col[data-col="2"]{ transform:translateY(-40%); }
+.gal__col[data-col="3"]{ transform:translateY(20%); }
+
+.gal.is-live .gal__matrix,
+.gal.is-live .gal__col{ will-change:transform; }
+
+/* ---- a photo ---- */
+.gal__card{
+  position:relative;
+  flex:none;
+  width:100%;
+  height:200px;
+  background:#111;
+  backface-visibility:hidden;
+  transition:transform .3s ease;
+}
+@media (min-width:640px){ .gal__card{ height:300px; } }
+@media (min-width:768px){ .gal__card{ height:400px; } }
+
+.gal__card img{
+  display:block;
+  width:100%; height:100%;
+  object-fit:cover;
+  opacity:.8;
+  transition:opacity .3s ease;
+}
+@media (hover:hover) and (pointer:fine){
+  .gal__card:hover{ transform:scale(1.02); }
+  .gal__card:hover img{ opacity:1; }
+}
+
+/* An empty entry: a numbered tile, so the wall works before any photos do. */
+.gal__slot{
+  display:grid; place-content:center;
+  width:100%; height:100%;
+  background:repeating-linear-gradient(135deg,
+    rgba(243,238,228,.05) 0 10px, transparent 10px 20px);
+  font-family:var(--mono);
+  font-size:.72rem; font-weight:600; letter-spacing:.2em;
+  color:rgba(243,238,228,.4);
+}
+
+/* ---- the edges melt into the banner ----
+   Two gradients rather than the big inset box-shadows this look is
+   usually built with: a blurred shadow that size is re-rasterised
+   whenever the layer under it moves; a gradient is free. The stops are
+   capped in vw / svh so a phone is not left with a mostly black screen. */
+.gal__mask{
+  position:absolute; inset:0;
+  z-index:2;
+  pointer-events:none;
+}
+.gal__mask--y{
+  background:linear-gradient(to bottom,
+    var(--black) 0,
+    var(--black) min(50px,5svh),
+    rgba(11,11,11,0) min(250px,24svh),
+    rgba(11,11,11,0) calc(100% - min(250px,24svh)),
+    var(--black) calc(100% - min(50px,5svh)),
+    var(--black) 100%);
+}
+.gal__mask--x{
+  background:linear-gradient(to right,
+    var(--black) 0,
+    var(--black) min(100px,7vw),
+    rgba(11,11,11,0) min(300px,22vw),
+    rgba(11,11,11,0) calc(100% - min(300px,22vw)),
+    var(--black) calc(100% - min(100px,7vw)),
+    var(--black) 100%);
+}
+
+@media (prefers-reduced-motion:reduce){
+  .gal__card,
+  .gal__card img{ transition:none; }
+}

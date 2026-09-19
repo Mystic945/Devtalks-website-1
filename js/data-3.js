@@ -152,6 +152,37 @@ const REELS = [
   { src: "", poster: "", label: "" }
 ];
 
+/* ---------- THE GALLERY ----------
+   The unfurling photo wall below the reel. Portrait photos work best
+   (2:3, about 600x900 — they are cropped to fill their card).
+
+   Each entry:
+     src    an image in assets/gallery/
+     label  alt text / caption for screen readers (optional)
+
+   The wall is dealt into four columns, so use a multiple of four
+   (8, 12, 16…) — a few over is fine, but the extras are left out so
+   the columns stay the same length. Fewer than 8 is padded with
+   numbered empty slots, and so is any entry whose src is empty.
+
+   The photos below are stock stand-ins — swap them for real event
+   photos and nothing else has to change.
+------------------------------------------------------------------ */
+const GALLERY = [
+  { src: "assets/gallery/g-01.jpg", label: "" },
+  { src: "assets/gallery/g-02.jpg", label: "" },
+  { src: "assets/gallery/g-03.jpg", label: "" },
+  { src: "assets/gallery/g-04.jpg", label: "" },
+  { src: "assets/gallery/g-05.jpg", label: "" },
+  { src: "assets/gallery/g-06.jpg", label: "" },
+  { src: "assets/gallery/g-07.jpg", label: "" },
+  { src: "assets/gallery/g-08.jpg", label: "" },
+  { src: "assets/gallery/g-09.jpg", label: "" },
+  { src: "assets/gallery/g-10.jpg", label: "" },
+  { src: "assets/gallery/g-11.jpg", label: "" },
+  { src: "assets/gallery/g-12.jpg", label: "" }
+];
+
 /* ---------- SCHEDULE ---------- */
 const SCHEDULE = [
   { time: "09:15", title: "Doors open & registration",      who: "Volunteer desk, main foyer", kind: "break" },
