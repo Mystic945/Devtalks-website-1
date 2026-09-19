@@ -25,7 +25,7 @@
 <link rel="stylesheet" href="css/hero-bento.css" />
 <!-- The palette layer. Loads last; re-inks everything above it. -->
 <link rel="stylesheet" href="css/paper.css" />
-<!-- The motion layer: doodle constellation, registration, magnify, center flow. -->
+<!-- The motion layer: card registration on scroll. -->
 <link rel="stylesheet" href="css/motion.css" />
 <!-- Speaker hover-reveal cards + schedule timeline. Loads last. -->
 <link rel="stylesheet" href="css/paper-hover-timeline.css" />
@@ -432,8 +432,7 @@
 
 <!-- ══════════════ SCRIPTS ══════════════ -->
 <!-- Libraries are bundled in /vendor — the site works fully offline.
-     (three.js r128 · GSAP 3.12.5 · ScrollTrigger 3.12.5) -->
-<script src="vendor/three.min.js"></script>
+     (GSAP 3.12.5 · ScrollTrigger 3.12.5) -->
 <script src="vendor/gsap.min.js"></script>
 <script src="vendor/ScrollTrigger.min.js"></script>
 <script src="js/data-3.js"></script>
@@ -447,10 +446,9 @@
      register.js restructures the cards, then flow.js measures what is left.
      js/comic-panels.js (comic-panel schedule) is unlinked in favour of the
      vertical timeline in css/paper-hover-timeline.css — still on disk,
-     add the <script> back to restore the panels. -->
-<script src="js/doodle-art.js"></script>
+     add its <script> back, with js/doodle-art.js before it, to restore
+     the panels. -->
 <script src="js/register.js"></script>
-<script src="js/doodle-field.js"></script>
 <script src="js/live-stage.js"></script>
 <script src="js/reel.js"></script>
 <script src="js/flow.js"></script>

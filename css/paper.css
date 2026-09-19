@@ -169,11 +169,10 @@ a{ text-underline-offset:.22em; text-decoration-thickness:1.5px; }
 /* ============================================================
    HERO
    ============================================================ */
-/* The backdrop the bento glass works against. Glass over a flat fill is
-   invisible — there has to be something behind it with edges to soften.
-   The dot field that used to do that is gone; the 3D doodle constellation
-   (js/hero-doodles.js) is what the glass blurs now, and these blooms are
-   the light it floats in. */
+/* The backdrop the bento glass works against: soft spot-colour blooms.
+   There used to be an animated doodle field behind the glass as well; it
+   was removed, so the frost now blurs a still backdrop, which the browser
+   blurs once and caches instead of re-blurring every frame. */
 .hero--bento .hero__veil{
   background:
     radial-gradient(58% 48% at 16% 14%, rgba(255,90,31,.30), transparent 66%),
