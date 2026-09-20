@@ -111,42 +111,45 @@ The site ships two generations of motion, kept apart on purpose:
 | Click sparks (`ClickSpark`) | Whole page | `useClickSpark` |
 | Edge tab (`CardNav`'s side tab) | Left edge, all pages | `EdgeTab` |
 | Icon set into a heading | The hero wordmark | `BoltMark` |
-| Word-by-word scroll reveal | Section headings, schedule row titles | `ui/ScrollReveal` |
-| Typed lines | Section sub-lines, schedule row details | `ui/TextType` |
+| Word-by-word scroll reveal | Section headings | `ui/ScrollReveal` |
+| Typed lines | Section sub-lines | `ui/TextType` |
+| Pinned horizontal timeline (`horizontal-timeline`) | The run of show | `useHorizontalTimeline` |
 
 Two of the reference's signature effects were **not** added, because the site
 already does them: the gallery banner opening from a rounded frame to full
 bleed is `animated-scroll`, and the reveal footer is the same slide-over the
 reference uses for its closing CTA.
 
-#### The schedule's rows
+#### The run of show, sideways
 
-Each row arrives in two beats, modelled on the reference site's Professional
-Journey entries: the **title** resolves word by word out of a blur as the row
-climbs to reading height, and the **detail** types itself in — but only once
-that title has fully resolved. `ScrollReveal` reports completion through
-`onReveal`, and `TextType` is held by its `start` prop until then. The
-**time** never animates; it is a label, and a label that animates is a label
-you cannot scan.
+The schedule is built after the reference site's **Professional Journey**
+section, and the same way it is: a tall outer box holds the scroll, a
+`position: sticky` stage inside it pins to the screen, and a
+`width: max-content` track is translated left as you scroll through. Each stop
+is a **zero-height anchor** on the rule — the time is positioned above the
+line, the title and detail below it — which is what keeps every node dead
+level however long a title runs.
 
-Both components are adapted from React Bits, not pasted. Three changes matter:
+Two decisions worth keeping:
 
-- **One ScrollTrigger per instance, not three.** Upstream builds a separate
-  tween — and trigger — for rotation, opacity and blur, and gives the last two
-  identical configuration. They are merged here, and rotation is only built
-  when a rotation was asked for. The schedule went from 33 triggers to 18.
-- **`will-change` is leased, not permanent.** Upstream sets it in the tween's
-  from-vars *and* in the stylesheet, so every word on the page stays promoted
-  for the session. Here it is taken while the reveal is on screen and handed
-  back after, and the blur filter is cleared at the end rather than parked at
-  `blur(0px)` — any filter value keeps an element on its own layer.
-- **The caret blinks in CSS.** Upstream runs a `repeat: -1` GSAP tween per
-  typed line; there are twenty on this page.
+- **Sticky, not ScrollTrigger's `pin`.** GSAP can pin for you, but it does it
+  by wrapping the element in a generated container and swapping in a spacer.
+  On a page that already has a sticky card deck, a scrubbed gallery and a
+  fixed reveal footer, that is one more thing rewriting layout behind
+  everyone's back. Sticky is the browser's own pin and it is what the
+  reference uses; the hook only measures and moves.
+- **The travel is derived, never hard-coded.** `distance = track.scrollWidth
+  − stage.clientWidth + tailPad`, and the outer box's height is one screen
+  plus that. Add a row to `SCHEDULE` and the pin lengthens to match. At 1280px
+  the fourteen stops measure 4521px of track, 3336px of travel, 4136px of
+  section.
 
-`TextType` also renders the finished string underneath at `visibility: hidden`
-so the element is always its final size. Without that, a line that wraps
-changes the page's height on every keystroke, which moves every ScrollTrigger
-below it while the visitor is reading.
+**Below 900px it is a vertical timeline again** — the same markup, laid out as
+a column with the spine on the left and every detail visible, because a pinned
+sideways scroll on a phone fights the gesture the visitor is already making.
+The hook does not run at that width, and it tears down and rebuilds when the
+breakpoint is crossed, so no inline height is ever left on a layout that no
+longer wants one. `prefers-reduced-motion` gets the same vertical layout.
 
 **Switching the speakers back to a row:** one line —
 `const LAYOUT = 'grid'` at the top of

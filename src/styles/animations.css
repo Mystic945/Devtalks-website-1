@@ -13,7 +13,7 @@
      4 · click sparks
      5 · the registrations tab
      6 · the wordmark bolt
-     7 · the schedule's revealing rows
+     7 · the run of show, sideways
 
    Every section degrades the same way the rest of the site does:
    the declared state is the finished state, and the reduced-motion
@@ -322,53 +322,290 @@
 }
 
 /* ============================================================
-   7 · THE SCHEDULE'S REVEALING ROWS
+   7 · THE RUN OF SHOW, SIDEWAYS
    ------------------------------------------------------------
-   Each row's title resolves word by word as the row climbs to
-   reading height, and its detail types itself in afterwards.
-   The markup comes from ScrollReveal and TextType; everything
-   here is about making them sit inside the timeline that
-   paper-hover-timeline.css already draws.
+   A rule across the middle of the screen, a node on it per stop,
+   the time above the line and the title below it. The section
+   pins and the track travels left; useHorizontalTimeline does the
+   measuring and the moving, everything else is here.
+
+   THE ZERO-HEIGHT STOP
+   Each stop is `height: 0` and everything inside it is positioned
+   off the rule. That is what keeps every node dead level no
+   matter how long a title runs — the same trick the reference
+   uses. It also means the track itself has no height, so `top:
+   50%` centres it without a translate, which matters because the
+   hook owns the track's transform and a transform has one owner.
+
+   The nodes are the ones the vertical timeline already used —
+   orange with an ink ring, smaller and hollow for a break — so
+   the section still reads as part of this site rather than as an
+   effect bolted onto it.
    ============================================================ */
 
-/* ScrollReveal renders the title as <h3 class="scroll-reveal">. The words
-   inside it are inline-blocks, which is what lets them be staggered — but
-   an inline-block will not break mid-word, so a long talk title needs the
-   line box to be allowed to wrap between them. */
-.sec--schedule .sched li .scroll-reveal-text {
-  display: block;
+.hsched {
+  position: relative;
+  /* height is written by the hook, from the travel it measured */
 }
 
-/* The typed detail sits where the plain <p> used to. TextType is a grid so
-   that its invisible sizer can hold the row's height steady while the
-   visible copy is typed over it; without that, every keystroke on a line
-   that wraps would move the whole timeline below it. */
-.sec--schedule .sched li .text-type {
+.hsched__stage {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  height: 100svh;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+}
+
+/* The heading rides inside the stage so it is still there at the far end of
+   the day, rather than having scrolled off before the first stop arrives.
+   It sits above the rule and takes no pointer events, so a stop passing
+   underneath is still hoverable. */
+.hsched__head {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: clamp(84px, 11vh, 132px);
+  z-index: 3;
+  pointer-events: none;
+}
+
+.hsched__head .sec__head {
+  margin-bottom: 0;
+}
+
+/* the rule, edge to edge */
+.hsched__rule {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 2px;
+  background: var(--ink-hair, #d9d2c4);
+}
+
+.hsched__track {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  display: flex;
+  align-items: center;
+  width: max-content;
+  gap: clamp(30px, 4.4vw, 68px);
+  padding: 0 clamp(28px, 8vw, 132px);
   margin: 0;
-  font: inherit;
-  color: inherit;
+  list-style: none;
 }
 
-/* A caret the size of the body text, in the row's own colour rather than
-   the site orange — fourteen orange carets down a timeline reads as an
-   error state. */
-.sec--schedule .sched li .text-type__cursor {
+/* ---- one stop ---- */
+.hstop {
+  position: relative;
+  flex: 0 0 auto;
+  width: clamp(230px, 20vw, 300px);
+  height: 0;
+  cursor: default;
+}
+
+.hstop__node {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--orange, #ff5a1f);
+  border: 2px solid var(--black, #0b0b0b);
+  transform: translate(-50%, -50%);
+  transition: box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.hstop.is-break .hstop__node {
+  width: 11px;
+  height: 11px;
+  background: var(--paper-2, #fbf8f2);
+  border-color: var(--grey, #a29d94);
+}
+
+/* above the rule */
+.hstop__time {
+  position: absolute;
+  left: 0;
+  bottom: 18px;
+  font-family: var(--mono, ui-monospace, monospace);
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  color: var(--spot-ink, #a83a0b);
+  white-space: nowrap;
+}
+
+.hstop.is-break .hstop__time {
   color: var(--grey, #a29d94);
-  margin-left: 0.12rem;
 }
 
-/* A break is a pause, not an announcement: its detail types at the same
-   weight as the rest of the row and its caret stays quiet. */
-.sec--schedule .sched li.is-break .text-type__cursor {
-  opacity: 0.6;
+/* below the rule */
+.hstop__body {
+  position: absolute;
+  left: 0;
+  top: 22px;
+  width: 100%;
+  padding-right: 14px;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  /* Both components already render their finished state; this only makes
-     sure nothing is left mid-blur if a stylesheet loaded out of order. */
-  .sec--schedule .sched li .scroll-reveal__word {
-    opacity: 1 !important;
-    filter: none !important;
+.hstop__title {
+  margin: 0;
+  font-size: clamp(1rem, 1.5vw, 1.22rem);
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--black, #0b0b0b);
+}
+
+.hstop.is-break .hstop__title {
+  font-weight: 500;
+  color: var(--rule, #393732);
+}
+
+/* The detail is the reward for stopping at a stop — it arrives on hover,
+   on keyboard focus, and it is simply there on touch, which has neither. */
+.hstop__who {
+  margin: 0.45em 0 0;
+  font-size: 0.78rem;
+  color: var(--rule, #393732);
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.4s ease, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.hstop:hover .hstop__who,
+.hstop:focus-visible .hstop__who {
+  opacity: 1;
+  transform: none;
+}
+
+.hstop:hover .hstop__node,
+.hstop:focus-visible .hstop__node {
+  box-shadow: 0 0 0 6px rgba(255, 90, 31, 0.18);
+}
+
+.hstop:focus-visible {
+  outline: none;
+}
+
+/* The rule is longer than the day: it runs off both edges under a wash of
+   paper rather than stopping dead at the viewport. */
+.hsched__fade {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: clamp(60px, 10vw, 170px);
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* The left edge is wider and holds solid for its first third: the
+   registrations tab is pinned over this strip, and a stop sliding out
+   underneath it must be gone before it gets there, not half-legible
+   through it. */
+.hsched__fade--l {
+  left: 0;
+  width: clamp(110px, 14vw, 230px);
+  background: linear-gradient(
+    to right,
+    var(--paper, #f3eee4) 0%,
+    var(--paper, #f3eee4) 34%,
+    rgba(243, 238, 228, 0) 100%
+  );
+}
+
+.hsched__fade--r {
+  right: 0;
+  background: linear-gradient(to left, var(--paper, #f3eee4), rgba(243, 238, 228, 0));
+}
+
+/* ------------------------------------------------------------
+   THE VERTICAL FALLBACK
+   A pinned sideways scroll on a phone fights the gesture the
+   visitor is already making, so below 900px the same markup is
+   laid out as the timeline it always was. The hook does not run
+   at this width, so nothing here is fighting an inline style.
+   ------------------------------------------------------------ */
+@media (max-width: 899px) {
+  .hsched {
+    height: auto !important;
+  }
+
+  .hsched__stage {
+    position: static;
+    height: auto;
+    overflow: visible;
+    display: block;
+  }
+
+  .hsched__rule,
+  .hsched__fade {
+    display: none;
+  }
+
+  .hsched__head {
+    position: static;
+    pointer-events: auto;
+  }
+
+  .hsched__head .sec__head {
+    margin-bottom: clamp(34px, 6vw, 60px);
+  }
+
+  .hsched__track {
+    position: static;
+    display: block;
+    width: auto;
+    /* The track is not inside a .wrap — it cannot be, because on desktop it
+       has to run past the page's max width. So it takes the page's own
+       gutter here, or the spine sits flush against the edge of the screen
+       and the nodes hang half off it. */
+    padding: 0 var(--gut);
+    max-width: var(--maxw);
+    margin: 0 auto;
+    transform: none !important;
+  }
+
+  /* the spine, back to being vertical */
+  .hstop {
+    width: auto;
+    height: auto;
+    padding: 16px 0 18px 44px;
+    border-left: 2px solid var(--ink-hair, #d9d2c4);
+  }
+
+  .hstop:first-child {
+    padding-top: 0;
+  }
+
+  .hstop__node {
+    top: 20px;
+    left: 0;
+  }
+
+  .hstop:first-child .hstop__node {
+    top: 4px;
+  }
+
+  .hstop__time,
+  .hstop__body {
+    position: static;
+    width: auto;
+    padding-right: 0;
+  }
+
+  .hstop__time {
+    display: block;
+    margin-bottom: 0.35em;
+  }
+
+  /* nothing to hover on a phone, so the detail is simply there */
+  .hstop__who {
+    opacity: 1;
+    transform: none;
   }
 }
 
@@ -389,6 +626,74 @@
 
   .pass__grow {
     transform: none !important;
+  }
+
+  /* The run of show lays itself out as the vertical timeline instead of
+     travelling. useHorizontalTimeline does not run under reduced motion,
+     so there is no inline height or transform to override here — these
+     rules only undo the horizontal composition. */
+  .hsched {
+    height: auto !important;
+  }
+
+  .hsched__stage {
+    position: static;
+    height: auto;
+    overflow: visible;
+    display: block;
+  }
+
+  .hsched__rule,
+  .hsched__fade {
+    display: none;
+  }
+
+  .hsched__head {
+    position: static;
+    pointer-events: auto;
+  }
+
+  .hsched__head .sec__head {
+    margin-bottom: clamp(34px, 6vw, 60px);
+  }
+
+  .hsched__track {
+    position: static;
+    display: block;
+    width: auto;
+    padding: 0 var(--gut);
+    max-width: var(--maxw);
+    margin: 0 auto;
+    transform: none !important;
+  }
+
+  .hstop {
+    width: auto;
+    height: auto;
+    padding: 16px 0 18px 44px;
+    border-left: 2px solid var(--ink-hair, #d9d2c4);
+  }
+
+  .hstop__time,
+  .hstop__body {
+    position: static;
+    width: auto;
+  }
+
+  .hstop__time {
+    display: block;
+    margin-bottom: 0.35em;
+  }
+
+  .hstop__node {
+    top: 20px;
+    left: 0;
+  }
+
+  .hstop__who {
+    opacity: 1;
+    transform: none;
+    transition: none;
   }
 
   .edgetab,

@@ -1,116 +1,91 @@
 /* ============================================================
    DEVTALKS — RUN OF SHOW
    ------------------------------------------------------------
-   A vertical timeline. Break rows carry `is-break`, which is what
-   styles/paper-hover-timeline.css uses to draw them differently
-   from a talk.
+   The day as a line you travel along rather than a list you
+   scroll down: the section pins and the schedule moves sideways
+   past you, one stop at a time.
 
-   HOW A ROW ARRIVES
-   Modelled on the reference site's Professional Journey, where an
-   entry is a title, a time and an organisation:
+   Built after the Professional Journey section on
+   syahrilarfianalmazril.my.id — a rule across the middle of the
+   screen, a node on it per entry, the time above the line and
+   the title below it, and the supporting detail fading in when
+   an entry is pointed at. The travel itself is in
+   useHorizontalTimeline.
 
-     the title     resolves word by word out of a blur as the row
-                   climbs to reading height (ScrollReveal)
-     the detail    types itself in, but only once the title above
-                   it has fully resolved (TextType, gated on the
-                   reveal's onReveal)
-     the time      is simply there — it is a label, and a label
-                   that animates is a label you cannot scan
+   Each card is a zero-height anchor on the rule, exactly as the
+   reference builds it: everything inside is positioned off the
+   line rather than stacked in flow, which is what keeps every
+   node dead level however long the titles are.
 
-   The rows no longer carry data-reveal. They used to fade in as a
-   block, and a block fade underneath a per-word fade is the same
-   text fading twice.
-
-   COST
-   Each row is exactly ONE ScrollTrigger: the titles pass
-   baseRotation={0}, which skips the rotation tween entirely, and
-   ScrollReveal merges opacity and blur into a single tween. The
-   typed lines start on visibility and stop for good when they
-   finish, so nothing is left running behind the fold.
+   Under 900px the same markup lays itself out as the vertical
+   timeline it always was — a pinned sideways scroll on a phone
+   fights the gesture the visitor is already making. That is CSS
+   only; the hook does not run at all.
    ============================================================ */
 
-import { useCallback, useState } from 'react';
-import { ScrollReveal } from '@/components/ui/ScrollReveal';
-import { TextType } from '@/components/ui/TextType';
-import { SCHEDULE, SITE, type SchedRow } from '@/data/site';
-
-function ScheduleRow({ row }: { row: SchedRow }) {
-  const [revealed, setRevealed] = useState(false);
-  const onReveal = useCallback(() => setRevealed(true), []);
-
-  return (
-    <li className={row.kind === 'break' ? 'is-break' : ''}>
-      <time>{row.time}</time>
-
-      <ScrollReveal
-        as="h3"
-        /* No tilt on a timeline row: the spine beside it is dead straight,
-           and a heading that leans off it reads as a rendering fault. */
-        baseRotation={0}
-        baseOpacity={0.12}
-        blurStrength={3}
-        /* Resolved by the time the row reaches reading height, rather than
-           while it is still at the bottom edge of the screen. */
-        wordAnimationEnd="top center"
-        onReveal={onReveal}
-      >
-        {row.title}
-      </ScrollReveal>
-
-      <TextType
-        as="p"
-        text={row.who}
-        start={revealed}
-        startOnVisible
-        loop={false}
-        typingSpeed={18}
-        initialDelay={90}
-        cursorCharacter="▍"
-        hideCursorWhenDone
-      />
-    </li>
-  );
-}
+import { useRef } from 'react';
+import { useHorizontalTimeline } from '@/hooks/useHorizontalTimeline';
+import { SplitText } from '@/components/SplitText';
+import { SCHEDULE, SITE } from '@/data/site';
 
 export function Schedule() {
+  const outerRef = useRef<HTMLDivElement>(null);
+  const stageRef = useRef<HTMLDivElement>(null);
+  const trackRef = useRef<HTMLOListElement>(null);
+
+  useHorizontalTimeline(outerRef, stageRef, trackRef);
+
   return (
     <section className="sec sec--schedule" id="schedule">
-      <div className="wrap">
-        <div className="sec__head">
-          <p className="eyebrow" data-reveal>
-            <em>03</em> Run of show
-          </p>
+      {/* The outer box is only there to hold scroll. Its height is written
+          by the hook, from the distance the track actually has to travel. */}
+      <div className="hsched" ref={outerRef}>
+        <div className="hsched__stage" ref={stageRef}>
+          {/* The heading rides inside the pinned stage, as it does on the
+              reference: it stays on screen for the whole journey instead of
+              scrolling away and leaving a bare line behind. */}
+          <div className="hsched__head">
+            <div className="wrap">
+              <div className="sec__head">
+                <p className="eyebrow" data-reveal>
+                  <em>03</em> Run of show
+                </p>
+                <SplitText className="big" text="Schedule" />
+                <p className="sec__sub" data-reveal>
+                  {SITE.timeLabel} &middot; {SITE.venueShort}
+                </p>
+              </div>
+            </div>
+          </div>
 
-          <ScrollReveal
-            as="h2"
-            containerClassName="big"
-            enableBlur
-            blurStrength={4}
-            baseRotation={2}
-            baseOpacity={0.1}
-          >
-            Schedule
-          </ScrollReveal>
+          <div className="hsched__rule" aria-hidden="true" />
 
-          {/* Types once and settles. It used to loop, which left a caret
-              blinking beside fourteen rows that are also typing. */}
-          <TextType
-            as="p"
-            className="sec__sub"
-            text={`${SITE.timeLabel} · ${SITE.venueShort}`}
-            startOnVisible
-            loop={false}
-            typingSpeed={22}
-            cursorCharacter="▍"
-            hideCursorWhenDone
-          />
+          <ol className="hsched__track" ref={trackRef}>
+            {SCHEDULE.map((row) => (
+              <li
+                className={`hstop${row.kind === 'break' ? ' is-break' : ''}`}
+                key={`${row.time}-${row.title}`}
+                tabIndex={0}
+              >
+                <span className="hstop__node" aria-hidden="true" />
+                <time className="hstop__time">{row.time}</time>
+
+                {/* Title and detail flow inside one absolutely-positioned
+                    box, so a two-line title pushes its own detail down
+                    without moving the node off the rule. */}
+                <div className="hstop__body">
+                  <h3 className="hstop__title">{row.title}</h3>
+                  <p className="hstop__who">{row.who}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
+
+          {/* The rule runs off both edges of the screen rather than stopping
+              at them, so the line reads as longer than the day. */}
+          <div className="hsched__fade hsched__fade--l" aria-hidden="true" />
+          <div className="hsched__fade hsched__fade--r" aria-hidden="true" />
         </div>
-
-        <ol className="sched">
-          {SCHEDULE.map((r) => (
-            <ScheduleRow key={`${r.time}-${r.title}`} row={r} />
-          ))}
-        </ol>
       </div>
     </section>
   );
