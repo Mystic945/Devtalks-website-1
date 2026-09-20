@@ -20,6 +20,7 @@
 import { useRef, type RefObject } from 'react';
 import { useSpotlight } from '@/hooks/useSpotlight';
 import { SplitText } from '@/components/SplitText';
+import { TextType } from '@/components/ui/TextType';
 import { BoltMark, PERK_ICONS } from '@/lib/icons';
 import { ticketProps } from '@/lib/links';
 import { PERKS, SITE } from '@/data/site';
@@ -28,12 +29,25 @@ import { StageTile } from './StageTile';
 import { RegistrationsTile } from './RegistrationsTile';
 import { CountdownTile } from './CountdownTile';
 
+/* When each small line starts typing, in ms after the doors hand over.
+   useHeroIntro fades these rows up from 0.5s with a 0.09s stagger, so
+   typing begins as each one arrives rather than before it. */
+const TYPE_IN = {
+  tag: 900,
+  date: 1150,
+  venue: 1400
+} as const;
+
 interface Props {
   /** Owned by App, because useHeroIntro animates into it. */
   heroRef: RefObject<HTMLElement>;
+  /** True once the doors have handed over. The small lines type themselves
+   *  in, and they must not start until the intro has faded them up — a line
+   *  typing at opacity 0 is a line nobody sees type. */
+  ready: boolean;
 }
 
-export function Hero({ heroRef }: Props) {
+export function Hero({ heroRef, ready }: Props) {
   const gridRef = useRef<HTMLDivElement>(null);
   const { needsTiltPermission, requestTilt } = useSpotlight(gridRef);
 
@@ -70,7 +84,17 @@ export function Hero({ heroRef }: Props) {
             </h1>
 
             <SplitText as="p" className="hero__theme" id="heroTheme" text={SITE.theme} />
-            <p className="hero__tag">{SITE.tagline}</p>
+            <TextType
+              as="p"
+              className="hero__tag"
+              text={SITE.tagline}
+              start={ready}
+              initialDelay={TYPE_IN.tag}
+              typingSpeed={16}
+              loop={false}
+              cursorCharacter="▍"
+              hideCursorWhenDone
+            />
 
             <div className="hero__actions">
               <a className="btn" data-magnetic {...tickets}>
@@ -96,10 +120,29 @@ export function Hero({ heroRef }: Props) {
             <p className="bt__label">
               <b>04</b> When &amp; where
             </p>
+            {/* Two lines, not one: the bento hero hides the separator and
+                makes each span a block, so they type one after the other. */}
             <div className="hero__meta">
-              <span>{SITE.dateLabel}</span>
+              <TextType
+                as="span"
+                text={SITE.dateLabel}
+                start={ready}
+                initialDelay={TYPE_IN.date}
+                typingSpeed={22}
+                loop={false}
+                showCursor={false}
+              />
               <i />
-              <span>{SITE.venueShort}</span>
+              <TextType
+                as="span"
+                text={SITE.venueShort}
+                start={ready}
+                initialDelay={TYPE_IN.venue}
+                typingSpeed={22}
+                loop={false}
+                cursorCharacter="▍"
+                hideCursorWhenDone
+              />
             </div>
           </Tile>
 

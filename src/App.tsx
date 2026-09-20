@@ -96,7 +96,7 @@ export default function App() {
       <EdgeTab />
 
       <main id="top" ref={mainRef}>
-        <Hero heroRef={heroRef} />
+        <Hero heroRef={heroRef} ready={ready} />
         <Ribbons />
         <About />
         <Speakers />

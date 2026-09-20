@@ -14,6 +14,7 @@
      5 · the registrations tab
      6 · the wordmark bolt
      7 · the run of show, sideways
+     8 · the hero's typed lines
 
    Every section degrades the same way the rest of the site does:
    the declared state is the finished state, and the reduced-motion
@@ -607,6 +608,29 @@
     opacity: 1;
     transform: none;
   }
+}
+
+/* ============================================================
+   8 · THE HERO'S TYPED LINES
+   ------------------------------------------------------------
+   The tagline and the when/where lines type themselves in once
+   the intro has faded them up. TextType is a grid so its
+   invisible sizer can hold the final size while the visible copy
+   is typed over it — but the bento hero styles its meta lines
+   with `.hero--bento .hero__meta span`, which out-specifies the
+   component's own `display: grid`. Left alone the sizer stops
+   overlaying and stacks underneath instead, and every meta row
+   is silently twice as tall as its text.
+   ============================================================ */
+.hero--bento .hero__meta .text-type {
+  display: grid;
+  justify-items: start;
+}
+
+/* The caret is the one piece of orange in a tile of quiet type; keep it
+   the same weight as the line it follows. */
+.hero .text-type__cursor {
+  font-weight: inherit;
 }
 
 /* ============================================================
