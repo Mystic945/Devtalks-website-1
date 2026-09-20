@@ -11,6 +11,7 @@
    ============================================================ */
 
 import { SplitText } from '@/components/SplitText';
+import { CountAnimation } from '@/components/ui/count-animation';
 import { pad2 } from '@/lib/dom';
 import { OFFERS, SITE, STATS } from '@/data/site';
 
@@ -53,9 +54,7 @@ export function About() {
         <div className="stats" data-flow>
           {STATS.map((s) => (
             <div className="stat" key={s.label}>
-              <b data-count={s.value} data-suffix={s.suffix}>
-                0
-              </b>
+              <CountAnimation as="b" number={s.value} suffix={s.suffix} />
               <span>{s.label}</span>
             </div>
           ))}
