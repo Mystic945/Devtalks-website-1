@@ -1,6 +1,8 @@
-.scroll-reveal {
-  margin: 0;
-}
+/* No margin rule here on purpose. This component renders as whatever tag
+   the caller asks for — h2.big, h3 inside the schedule, .final__h — and
+   each of those already carries the margin the design gives it. A `margin: 0`
+   on .scroll-reveal loads after those sheets and silently flattens every
+   one of them. */
 
 .scroll-reveal-text {
   display: block;
@@ -10,7 +12,11 @@
   font-family: inherit;
 }
 
+/* No will-change here on purpose. The hint is a lease on a compositor
+   layer, and there is one of these per word across nine sections — left
+   in the stylesheet it promotes several hundred elements for the life of
+   the page. ScrollReveal takes the hint while the reveal is on screen and
+   hands it back after. */
 .scroll-reveal__word {
   display: inline-block;
-  will-change: opacity, filter;
 }

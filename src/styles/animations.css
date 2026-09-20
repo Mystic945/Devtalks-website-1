@@ -13,6 +13,7 @@
      4 · click sparks
      5 · the registrations tab
      6 · the wordmark bolt
+     7 · the schedule's revealing rows
 
    Every section degrades the same way the rest of the site does:
    the declared state is the finished state, and the reduced-motion
@@ -318,6 +319,57 @@
     drop-shadow(-1.5px 0 0 var(--black, #0b0b0b))
     drop-shadow(0 1.5px 0 var(--black, #0b0b0b))
     drop-shadow(0 -1.5px 0 var(--black, #0b0b0b));
+}
+
+/* ============================================================
+   7 · THE SCHEDULE'S REVEALING ROWS
+   ------------------------------------------------------------
+   Each row's title resolves word by word as the row climbs to
+   reading height, and its detail types itself in afterwards.
+   The markup comes from ScrollReveal and TextType; everything
+   here is about making them sit inside the timeline that
+   paper-hover-timeline.css already draws.
+   ============================================================ */
+
+/* ScrollReveal renders the title as <h3 class="scroll-reveal">. The words
+   inside it are inline-blocks, which is what lets them be staggered — but
+   an inline-block will not break mid-word, so a long talk title needs the
+   line box to be allowed to wrap between them. */
+.sec--schedule .sched li .scroll-reveal-text {
+  display: block;
+}
+
+/* The typed detail sits where the plain <p> used to. TextType is a grid so
+   that its invisible sizer can hold the row's height steady while the
+   visible copy is typed over it; without that, every keystroke on a line
+   that wraps would move the whole timeline below it. */
+.sec--schedule .sched li .text-type {
+  margin: 0;
+  font: inherit;
+  color: inherit;
+}
+
+/* A caret the size of the body text, in the row's own colour rather than
+   the site orange — fourteen orange carets down a timeline reads as an
+   error state. */
+.sec--schedule .sched li .text-type__cursor {
+  color: var(--grey, #a29d94);
+  margin-left: 0.12rem;
+}
+
+/* A break is a pause, not an announcement: its detail types at the same
+   weight as the rest of the row and its caret stays quiet. */
+.sec--schedule .sched li.is-break .text-type__cursor {
+  opacity: 0.6;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Both components already render their finished state; this only makes
+     sure nothing is left mid-blur if a stylesheet loaded out of order. */
+  .sec--schedule .sched li .scroll-reveal__word {
+    opacity: 1 !important;
+    filter: none !important;
+  }
 }
 
 /* ============================================================

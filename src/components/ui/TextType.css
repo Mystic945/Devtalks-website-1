@@ -1,16 +1,58 @@
+/* The finished string and the typed copy occupy the same grid cell: the
+   first reserves the space, the second is drawn over it. That is what stops
+   a line that wraps from changing the page's height on every keystroke —
+   which would move every ScrollTrigger below it while the visitor reads. */
 .text-type {
-  display: inline-block;
+  display: grid;
+  justify-items: start;
   white-space: pre-wrap;
+}
+
+.text-type__sizer,
+.text-type__line {
+  grid-area: 1 / 1;
+}
+
+.text-type__sizer {
+  visibility: hidden;
+  pointer-events: none;
 }
 
 .text-type__cursor {
   margin-left: 0.18rem;
   display: inline-block;
-  opacity: 1;
   color: var(--orange, #ff5a1f);
   font-weight: 300;
+
+  /* The caret blinks in CSS rather than on a never-ending GSAP tween.
+     There is one of these per typed line, and the duration is set inline
+     from the cursorBlinkDuration prop. */
+  animation-name: text-type-blink;
+  animation-duration: 1s;
+  animation-timing-function: steps(1, end);
+  animation-iteration-count: infinite;
+}
+
+@keyframes text-type-blink {
+  0%,
+  49% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
 }
 
 .text-type__cursor--hidden {
   display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* The component already prints the finished text under reduced motion;
+     this covers a caret rendered by any other caller. */
+  .text-type__cursor {
+    animation: none;
+    opacity: 1;
+  }
 }

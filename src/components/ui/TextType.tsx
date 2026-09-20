@@ -1,15 +1,45 @@
-'use client';
+/* ============================================================
+   TEXT TYPE  (adapted from React Bits)
+   ------------------------------------------------------------
+   Text that types itself in, optionally cycling through several
+   strings.
+
+   WHAT WAS CHANGED FROM THE UPSTREAM COMPONENT, AND WHY
+
+   1. THE CURSOR BLINKS IN CSS, NOT IN GSAP.
+      Upstream starts a `repeat: -1` GSAP tween per instance to
+      blink the caret. That is one never-ending tween on the
+      global ticker for every typed line on the page — and this
+      site has one in most sections plus one per schedule row.
+      A two-keyframe CSS animation does the same job on the
+      compositor and costs the main thread nothing.
+
+   2. IT CAN BE HELD UNTIL SOMETHING ELSE FINISHES.
+      `start` gates the whole machine, so a line can wait for the
+      heading above it to finish resolving rather than racing it.
+      See the schedule, where each row's detail types only once
+      its title has fully revealed.
+
+   3. IT DOES NOT REFLOW THE PAGE WHILE IT TYPES.
+      The finished string is rendered underneath at zero opacity
+      so the element is always its final size. Without that, every
+      character typed on a line that wraps changes the height of
+      the page, which moves every ScrollTrigger below it.
+
+   4. REDUCED MOTION PRINTS THE TEXT.
+      No timers, no caret, no re-renders.
+   ============================================================ */
 
 import React, {
-  useEffect,
-  useRef,
-  useState,
   createElement,
-  useMemo,
   useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState
 } from 'react';
-import { gsap } from '@/lib/gsap';
 import { cn } from '@/lib/utils';
+import { prefersReducedMotion } from '@/lib/dom';
 import './TextType.css';
 
 export interface TextTypeProps extends React.HTMLAttributes<HTMLElement> {
@@ -31,6 +61,12 @@ export interface TextTypeProps extends React.HTMLAttributes<HTMLElement> {
   onSentenceComplete?: (sentence: string, index: number) => void;
   startOnVisible?: boolean;
   reverseMode?: boolean;
+  /** Hold the machine until this turns true. Combined with `startOnVisible`,
+   *  both conditions must be met. */
+  start?: boolean;
+  /** Hide the caret once there is nothing left to type. Right for a line of
+   *  content, wrong for a looping strapline. */
+  hideCursorWhenDone?: boolean;
 }
 
 export const TextType: React.FC<TextTypeProps> = ({
@@ -52,21 +88,24 @@ export const TextType: React.FC<TextTypeProps> = ({
   onSentenceComplete,
   startOnVisible = false,
   reverseMode = false,
+  start = true,
+  hideCursorWhenDone = false,
   ...props
 }) => {
+  const textArray = useMemo(() => (Array.isArray(text) ? text : [text]), [text]);
+
+  /* Decided once, at mount: a visitor does not change this mid-session, and
+     re-reading it per render would re-run the machine. */
+  const [reduced] = useState(prefersReducedMotion);
+
   const [displayedText, setDisplayedText] = useState('');
   const [currentCharIndex, setCurrentCharIndex] = useState(0);
   const [isDeleting, setIsDeleting] = useState(false);
   const [currentTextIndex, setCurrentTextIndex] = useState(0);
-  const [loopCount, setLoopCount] = useState(0);
   const [isVisible, setIsVisible] = useState(!startOnVisible);
-  const cursorRef = useRef<HTMLSpanElement>(null);
-  const containerRef = useRef<HTMLElement>(null);
+  const [done, setDone] = useState(false);
 
-  const textArray = useMemo(
-    () => (Array.isArray(text) ? text : [text]),
-    [text]
-  );
+  const containerRef = useRef<HTMLElement>(null);
 
   const getRandomSpeed = useCallback(() => {
     if (!variableSpeed) return typingSpeed;
@@ -74,152 +113,155 @@ export const TextType: React.FC<TextTypeProps> = ({
     return Math.random() * (max - min) + min;
   }, [variableSpeed, typingSpeed]);
 
-  const getCurrentTextColor = () => {
-    if (textColors.length === 0) return 'inherit';
-    return textColors[currentTextIndex % textColors.length];
-  };
+  const currentColor = textColors.length
+    ? textColors[currentTextIndex % textColors.length]
+    : 'inherit';
 
+  /* ---- wait until it is on screen ---- */
   useEffect(() => {
-    if (!startOnVisible || !containerRef.current) return;
+    if (!startOnVisible || reduced) return;
+    const el = containerRef.current;
+    if (!el) return;
 
-    const observer = new IntersectionObserver(
+    const io = new IntersectionObserver(
       (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setIsVisible(true);
-          }
-        });
+        if (entries.some((e) => e.isIntersecting)) {
+          setIsVisible(true);
+          io.disconnect(); // it only ever needs to fire once
+        }
       },
       { threshold: 0.15 }
     );
 
-    observer.observe(containerRef.current);
-    return () => observer.disconnect();
-  }, [startOnVisible]);
+    io.observe(el);
+    return () => io.disconnect();
+  }, [startOnVisible, reduced]);
+
+  /* ---- the machine ---- */
+  const running = isVisible && start && !reduced;
 
   useEffect(() => {
-    if (showCursor && cursorRef.current) {
-      gsap.set(cursorRef.current, { opacity: 1 });
-      const tween = gsap.to(cursorRef.current, {
-        opacity: 0,
-        duration: cursorBlinkDuration,
-        repeat: -1,
-        yoyo: true,
-        ease: 'power2.inOut',
-      });
-      return () => {
-        tween.kill();
-      };
-    }
-  }, [showCursor, cursorBlinkDuration]);
+    if (!running) return;
 
-  useEffect(() => {
-    if (!isVisible) return;
+    const currentText = textArray[currentTextIndex] ?? '';
+    const processed = reverseMode ? [...currentText].reverse().join('') : currentText;
 
     let timeout: ReturnType<typeof setTimeout> | undefined;
-    const currentText = textArray[currentTextIndex] ?? '';
-    const processedText = reverseMode
-      ? currentText.split('').reverse().join('')
-      : currentText;
 
-    const executeTypingAnimation = () => {
+    const step = () => {
       if (isDeleting) {
         if (displayedText === '') {
-          if (currentTextIndex === textArray.length - 1 && !loop) {
+          if (!loop && currentTextIndex === textArray.length - 1) {
             setIsDeleting(false);
             return;
           }
-
-          if (onSentenceComplete) {
-            onSentenceComplete(textArray[currentTextIndex], currentTextIndex);
-          }
-
+          onSentenceComplete?.(textArray[currentTextIndex], currentTextIndex);
           timeout = setTimeout(() => {
             setIsDeleting(false);
             setCurrentCharIndex(0);
             setCurrentTextIndex((prev) => (prev + 1) % textArray.length);
-            setLoopCount((c) => c + 1);
           }, pauseDuration);
         } else {
-          timeout = setTimeout(() => {
-            setDisplayedText((prev) => prev.slice(0, -1));
-          }, deletingSpeed);
-        }
-      } else {
-        if (currentCharIndex < processedText.length) {
           timeout = setTimeout(
-            () => {
-              setDisplayedText((prev) => prev + processedText[currentCharIndex]);
-              setCurrentCharIndex((prev) => prev + 1);
-            },
-            variableSpeed ? getRandomSpeed() : typingSpeed
+            () => setDisplayedText((prev) => prev.slice(0, -1)),
+            deletingSpeed
           );
-        } else if (textArray.length >= 1) {
-          if (!loop && currentTextIndex === textArray.length - 1) return;
-          timeout = setTimeout(() => {
-            setIsDeleting(true);
-          }, pauseDuration);
         }
+        return;
       }
+
+      if (currentCharIndex < processed.length) {
+        timeout = setTimeout(
+          () => {
+            setDisplayedText((prev) => prev + processed[currentCharIndex]);
+            setCurrentCharIndex((prev) => prev + 1);
+          },
+          variableSpeed ? getRandomSpeed() : typingSpeed
+        );
+        return;
+      }
+
+      // Nothing left to type.
+      if (!loop && currentTextIndex === textArray.length - 1) {
+        setDone(true);
+        return;
+      }
+      timeout = setTimeout(() => setIsDeleting(true), pauseDuration);
     };
 
     if (currentCharIndex === 0 && !isDeleting && displayedText === '') {
-      timeout = setTimeout(executeTypingAnimation, initialDelay);
+      timeout = setTimeout(step, initialDelay);
     } else {
-      executeTypingAnimation();
+      step();
     }
 
     return () => {
       if (timeout) clearTimeout(timeout);
     };
   }, [
+    running,
     currentCharIndex,
     displayedText,
     isDeleting,
+    currentTextIndex,
+    textArray,
     typingSpeed,
     deletingSpeed,
     pauseDuration,
-    textArray,
-    currentTextIndex,
-    loop,
     initialDelay,
-    isVisible,
+    loop,
     reverseMode,
     variableSpeed,
     getRandomSpeed,
-    onSentenceComplete,
-    loopCount,
+    onSentenceComplete
   ]);
 
-  const currentLength = textArray[currentTextIndex]?.length ?? 0;
+  const fullText = textArray[currentTextIndex] ?? '';
   const shouldHideCursor =
-    hideCursorWhileTyping && (currentCharIndex < currentLength || isDeleting);
+    (hideCursorWhileTyping && (currentCharIndex < fullText.length || isDeleting)) ||
+    (hideCursorWhenDone && done);
+
+  /* Reduced motion: the finished text, and nothing else. */
+  if (reduced) {
+    return createElement(
+      Component,
+      { ref: containerRef, className: cn('text-type', className), ...props },
+      <span className="text-type__content" style={{ color: currentColor }}>
+        {textArray[0] ?? ''}
+      </span>
+    );
+  }
 
   return createElement(
     Component,
-    {
-      ref: containerRef,
-      className: cn('text-type', className),
-      ...props,
-    },
-    <span
-      className="text-type__content"
-      style={{ color: getCurrentTextColor() || 'inherit' }}
-    >
-      {displayedText}
+    { ref: containerRef, className: cn('text-type', className), ...props },
+    /* The finished string, laid out but invisible, so the element never
+       changes size as the visible copy is typed over it. Without this every
+       keystroke on a wrapping line reflows the page and moves every
+       ScrollTrigger below it. */
+    <span className="text-type__sizer" aria-hidden="true">
+      {textArray.reduce((a, b) => (b.length > a.length ? b : a), '')}
     </span>,
-    showCursor && (
-      <span
-        ref={cursorRef}
-        className={cn(
-          'text-type__cursor',
-          cursorClassName,
-          shouldHideCursor && 'text-type__cursor--hidden'
-        )}
-      >
-        {cursorCharacter}
+    /* Content and caret travel together in one overlay, so the caret stays
+       next to the last character typed instead of being positioned. */
+    <span className="text-type__line" key="line">
+      <span className="text-type__content" style={{ color: currentColor }}>
+        {displayedText}
       </span>
-    )
+      {showCursor && (
+        <span
+          className={cn(
+            'text-type__cursor',
+            cursorClassName,
+            shouldHideCursor && 'text-type__cursor--hidden'
+          )}
+          style={{ animationDuration: `${cursorBlinkDuration * 2}s` }}
+          aria-hidden="true"
+        >
+          {cursorCharacter}
+        </span>
+      )}
+    </span>
   );
 };
 

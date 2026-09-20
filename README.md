@@ -111,11 +111,42 @@ The site ships two generations of motion, kept apart on purpose:
 | Click sparks (`ClickSpark`) | Whole page | `useClickSpark` |
 | Edge tab (`CardNav`'s side tab) | Left edge, all pages | `EdgeTab` |
 | Icon set into a heading | The hero wordmark | `BoltMark` |
+| Word-by-word scroll reveal | Section headings, schedule row titles | `ui/ScrollReveal` |
+| Typed lines | Section sub-lines, schedule row details | `ui/TextType` |
 
 Two of the reference's signature effects were **not** added, because the site
 already does them: the gallery banner opening from a rounded frame to full
 bleed is `animated-scroll`, and the reveal footer is the same slide-over the
 reference uses for its closing CTA.
+
+#### The schedule's rows
+
+Each row arrives in two beats, modelled on the reference site's Professional
+Journey entries: the **title** resolves word by word out of a blur as the row
+climbs to reading height, and the **detail** types itself in — but only once
+that title has fully resolved. `ScrollReveal` reports completion through
+`onReveal`, and `TextType` is held by its `start` prop until then. The
+**time** never animates; it is a label, and a label that animates is a label
+you cannot scan.
+
+Both components are adapted from React Bits, not pasted. Three changes matter:
+
+- **One ScrollTrigger per instance, not three.** Upstream builds a separate
+  tween — and trigger — for rotation, opacity and blur, and gives the last two
+  identical configuration. They are merged here, and rotation is only built
+  when a rotation was asked for. The schedule went from 33 triggers to 18.
+- **`will-change` is leased, not permanent.** Upstream sets it in the tween's
+  from-vars *and* in the stylesheet, so every word on the page stays promoted
+  for the session. Here it is taken while the reveal is on screen and handed
+  back after, and the blur filter is cleared at the end rather than parked at
+  `blur(0px)` — any filter value keeps an element on its own layer.
+- **The caret blinks in CSS.** Upstream runs a `repeat: -1` GSAP tween per
+  typed line; there are twenty on this page.
+
+`TextType` also renders the finished string underneath at `visibility: hidden`
+so the element is always its final size. Without that, a line that wraps
+changes the page's height on every keystroke, which moves every ScrollTrigger
+below it while the visitor is reading.
 
 **Switching the speakers back to a row:** one line —
 `const LAYOUT = 'grid'` at the top of
