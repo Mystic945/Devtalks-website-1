@@ -1,0 +1,27 @@
+/* ============================================================
+   DEVTALKS — STYLE ORDER
+   ------------------------------------------------------------
+   Exactly the order the old index.html loaded them in. It
+   matters: paper.css re-inks everything above it, motion.css
+   layers on top of that, and the timeline + gallery sheets load
+   last because they override both.
+
+   Tailwind comes first so that hand-written CSS always wins a
+   specificity tie — the existing sections must not shift.
+   ============================================================ */
+@import './tailwind.css';
+
+@import './fonts.css';
+@import './style-devkraft.css';
+@import './doors.css';
+@import './parallax.css';
+@import './bento.css';
+@import './hero-bento.css';
+@import './paper.css';
+@import './motion.css';
+@import './paper-hover-timeline.css';
+@import './gallery.css';
+
+/* Everything added after the React port. Last, so it can override
+   any of the sheets above without editing them. */
+@import './animations.css';

@@ -1,0 +1,351 @@
+/* ============================================================
+   DEVTALKS — THE MOTION LAYER ADDED AFTER THE REACT PORT
+   ------------------------------------------------------------
+   Everything in this file is new. The ten sheets imported above
+   it are the original build, unchanged, so that a diff against
+   the static site stays readable — nothing here edits them, it
+   only adds or overrides.
+
+   Contents:
+     1 · crossing ribbons        (replaces the single marquee band)
+     2 · the speaker card stack
+     3 · the ticket's arrival
+     4 · click sparks
+     5 · the registrations tab
+     6 · the wordmark bolt
+
+   Every section degrades the same way the rest of the site does:
+   the declared state is the finished state, and the reduced-motion
+   block at the bottom takes the movement out without taking the
+   composition with it.
+   ============================================================ */
+
+/* ============================================================
+   1 · CROSSING RIBBONS
+   ------------------------------------------------------------
+   Two marquee bands crossing at a shallow angle instead of one
+   flat strip. They keep the .marquee classes, so the orange,
+   the rules and the type all come from the original sheets and
+   only the arrangement is new.
+
+   The bands are wider than the page and pulled back by the
+   overhang, because a rotated band has to be longer than the
+   viewport or its ends swing into view at the corners.
+   ============================================================ */
+.ribbons {
+  position: relative;
+  isolation: isolate;
+  /* A rotated band is taller than a flat one by the width of the page
+     times the sine of its angle, so the section is sized to hold both
+     of them rather than clipping their corners. */
+  min-height: clamp(150px, 16vw, 232px);
+  overflow: hidden;
+}
+
+.ribbons .marquee {
+  --overhang: 8vw;
+  position: absolute;
+  left: calc(var(--overhang) * -1);
+  width: calc(100% + var(--overhang) * 2);
+  top: 50%;
+}
+
+.ribbons .marquee--a {
+  transform: translateY(-50%) rotate(-3.2deg);
+  z-index: 2;
+}
+
+.ribbons .marquee--b {
+  transform: translateY(-50%) rotate(2.6deg);
+  z-index: 1;
+  /* the band behind reads as the shadow of the one in front */
+  background: var(--paper-2, #fbf8f2);
+  color: var(--black, #0b0b0b);
+}
+
+.ribbons .marquee--b .marquee__track span::after {
+  background: var(--orange, #ff5a1f);
+}
+
+@media (max-width: 700px) {
+  .ribbons .marquee--a {
+    transform: translateY(-50%) rotate(-2.2deg);
+  }
+  .ribbons .marquee--b {
+    transform: translateY(-50%) rotate(1.8deg);
+  }
+}
+
+/* ============================================================
+   2 · THE SPEAKER CARD STACK
+   ------------------------------------------------------------
+   The three cards stop being a row and become a deck: each one
+   sticks under the nav, and the next scrolls up and comes to
+   rest on top of it, a little lower each time so the edges of
+   the ones underneath stay visible.
+
+   FOUR ELEMENTS, FOUR OWNERS
+   The section already had two things writing transforms to one
+   card. The stack is a third, so it gets its own element rather
+   than sharing:
+
+     .spk-stack       sticky position          (CSS, no transform)
+       .spk-stack__in the shrink as it is covered   (useCardStack)
+         .spk-flow    the hover lift            (CSS, original)
+           .spk       the pointer tilt          (useTilt)
+
+   Breaking that is what made these cards jitter under the cursor
+   in an earlier build; see the note in src/hooks/useTilt.ts.
+   ============================================================ */
+.speakers--stack {
+  display: block;
+  max-width: 860px;
+  margin-inline: auto;
+  /* room for the last card to come to rest before the section ends */
+  padding-bottom: 12vh;
+}
+
+.speakers--stack .spk-stack {
+  position: sticky;
+  /* each card rests a little lower than the one it covers, so the
+     deck reads as a deck rather than as a single card */
+  top: calc(var(--stack-top, 104px) + var(--i, 0) * 18px);
+  margin-bottom: var(--stack-gap, 22vh);
+}
+
+.speakers--stack .spk-stack:last-child {
+  margin-bottom: 0;
+}
+
+.speakers--stack .spk-stack__in {
+  transform-origin: 50% 0%;
+  will-change: auto;
+}
+
+/* A card in the deck is landscape: portrait cards stacked under a
+   fixed nav do not fit a laptop screen. */
+.sec--speakers .speakers--stack .spk {
+  aspect-ratio: 16 / 9;
+  box-shadow: 0 24px 60px -32px rgba(11, 11, 11, 0.55);
+}
+
+.sec--speakers .speakers--stack .spk__body {
+  padding: clamp(22px, 3vw, 34px) clamp(20px, 3vw, 34px) clamp(24px, 3vw, 34px);
+}
+
+.sec--speakers .speakers--stack .spk__name {
+  font-size: clamp(1.6rem, 4vw, 2.6rem);
+}
+
+/* The talk line is the reason to look at the card; in a deck there
+   is room for it to simply be there rather than waiting for hover. */
+.sec--speakers .speakers--stack .spk__talk {
+  opacity: 1;
+  transform: none;
+  font-size: clamp(0.92rem, 1.6vw, 1.08rem);
+  max-width: 46ch;
+}
+
+/* Dimming the neighbours belongs to a row, where you can see them.
+   In a deck they are behind the card you are pointing at. */
+.sec--speakers .speakers--stack:hover .spk-flow:not(:hover):not(:focus-within),
+.sec--speakers .speakers--stack:focus-within .spk-flow:not(:hover):not(:focus-within) {
+  transform: none;
+}
+
+.sec--speakers .speakers--stack:hover .spk-flow:not(:hover):not(:focus-within) .spk,
+.sec--speakers
+  .speakers--stack:focus-within
+  .spk-flow:not(:hover):not(:focus-within)
+  .spk {
+  opacity: 1;
+  filter: none;
+}
+
+/* Below this the deck is not worth it: a sticky card under a nav on
+   a short screen leaves nothing to read. The cards fall back to the
+   original grid, which is what the rest of the sheets already style. */
+@media (max-width: 860px), (max-height: 640px) {
+  .speakers--stack {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: clamp(10px, 2.5vw, 22px);
+    padding-bottom: 0;
+  }
+  .speakers--stack .spk-stack {
+    position: static;
+    margin-bottom: 0;
+  }
+  .sec--speakers .speakers--stack .spk {
+    aspect-ratio: 3 / 4;
+    box-shadow: 0 1px 2px rgba(11, 11, 11, 0.05);
+  }
+}
+
+/* ============================================================
+   3 · THE TICKET'S ARRIVAL
+   ------------------------------------------------------------
+   The pass comes in slightly small and settles at full size as
+   it reaches reading height — the same gesture the gallery banner
+   makes when it opens, at the scale of one card.
+
+   Only a transform, and only while it is travelling: useScrollScale
+   clears the property the moment it lands.
+   ============================================================ */
+.pass__grow {
+  transform-origin: 50% 65%;
+}
+
+/* ============================================================
+   4 · CLICK SPARKS
+   ------------------------------------------------------------
+   One canvas over the whole page. It is only ever drawn on while
+   a spark is alive, and it never takes a pointer event.
+   ============================================================ */
+.spark {
+  position: fixed;
+  inset: 0;
+  z-index: 9500; /* over the dialogs, under nothing that needs clicking */
+  pointer-events: none;
+  display: block;
+}
+
+/* ============================================================
+   5 · THE REGISTRATIONS TAB
+   ------------------------------------------------------------
+   The call to action, pinned to the left edge so it is on screen
+   for the whole page rather than only in the hero. It takes
+   itself away while the ticket section is actually open, because
+   pointing at a thing that is already in front of you is noise.
+   ============================================================ */
+.edgetab {
+  position: fixed;
+  left: 0;
+  top: 50%;
+  z-index: 60;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7em;
+
+  transform: translateY(-50%) rotate(180deg) translateX(0);
+  writing-mode: vertical-rl;
+
+  padding: 1.1em 0.62em;
+  border: 2px solid var(--black, #0b0b0b);
+  border-left: 0;
+  border-radius: 0 10px 10px 0;
+  background: var(--orange, #ff5a1f);
+  color: var(--black, #0b0b0b);
+
+  font-family: var(--mono, ui-monospace, monospace);
+  font-size: 0.62rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  text-decoration: none;
+  white-space: nowrap;
+
+  box-shadow: 4px 0 0 rgba(11, 11, 11, 0.12);
+  transition: opacity 0.35s ease, transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.edgetab:hover,
+.edgetab:focus-visible {
+  transform: translateY(-50%) rotate(180deg) translateX(-4px);
+}
+
+.edgetab__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--black, #0b0b0b);
+  animation: edgetab-pulse 2.2s ease-in-out infinite;
+}
+
+@keyframes edgetab-pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.45;
+    transform: scale(0.72);
+  }
+}
+
+.edgetab.is-hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-50%) rotate(180deg) translateX(14px);
+}
+
+/* No room for it beside the content, and a phone has the nav CTA
+   a thumb away anyway. */
+@media (max-width: 1180px) {
+  .edgetab {
+    display: none;
+  }
+}
+
+/* ============================================================
+   6 · THE WORDMARK BOLT
+   ------------------------------------------------------------
+   An icon set into the wordmark, the way the reference sets them
+   into its headings. It is sized and coloured from the type
+   around it, so it tracks the responsive wordmark instead of
+   needing its own breakpoints.
+   ============================================================ */
+.hero__title .bolt {
+  display: inline-block;
+  width: 0.46em;
+  height: 0.62em;
+  margin-left: 0.06em;
+  vertical-align: baseline;
+  color: var(--orange, #ff5a1f);
+  /* the wordmark sits on a 0.9 line-height; nudge the glyph onto
+     the same optical baseline as the caps beside it */
+  transform: translateY(0.04em);
+}
+
+.hero__title .bolt svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  fill: currentColor;
+  /* the same layered outline the wordmark itself carries */
+  filter: drop-shadow(1.5px 0 0 var(--black, #0b0b0b))
+    drop-shadow(-1.5px 0 0 var(--black, #0b0b0b))
+    drop-shadow(0 1.5px 0 var(--black, #0b0b0b))
+    drop-shadow(0 -1.5px 0 var(--black, #0b0b0b));
+}
+
+/* ============================================================
+   REDUCED MOTION
+   ------------------------------------------------------------
+   The composition stays; the movement goes.
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  .ribbons .marquee--a,
+  .ribbons .marquee--b {
+    transform: translateY(-50%);
+  }
+
+  .speakers--stack .spk-stack__in {
+    transform: none !important;
+  }
+
+  .pass__grow {
+    transform: none !important;
+  }
+
+  .edgetab,
+  .edgetab__dot {
+    animation: none;
+    transition: none;
+  }
+
+  .spark {
+    display: none;
+  }
+}

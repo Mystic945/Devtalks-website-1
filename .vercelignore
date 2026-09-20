@@ -20,3 +20,9 @@ pdf/
 .DS_Store
 Thumbs.db
 node_modules/
+
+# Local build output — Vercel builds its own
+dist/
+
+# The original static site, kept as design reference only
+legacy/

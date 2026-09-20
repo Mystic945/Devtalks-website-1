@@ -20,3 +20,6 @@ pdf/
 .DS_Store
 Thumbs.db
 node_modules/
+
+# Build output
+dist/

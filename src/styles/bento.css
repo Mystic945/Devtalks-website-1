@@ -1,0 +1,141 @@
+/* ============================================================
+   DEVTALKS — GLASS BENTO SPEAKER CARDS
+   ------------------------------------------------------------
+   Speaker cards as 3D glass slabs with real depth. Tilting a
+   card (pointer on desktop, drag on touch) swings it on two
+   axes, and the layers inside sit at different translateZ so
+   they part with parallax — the topic icon floats clear of the
+   card face.
+
+   Deliberately CSS 3D, not WebGL: the hero already owns a
+   canvas, and a second GL context for a card grid is battery
+   spent for nothing. transform-style: preserve-3d and a
+   perspective on the grid do the whole job on the compositor.
+   ============================================================ */
+
+.speakers{
+  grid-template-columns:1fr;
+  gap:clamp(26px, 5vw, 44px);
+  perspective:1400px;                /* one shared vanishing point */
+  perspective-origin:50% 40%;
+}
+@media (min-width:900px){
+  .speakers{ grid-template-columns:repeat(3,1fr); gap:clamp(20px,2.6vw,34px); }
+}
+
+/* ---- the slab ---- */
+.spk{
+  position:relative;
+  transform-style:preserve-3d;
+  border-radius:22px;
+  border:1px solid rgba(255,255,255,.14);
+  background:
+    linear-gradient(150deg, rgba(255,255,255,.075), rgba(255,255,255,.012) 42%,
+                    rgba(0,0,0,.20)),
+    linear-gradient(180deg, var(--ink-2), #0B0604);
+  -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px);
+  box-shadow:
+    0 30px 60px -30px rgba(0,0,0,.9),
+    inset 0 1px 0 rgba(255,255,255,.14),
+    inset 0 -1px 0 rgba(0,0,0,.4);
+  will-change:transform;
+  transition:box-shadow .4s var(--ease);
+}
+.spk.is-tilting{
+  box-shadow:
+    0 44px 80px -34px rgba(0,0,0,.95),
+    0 0 0 1px rgba(236,105,27,.30),
+    inset 0 1px 0 rgba(255,255,255,.2);
+}
+
+/* the sheen that slides across glass as it turns */
+.spk::before{
+  content:'';
+  position:absolute; inset:0; z-index:3;
+  border-radius:inherit;
+  background:linear-gradient(
+    var(--sheen-angle, 130deg),
+    rgba(255,255,255,.16) 0%,
+    rgba(255,255,255,0) 38%,
+    rgba(255,255,255,0) 62%,
+    rgba(236,105,27,.10) 100%);
+  opacity:.55;
+  pointer-events:none;
+  transition:opacity .4s var(--ease);
+}
+.spk.is-tilting::before{ opacity:1; }
+
+/* ---- depth layers ----
+   Each sits at its own translateZ, so turning the card parts them. */
+.spk__img{
+  aspect-ratio:4/5;
+  border-radius:20px 20px 0 0;
+  transform:translateZ(8px);
+  transform-style:preserve-3d;
+}
+.spk__body{ transform:translateZ(26px); }
+.spk__name{ transform:translateZ(14px); }
+
+/* ---- the topic icon, floating clear of the face ---- */
+.spk__topic{
+  position:absolute; top:14px; right:14px; z-index:4;
+  width:62px; height:62px;
+  display:grid; place-content:center;
+  border-radius:16px;
+  border:1px solid rgba(236,105,27,.42);
+  background:linear-gradient(150deg, rgba(236,105,27,.24), rgba(12,7,5,.82));
+  box-shadow:0 16px 30px -14px rgba(0,0,0,.9), inset 0 1px 0 rgba(255,255,255,.18);
+  transform:translateZ(58px);        /* the pop-out */
+  transition:transform .5s var(--ease), box-shadow .4s var(--ease);
+}
+.spk.is-tilting .spk__topic{
+  transform:translateZ(88px) scale(1.06);
+  box-shadow:0 26px 44px -16px rgba(0,0,0,.95), inset 0 1px 0 rgba(255,255,255,.26);
+}
+.spk__topic svg{ width:30px; height:30px; display:block; }
+.spk__topic svg *{ stroke:var(--hero-b, #F7A93C); }
+
+/* the icon's shadow on the card face, which sells the gap */
+.spk__topic::after{
+  content:'';
+  position:absolute; inset:6px -4px -10px 6px;
+  border-radius:16px;
+  background:rgba(0,0,0,.55);
+  filter:blur(10px);
+  transform:translateZ(-30px);
+  z-index:-1;
+}
+
+@media (min-width:900px){
+  .spk__topic{ width:70px; height:70px; }
+  .spk__topic svg{ width:34px; height:34px; }
+}
+
+/* ---- typography, sized for three cards not eight ---- */
+.spk__no{ top:16px; left:18px; font-size:.68rem; letter-spacing:.2em; }
+.spk__body{ padding:clamp(18px,2vw,24px) clamp(18px,2vw,24px) clamp(22px,2.4vw,28px); }
+.spk__name{ font-size:clamp(1.35rem,3.4vw,1.9rem); line-height:1.02; margin-bottom:.35em; }
+.spk__role{ font-size:.82rem; margin-bottom:1.1em; }
+.spk__talk{
+  font-size:clamp(.92rem,2.4vw,1.02rem); line-height:1.4; font-weight:500;
+  color:#EDEDED; -webkit-line-clamp:3; padding-top:1em;
+}
+.spk__more{ right:16px; bottom:18px; width:34px; height:34px; }
+@media (hover:none){ .spk__more{ opacity:1; transform:none; } }
+
+/* On touch the affordance has to be stated, because there is no hover to
+   discover the tilt with. */
+.speakers__hint{
+  display:none;
+  font-family:var(--mono); font-size:.62rem; letter-spacing:.2em;
+  text-transform:uppercase; color:var(--mute-2);
+  margin:0 0 18px;
+}
+@media (hover:none){ .speakers__hint{ display:block; } }
+
+/* ---- Reduced motion: slabs sit flat and still ---- */
+@media (prefers-reduced-motion:reduce){
+  .spk{ transform:none !important; }
+  .spk__topic{ transform:translateZ(0) !important; }
+  .spk::before{ opacity:.5 !important; }
+}

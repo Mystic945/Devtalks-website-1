@@ -1,0 +1,120 @@
+/* ============================================================
+   DEVTALKS — AUDITORIUM DOOR INTRO
+   ------------------------------------------------------------
+   Layered on top of the page's own stylesheet. Two panels part
+   from the centre to reveal a hero that is already running
+   behind them — nothing on the page waits for this.
+
+   Plays once per browser session. Skipped entirely under
+   prefers-reduced-motion. Colours come from the page's tokens,
+   so it inherits whatever palette the page is using.
+   ============================================================ */
+
+.doors{
+  position:fixed; inset:0; z-index:10000;
+  pointer-events:none;
+}
+.doors.is-gone{ display:none; }
+
+/* ---- The two panels ---- */
+.door{
+  position:fixed; top:0; bottom:0;
+  width:50.2vw;                 /* slight overlap so no hairline shows at the seam */
+  overflow:hidden;
+  will-change:transform;
+  backface-visibility:hidden;
+}
+/* Both panels are positioned from the left so they share one coordinate
+   origin with their wordmark halves — anchoring one from the right lets a
+   scrollbar shift it and the word tears out of alignment. */
+.door--l{ left:0; }
+.door--r{ left:49.8vw; }
+
+/* Panel face: the ground, warming very slightly toward the seam,
+   with a soft vertical vignette so it reads as a surface not a fill. */
+.door--l{
+  background:
+    linear-gradient(to bottom, rgba(0,0,0,.45), transparent 22%, transparent 78%, rgba(0,0,0,.45)),
+    linear-gradient(90deg, var(--ink) 0%, var(--ink) 62%, #100A06 92%, #18100A 100%);
+  box-shadow:inset -1px 0 0 rgba(236,105,27,.30), inset -18px 0 40px -30px rgba(236,105,27,.55);
+}
+.door--r{
+  background:
+    linear-gradient(to bottom, rgba(0,0,0,.45), transparent 22%, transparent 78%, rgba(0,0,0,.45)),
+    linear-gradient(270deg, var(--ink) 0%, var(--ink) 62%, #100A06 92%, #18100A 100%);
+  box-shadow:inset 1px 0 0 rgba(236,105,27,.30), inset 18px 0 40px -30px rgba(236,105,27,.55);
+}
+
+/* ---- The wordmark, torn down the middle ----
+   Each panel holds a full-viewport-width copy of the wordmark,
+   clipped by its own panel. Together they read as one word; as
+   the panels part, the word tears in half and goes with them. */
+.door__mark{
+  position:absolute; top:50%;
+  width:100vw; text-align:center;
+  transform:translateY(-50%);
+  will-change:transform, opacity;
+}
+/* Each half is clipped to its own side of the word. Without this, drifting a
+   half outward slides letters out from behind the opposite panel and the word
+   appears to duplicate mid-open. */
+.door--l .door__mark{ left:0;        clip-path:inset(0 50% 0 0); }
+.door--r .door__mark{ left:-49.8vw;  clip-path:inset(0 0 0 50%); }
+
+.door__word{
+  display:block;
+  font-family:var(--display);
+  font-size:clamp(2.2rem, 8vw, 5.2rem);
+  line-height:1;
+  letter-spacing:.02em;
+  text-transform:uppercase;
+  color:var(--paper);
+}
+.door__word span{ color:var(--red); }
+
+/* ---- The seam ---- */
+.doors__seam{
+  position:fixed; top:0; bottom:0; left:50%;
+  width:2px; margin-left:-1px;
+  background:linear-gradient(to bottom,
+    transparent, var(--red) 12%, #FFC98A 50%, var(--red) 88%, transparent);
+  opacity:0;
+  will-change:opacity, transform;
+}
+/* Scales with the viewport — a fixed 190px bloom eats half a phone screen. */
+.doors__glow{
+  position:fixed; top:0; bottom:0; left:50%;
+  width:min(190px, 26vw);
+  transform:translateX(-50%);
+  background:radial-gradient(closest-side, rgba(236,105,27,.42), transparent 78%);
+  opacity:0;
+  will-change:opacity;
+}
+
+/* ---- Phones ----
+   The seam bloom, the two panel edge-glows and the warm panel ramp all stack
+   in the middle of the screen. At 1440px that's a hairline of light; at 390px
+   it becomes a flame filling a third of the display. Pull all three back. */
+@media (max-width:700px){
+  .door--l{
+    background:
+      linear-gradient(to bottom, rgba(0,0,0,.45), transparent 22%, transparent 78%, rgba(0,0,0,.45)),
+      linear-gradient(90deg, var(--ink) 0%, var(--ink) 84%, #0D0906 96%, #130C08 100%);
+    box-shadow:inset -1px 0 0 rgba(236,105,27,.26), inset -8px 0 18px -16px rgba(236,105,27,.40);
+  }
+  .door--r{
+    background:
+      linear-gradient(to bottom, rgba(0,0,0,.45), transparent 22%, transparent 78%, rgba(0,0,0,.45)),
+      linear-gradient(270deg, var(--ink) 0%, var(--ink) 84%, #0D0906 96%, #130C08 100%);
+    box-shadow:inset 1px 0 0 rgba(236,105,27,.26), inset 8px 0 18px -16px rgba(236,105,27,.40);
+  }
+  .doors__glow{
+    width:min(110px, 19vw);
+    background:radial-gradient(closest-side, rgba(236,105,27,.26), transparent 74%);
+  }
+}
+
+/* ---- No JS / reduced motion: never let the doors trap the page ---- */
+@media (prefers-reduced-motion:reduce){
+  .doors{ display:none !important; }
+}

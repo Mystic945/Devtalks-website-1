@@ -1,0 +1,93 @@
+/* ============================================================
+   DEVTALKS — MOTION LAYER  (paper edition only)
+   ------------------------------------------------------------
+   Loads after css/paper.css. Styles for the moving parts the
+   paper edition adds:
+
+     2. registration — cards arriving as you scroll
+     3. the speaker card magnify
+
+   Every element's DEFAULT state here is its finished state, so
+   a script that never runs leaves a correct, static page rather
+   than a blank one.
+   ============================================================ */
+
+/* ============================================================
+   2 · REGISTRATION
+   ------------------------------------------------------------
+   js/flow.js writes transform, opacity and filter on these as
+   they cross the fold. The declared state is the settled one.
+   ============================================================ */
+/* No will-change here. js/flow.js sets it while a card is actually
+   travelling and clears it the moment the card lands — a permanent hint on
+   16 elements is 16 layers the compositor holds for a 600ms animation. */
+[data-flow]{
+  transform-style:preserve-3d;
+}
+
+/* ============================================================
+   3 · THE SPEAKER CARD
+   ------------------------------------------------------------
+   There used to be a hover magnify here: a wrapper that scaled
+   the card to 1.07. It is gone. Scaling a card that js/bento.js
+   is already tilting every frame, inside an element js/flow.js
+   is writing a registration transform to, gave the compositor
+   three transforms on three nested elements to reconcile and
+   the card jittered under the cursor.
+
+   The card still answers the pointer — it tilts, and its ink
+   drop deepens with the tilt (see .spk.is-tilting in
+   css/paper.css). One transform, one owner.
+   ============================================================ */
+.spk-flow{ position:relative; }
+
+.spk{
+  overflow:hidden;              /* the portrait keeps to the panel */
+  transition:box-shadow .45s cubic-bezier(.16,1,.3,1),
+             border-color .3s ease;
+}
+.spk__img{ overflow:hidden; }
+
+/* A tilted card is the one in front; let it sit above its neighbours. */
+.speakers{ isolation:isolate; }
+.spk-flow:hover{ z-index:5; }
+
+/* ============================================================
+   REDUCED MOTION
+   ------------------------------------------------------------
+   The composition stays. Only the movement goes.
+   ============================================================ */
+@media (prefers-reduced-motion:reduce){
+  [data-flow]{
+    opacity:1 !important;
+    transform:none !important;
+    filter:none !important;
+    will-change:auto;
+  }
+
+}
+
+/* ============================================================
+   6 · ACTION PANELS — the converging speed lines
+   ------------------------------------------------------------
+   One <svg class="rays"> per panel, stretched to the panel box
+   and clipped by it. The polygons taper to a vanishing point,
+   which is what separates impact from hatching.
+   ============================================================ */
+.rays{
+  position:absolute; inset:0;
+  width:100%; height:100%;
+  z-index:0;
+  pointer-events:none;
+}
+.rays polygon{ fill:var(--black); }
+
+/* ============================================================
+   7 · THE SCHEDULE
+   ------------------------------------------------------------
+   Used to be comic panels (js/comic-panels.js built .sched--comic,
+   one row per panel, a rays SVG behind the list). That script is
+   unlinked now — the schedule is a vertical timeline instead, in
+   css/paper-hover-timeline.css. Nothing here targets .sched--comic
+   any more; re-link the script and this file no longer applies.
+   ============================================================ */

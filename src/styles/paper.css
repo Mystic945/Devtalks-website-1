@@ -1,0 +1,1369 @@
+/* ============================================================
+   DEVTALKS — PAPER PALETTE (comic print)
+   ------------------------------------------------------------
+   Loads LAST, on top of the existing stylesheet stack. Nothing
+   about the layout, the markup or the behaviour changes: this
+   file only re-inks the site.
+
+   The five colours this palette is built from:
+
+     #0b0b0b  black   — every line, every letter
+     #f3eee4  paper   — the ground the whole issue is printed on
+     #ff5a1f  orange  — the one spot colour on the press
+     #a29d94  grey    — rules and borders, never text
+     #393732  line    — the softer ink used for body copy
+
+   Two rules kept this honest:
+
+   1. Orange on paper measures 2.7:1. That is below the floor for
+      text at ANY size, so orange is never a typeface colour here
+      — it is a fill (black sits on it at 6.3:1), a rule, a dot,
+      or a mark. Where the dark design used orange type, this
+      file swaps in --spot-ink, a deeper press orange that clears
+      5.5:1. The one exception is the hero wordmark, which keeps
+      the vivid orange and earns its contrast from a black ink
+      outline — which is how a comic logo is lettered anyway.
+
+   2. Grey (#a29d94) measures 2.3:1 on paper, so it is used for
+      rules and borders only, never for type.
+
+   Delete this one <link> and the site is dark again.
+   ============================================================ */
+
+:root{
+  /* ---- the palette, as given ---- */
+  --black:  #0b0b0b;
+  --paper:  #f3eee4;
+  --orange: #ff5a1f;
+  --grey:   #a29d94;
+  --rule:   #393732;
+
+  /* ---- derived press inks ---- */
+  --paper-2:  #FBF8F2;                 /* card stock, a shade brighter    */
+  --paper-3:  #E7E0D2;                 /* recessed / unprinted areas      */
+  --spot-ink: #A83A0B;                 /* orange dark enough to set type  */
+  --ink-line: rgba(57,55,50,.55);
+  --ink-hair: rgba(57,55,50,.26);
+
+  /* ---- remap the tokens the rest of the site already reads ---- */
+  --red:      #ff5a1f;
+  --red-deep: #C24312;
+  --amber:    #A83A0B;
+  --ink:      #f3eee4;                 /* page ground                     */
+  --ink-2:    #FBF8F2;                 /* card surface                    */
+  --ink-3:    #E7E0D2;                 /* raised surface                  */
+  --line:     rgba(57,55,50,.55);
+  --line-2:   rgba(57,55,50,.26);
+  --mute:     #5A564E;                 /* 6.3:1 on paper                  */
+  --mute-2:   #6B665C;                 /* 4.9:1 on paper                  */
+
+  /* icon strokes */
+  --hero-a:   #393732;
+  --hero-b:   #393732;
+
+  /* the comic panel drop — flat ink, no blur, because print has none */
+  --drop:     6px 6px 0 var(--black);
+  --drop-sm:  3px 3px 0 var(--black);
+}
+
+/* ============================================================
+   THE PAGE
+   ============================================================ */
+body{
+  background:var(--paper);
+  color:var(--black);
+}
+
+/* The dot screen is off. The comic marks carry the texture now, and a
+   halftone under them was two patterns competing for the same paper.
+   The grain the dark build used is off with it — this ground is clean
+   stock, printed on. */
+body::after{ display:none; }
+
+/* ---- browser surfaces: these ship with the design too ---- */
+::selection{ background:var(--orange); color:var(--black); }
+html{ caret-color:var(--spot-ink); scrollbar-color:var(--rule) var(--paper-3); }
+::-webkit-scrollbar{ width:12px; height:12px; }
+::-webkit-scrollbar-track{ background:var(--paper-3); }
+::-webkit-scrollbar-thumb{
+  background:var(--rule); border:3px solid var(--paper-3); border-radius:8px;
+}
+::-webkit-scrollbar-thumb:hover{ background:var(--black); }
+
+:focus-visible{
+  outline:3px solid var(--orange);
+  outline-offset:3px;
+  border-radius:2px;
+}
+a{ text-underline-offset:.22em; text-decoration-thickness:1.5px; }
+
+/* Numerals that sit in columns line up. */
+.count__cell strong, .bttick__n, .sched time, .tier__price b, .stat b{
+  font-variant-numeric:tabular-nums;
+}
+
+/* ============================================================
+   TYPE
+   ============================================================ */
+.sec__sub, .eyebrow{ color:var(--mute); }
+.eyebrow em{ color:var(--spot-ink); border-right-color:var(--ink-line); }
+
+/* ============================================================
+   BUTTONS — an ink block that fills black on hover
+   ============================================================ */
+.btn{
+  --bg:var(--orange); --fg:var(--black);
+  border:2px solid var(--black);
+  box-shadow:var(--drop-sm);
+  font-weight:800;
+}
+.btn::before{ background:var(--black); }
+.btn:hover{ color:var(--paper); }
+.btn:active{ box-shadow:1px 1px 0 var(--black); }
+.btn--ghost{ --bg:transparent; --fg:var(--black); box-shadow:var(--drop-sm); }
+.btn--ghost:hover{ color:var(--paper); }
+
+/* ============================================================
+   NAV
+   ============================================================ */
+/* Stuck nav goes to black glass rather than paper — it bookends the black
+   footer and gives the one piece of chrome that's on screen for the whole
+   visit a stronger ink presence. Padding matches the resting .nav exactly
+   (16px, not the old 11px) so nothing here ever animates a layout property
+   — background/shadow/backdrop-filter are the only things transitioning,
+   all compositor-only. */
+.nav.is-stuck{
+  /* Near-opaque instead of frosted: a fixed bar with backdrop-filter has to
+     re-blur whatever slides under it on every scrolled frame. */
+  background:rgba(11,11,11,.95);
+  -webkit-backdrop-filter:none;
+  backdrop-filter:none;
+  box-shadow:0 1px 0 rgba(243,238,228,.14);
+  padding-top:16px;
+  padding-bottom:16px;
+}
+.nav.is-stuck .nav__logo{ color:var(--paper); }
+.nav.is-stuck .nav__logo span{ color:var(--orange); }
+.nav.is-stuck .nav__logo b{ color:var(--grey); }
+.nav.is-stuck .nav__links a{ color:var(--grey); }
+.nav.is-stuck .nav__links a:hover,
+.nav.is-stuck .nav__links a.is-active{ color:var(--paper); }
+.nav.is-stuck .burger i{ background:var(--paper); }
+
+.nav__logo,
+.nav__logo span,
+.nav__logo b{ transition:color .3s ease; }
+.burger i{ transition:transform .4s var(--ease), opacity .3s, background-color .3s ease; }
+
+.nav__logo span{ color:var(--spot-ink); }
+.nav__logo b{ color:var(--mute-2); }
+.nav__links a{ color:var(--rule); }
+.nav__links a:hover, .nav__links a.is-active{ color:var(--black); }
+.nav__links a::after{ background:var(--orange); height:2px; }
+.burger i{ background:var(--black); }
+
+.menu{ background:var(--paper); }
+.menu__links a{ border-bottom-color:var(--ink-hair); }
+.menu__links em{ color:var(--spot-ink); }
+.menu__socials{ color:var(--mute); }
+.menu__socials a:hover{ color:var(--black); }
+
+/* ============================================================
+   HERO
+   ============================================================ */
+/* The backdrop the bento glass works against: soft spot-colour blooms.
+   There used to be an animated doodle field behind the glass as well; it
+   was removed, so the frost now blurs a still backdrop, which the browser
+   blurs once and caches instead of re-blurring every frame. */
+.hero--bento .hero__veil{
+  background:
+    radial-gradient(58% 48% at 16% 14%, rgba(255,90,31,.30), transparent 66%),
+    radial-gradient(48% 44% at 88% 72%, rgba(255,90,31,.18), transparent 68%),
+    radial-gradient(40% 40% at 62% 96%, rgba(168,58,11,.13), transparent 70%),
+    linear-gradient(180deg, rgba(231,224,210,.26), rgba(243,238,228,0) 46%);
+}
+
+/* The wordmark, lettered the way a comic logo is: solid colour, a hard
+   black outline, and a flat drop behind it.
+
+   The outline is built from text-shadow, NOT -webkit-text-stroke.
+   text-stroke centres the stroke on the glyph edge, so half of every
+   line is painted INTO the letterform — at this weight it thins the
+   Anton stems and the whole wordmark goes soft. text-shadow paints
+   behind the glyph, so the outline is entirely outside it and the
+   letterforms stay exactly as drawn. */
+.hero__title{ line-height:.9; }
+
+.hero__title .line > span{
+  --ink-out:3px;
+  --ink-drop:9px;
+}
+.hero__title .line:nth-child(2) > span{
+  color:var(--orange);
+  background:none;
+  -webkit-text-fill-color:var(--orange);
+  -webkit-text-stroke:0;
+  text-shadow:
+    var(--ink-out) 0 0 var(--black),
+    calc(var(--ink-out) * -1) 0 0 var(--black),
+    0 var(--ink-out) 0 var(--black),
+    0 calc(var(--ink-out) * -1) 0 var(--black),
+    calc(var(--ink-out) * .72) calc(var(--ink-out) * .72) 0 var(--black),
+    calc(var(--ink-out) * -.72) calc(var(--ink-out) * .72) 0 var(--black),
+    calc(var(--ink-out) * .72) calc(var(--ink-out) * -.72) 0 var(--black),
+    calc(var(--ink-out) * -.72) calc(var(--ink-out) * -.72) 0 var(--black),
+    var(--ink-drop) var(--ink-drop) 0 var(--black);
+}
+/* DEV is already ink on paper, so it takes the drop and skips the outline —
+   a black rule around black letters is just a heavier letter. */
+.hero__title .line:nth-child(1) > span{
+  color:var(--black);
+  -webkit-text-fill-color:var(--black);
+  text-shadow:var(--ink-drop) var(--ink-drop) 0 rgba(255,90,31,.55);
+}
+@media (min-width:900px){
+  .hero__title .line > span{ --ink-out:4px; --ink-drop:12px; }
+}
+@media (max-width:640px){
+  .hero__title .line > span{ --ink-out:2px; --ink-drop:6px; }
+  /* At this size the outline closes the gap and the 26 collides with the S. */
+  .hero__title b{ margin-left:.7em; }
+}
+.hero__title b{
+  color:var(--rule);
+  -webkit-text-fill-color:var(--rule);
+  -webkit-text-stroke:0;
+  text-shadow:none;
+  margin-left:.42em;        /* clear of the S and its outline */
+}
+.hero__theme{ color:var(--black); }
+.hero__tag{ color:var(--rule); }
+.hero__meta{ color:var(--rule); }
+.hero__meta i{ background:var(--orange); height:2px; }
+.hero__scroll{ color:var(--mute-2); }
+.hero__scroll i{ background:linear-gradient(to bottom,var(--orange),transparent); width:2px; }
+
+/* ---- the bento panels ---- */
+/* Frosted paper. The fill stays translucent so the blooms and the dot
+   field read through it; the ink border and the flat drop keep the tile
+   sitting on a printed page rather than floating in a dark UI. */
+.bt{
+  border:2px solid var(--black);
+  background:linear-gradient(150deg,
+    rgba(255,253,249,.88) 0%, rgba(251,248,242,.72) 48%, rgba(231,224,210,.68) 100%);
+  /* 14px, not 26px. A frosted pane over a STATIC backdrop is blurred once
+     and cached; over an animating canvas the compositor re-blurs it every
+     frame, and the cost scales with the radius and the area. At this size
+     the tiles still read as glass and the bill halves. */
+  -webkit-backdrop-filter:blur(14px) saturate(1.2);
+  backdrop-filter:blur(14px) saturate(1.2);
+  box-shadow:
+    var(--drop),
+    inset 0 1px 0 rgba(255,255,255,.85),
+    inset 0 0 0 1px rgba(255,255,255,.35);
+  transition:border-color .35s var(--ease), box-shadow .35s var(--ease),
+             background .35s var(--ease);
+}
+/* Under the spotlight the glass clears a little and the pane picks up
+   more of the light behind it. */
+.bt.is-lit{
+  border-color:var(--black);
+  background:linear-gradient(150deg,
+    rgba(255,253,249,.80) 0%, rgba(251,248,242,.60) 48%, rgba(231,224,210,.56) 100%);
+  box-shadow:
+    8px 8px 0 var(--orange),
+    inset 0 1px 0 rgba(255,255,255,.95),
+    inset 0 0 0 1px rgba(255,255,255,.45);
+}
+
+/* Glass needs a lit edge to read as a pane rather than a tint. This is
+   the highlight running along the top-left of each tile. */
+.bt__in::before{
+  content:'';
+  position:absolute; inset:0;
+  border-radius:inherit;
+  pointer-events:none;
+  background:linear-gradient(148deg,
+    rgba(255,255,255,.55) 0%, rgba(255,255,255,0) 26%);
+  z-index:-1;
+}
+
+/* The small panes inside a tile used to be frosted too. They sit ON a tile
+   that is already frosting the same backdrop, so the second blur showed
+   almost nothing and cost fourteen more composited layers on a surface the
+   compositor is already re-blurring every frame. They keep the translucent
+   fill that makes them read as glass, and drop the filter. */
+.count__cell, .btstack span, .btspk__img{
+  -webkit-backdrop-filter:none; backdrop-filter:none;
+}
+
+/* The nav frosts a backdrop that is not animating, so it stays as it was. */
+
+/* The spotlight, printed. The wash is the same gradient the dark
+   build slid around; here it is masked into a dot screen, so the
+   light that follows the cursor arrives as halftone on paper. */
+.bt__glow{
+  background:radial-gradient(circle closest-side,
+    rgba(255,90,31,.46) 0%, rgba(255,90,31,.24) 42%,
+    rgba(255,90,31,.07) 66%, transparent 78%);
+  -webkit-mask-image:radial-gradient(#000 38%, transparent 40%);
+  mask-image:radial-gradient(#000 38%, transparent 40%);
+  -webkit-mask-size:5px 5px; mask-size:5px 5px;
+  mix-blend-mode:multiply;
+}
+.bt__rim{
+  box-shadow:inset 0 0 0 2px var(--orange);
+}
+.bt__label{ color:var(--mute-2); }
+.bt__label b{ color:var(--spot-ink); }
+
+.btspk__img{
+  border:2px solid var(--black);
+  background:rgba(231,224,210,.55);
+}
+.btspk__img img{ filter:grayscale(1) contrast(1.12) brightness(1.04); }
+.btspk__ini{ color:rgba(11,11,11,.22); }
+.btspk__role{ color:var(--mute); }
+.btspk__talk{ color:var(--rule); border-top-color:var(--ink-hair); }
+
+.bttick__u{ color:var(--mute-2); }
+.bttick__live{ color:var(--spot-ink); }
+.bttick__live i{ background:var(--orange); }
+@keyframes btpulse{
+  0%{   box-shadow:0 0 0 0 rgba(255,90,31,.7); }
+  70%{  box-shadow:0 0 0 9px rgba(255,90,31,0); }
+  100%{ box-shadow:0 0 0 0 rgba(255,90,31,0); }
+}
+.bttick__feed{ color:var(--mute); }
+
+.btstack span{
+  border:1.5px solid var(--ink-line);
+  background:rgba(255,253,249,.45);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.75);
+}
+.btstack svg *{ stroke:var(--rule); }
+
+.count__cell{
+  border:2px solid var(--black);
+  background:rgba(255,253,249,.42);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.8);
+}
+.count__cell small{ color:var(--mute-2); }
+
+.bento__hint{ color:var(--mute-2); }
+.bento__hint button{ color:var(--spot-ink); border-color:var(--spot-ink); }
+
+/* ============================================================
+   MARQUEE — solid spot colour, black lettering
+   ============================================================ */
+.marquee{
+  background:var(--orange);
+  border-top:2px solid var(--black);
+  border-bottom:2px solid var(--black);
+  color:var(--black);
+}
+.marquee__track span::after{ background:var(--black); }
+
+/* ============================================================
+   SECTIONS
+   ============================================================ */
+.sec + .sec{ border-top:1px solid var(--ink-hair); }
+
+.about__copy{ color:var(--rule); }
+.note{
+  border:2px solid var(--black);
+  background:var(--paper-2);
+  box-shadow:var(--drop-sm);
+}
+.note b{ color:var(--black); }
+.note span{ color:var(--mute); }
+
+.stats{
+  background:var(--black);
+  border:2px solid var(--black);
+  gap:2px;
+}
+.stat{ background:var(--paper-2); }
+.stat b{ color:var(--spot-ink); }
+.stat span{ color:var(--mute); }
+
+/* ============================================================
+   SPEAKERS — panels on the page, art printed in ink
+   ============================================================ */
+.spk{
+  border:2px solid var(--black);
+  background:var(--paper-2);
+  -webkit-backdrop-filter:none; backdrop-filter:none;
+  box-shadow:var(--drop);
+}
+.spk:hover{ border-color:var(--black); }
+.spk.is-tilting{ box-shadow:10px 10px 0 var(--orange); }
+
+/* The sheen becomes a halftone screen that comes up as the card turns. */
+/* The sheen becomes a soft ink wash that comes up as the card turns —
+   no dot screen, since the page no longer has one. */
+.spk::before{
+  background:linear-gradient(148deg,
+    rgba(11,11,11,.10) 0%, rgba(11,11,11,0) 42%, rgba(255,90,31,.10) 100%);
+  opacity:.5;
+  mix-blend-mode:multiply;
+}
+.spk.is-tilting::before{ opacity:.85; }
+
+.spk__img{
+  background:var(--paper-3);
+  border-bottom:2px solid var(--black);
+}
+/* Printed in one ink by default; hovering runs the colour plate.
+   No multiply here — a dark source photo multiplied against paper
+   just goes black, and half these portraits are dark. The dot
+   screen that makes it read as print is the .spk::before layer,
+   which sits above the art. */
+.spk__img img{ filter:grayscale(1) contrast(1.12) brightness(1.04); }
+.spk:hover .spk__img img{ filter:grayscale(0) contrast(1.02); }
+.spk__img::after{
+  background:linear-gradient(to top, rgba(251,248,242,.55), rgba(251,248,242,0) 30%);
+}
+.spk__ini{ color:rgba(11,11,11,.16); }
+/* The corner number sat in deep orange on top of a photo, which reads at
+   about 2:1 against a dark one. It gets its own plate instead. */
+.spk__no{
+  color:var(--black);
+  background:var(--orange);
+  border:2px solid var(--black);
+  border-radius:6px;
+  padding:3px 7px;
+  font-weight:600;
+  line-height:1;
+}
+.spk__role{ color:var(--mute); }
+.spk__talk{ color:var(--black); border-top-color:var(--ink-hair); }
+.spk__more{ background:var(--orange); color:var(--black); border:2px solid var(--black); }
+
+/* The topic chip. It sits on a portrait this file cannot predict the
+   brightness of, so every edge of it is declared rather than inherited:
+   solid stock, a heavy ink rule, and a flat drop. Nothing soft. */
+.spk__topic{
+  width:66px; height:66px;
+  border:3px solid var(--black);
+  border-radius:12px;                /* tighter than the card — a chip, not a card */
+  background:var(--paper-2);
+  box-shadow:4px 4px 0 var(--black);
+}
+@media (min-width:900px){
+  .spk__topic{ width:74px; height:74px; border-radius:13px; }
+}
+.spk.is-tilting .spk__topic{ box-shadow:7px 7px 0 var(--black); }
+
+/* css/bento.css hangs a blur(10px) cast shadow off this pseudo-element.
+   It was depth for a dark glass card; on paper it only fogs the chip's
+   own edge, and it is the one blurred thing in this corner of the page. */
+.spk__topic::after{ display:none; }
+
+/* The icon carries the same weight as the rule around it. */
+.spk__topic svg{ width:34px; height:34px; }
+.spk__topic svg *{ stroke:var(--orange); stroke-width:2.4; }
+@media (min-width:900px){
+  .spk__topic svg{ width:38px; height:38px; }
+}
+.speakers__hint{ color:var(--mute-2); }
+
+/* ============================================================
+   MODAL
+   ============================================================ */
+.modal__scrim{ background:rgba(11,11,11,.55); }
+.modal__card{
+  background:var(--paper-2);
+  border:2px solid var(--black);
+  box-shadow:var(--drop);
+}
+.modal__x{ background:var(--paper); border:2px solid var(--black); color:var(--black); }
+.modal__media{
+  background:var(--paper-3);
+  color:rgba(11,11,11,.16);
+  border-bottom:2px solid var(--black);
+}
+.modal__media img{ filter:grayscale(1) contrast(1.12) brightness(1.04); }
+@media (min-width:760px){
+  .modal__media{ border-bottom:0; border-right:2px solid var(--black); }
+}
+.modal__tags span{ border:1.5px solid var(--ink-line); color:var(--mute); }
+.modal__role{ color:var(--spot-ink); }
+.modal__talkLabel{ color:var(--mute-2); }
+.modal__bio{ color:var(--rule); }
+.modal__link{ color:var(--spot-ink); }
+
+/* ============================================================
+   SCHEDULE
+   ============================================================ */
+.sched{ border-top:2px solid var(--black); }
+.sched li{ border-bottom:1px solid var(--ink-hair); }
+.sched li:hover{ background:rgba(255,90,31,.10); }
+.sched time{ color:var(--spot-ink); }
+.sched li.is-break time{ color:var(--mute-2); }
+.sched li.is-break h3{ color:var(--mute); }
+.sched p{ color:var(--mute-2); }
+
+/* ============================================================
+   TICKETS
+   ============================================================ */
+.tier{
+  border:2px solid var(--black);
+  background:var(--paper-2);
+  box-shadow:var(--drop);
+}
+.tier:hover{ border-color:var(--black); }
+.tier--feat{
+  border-color:var(--black);
+  background:linear-gradient(180deg, rgba(255,90,31,.16), rgba(255,90,31,.04));
+  box-shadow:8px 8px 0 var(--orange);
+}
+.tier__flag{
+  background:var(--orange); color:var(--black);
+  border:2px solid var(--black);
+  font-weight:700;
+}
+.tier__price s{ color:var(--mute-2); }
+.tier__note{ color:var(--mute); }
+.tier li{ color:var(--rule); }
+.tier li::before{ color:var(--spot-ink); }
+.tickets__fine{ color:var(--mute-2); }
+
+/* ============================================================
+   SPONSORS
+   ============================================================ */
+.tierRow h3{ color:var(--mute); }
+.tierRow h3::after{ background:var(--ink-hair); }
+.logo{
+  border:2px solid var(--black);
+  background:var(--paper-2);
+  color:var(--mute);
+}
+.logo:hover{ color:var(--black); border-color:var(--black); background:rgba(255,90,31,.12); }
+.logo img{ filter:grayscale(1) contrast(1.05); mix-blend-mode:multiply; opacity:.9; }
+.logo:hover img{ filter:none; mix-blend-mode:normal; opacity:1; }
+.tierRow--title .logo{ color:var(--black); }
+
+.cta{ background:var(--orange); border:2px solid var(--black); box-shadow:var(--drop); }
+.cta h3, .cta p{ color:var(--black); }
+.cta .btn{ --bg:var(--black); --fg:var(--paper); }
+.cta .btn:hover{ color:var(--orange); }
+
+/* ============================================================
+   VENUE
+   ============================================================ */
+.venue__info > p{ color:var(--mute); }
+.venue__info dl{ border-top-color:var(--ink-hair); }
+.venue__info dl > div{ border-bottom-color:var(--ink-hair); }
+.venue__info dt{ color:var(--mute-2); }
+.venue__map{
+  border:2px solid var(--black);
+  background:var(--paper-3);
+  box-shadow:var(--drop);
+}
+.venue__grid{
+  background-image:
+    linear-gradient(rgba(57,55,50,.42) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(57,55,50,.42) 1px, transparent 1px);
+}
+.venue__pin i{ background:var(--orange); border:2px solid var(--black); }
+.venue__pin span{ color:var(--black); }
+@keyframes pulse{
+  0%{   box-shadow:0 0 0 0 rgba(255,90,31,.55); }
+  70%{  box-shadow:0 0 0 12px rgba(255,90,31,0); }
+  100%{ box-shadow:0 0 0 0 rgba(255,90,31,0); }
+}
+
+/* ============================================================
+   FAQ
+   ============================================================ */
+.faq{ border-top:2px solid var(--black); }
+.faq__item{ border-bottom-color:var(--ink-hair); }
+.faq__q i::before, .faq__q i::after{ background:var(--spot-ink); }
+.faq__a p{ color:var(--rule); }
+
+/* ============================================================
+   FINAL CTA — halftone burning up from the bottom of the page
+   ============================================================ */
+.final{
+  background:
+    radial-gradient(80% 110% at 50% 100%, rgba(255,90,31,.55), transparent 70%),
+    var(--paper);
+  border-top:2px solid var(--black);
+}
+.final__k{ color:var(--rule); }
+.final__h{ color:var(--black); }
+
+/* ============================================================
+   FOOTER — the reveal
+   ------------------------------------------------------------
+   The one surface on this page that is deliberately not comic:
+   no panels, no speed lines, no paste-up angles, no flat ink
+   drops. It is the back cover — solid black stock, a hairline,
+   a single warm cast of the spot colour, and the type set
+   quietly. Everything loud on this site happens above it.
+
+   It is pinned behind the page and uncovered as you scroll off
+   the end; js/footer-reveal.js owns that and turns it off when
+   the footer is taller than the window.
+   ============================================================ */
+.foot{
+  position:relative;
+  background:var(--black);
+  color:var(--paper);
+  border-top:0;
+  border-radius:26px 26px 0 0;
+  overflow:hidden;
+  padding:clamp(44px,6vw,76px) 0 clamp(20px,3vw,30px);
+}
+
+/* The page rides over the footer, so it needs its own ground to hide it
+   until the end. */
+main{
+  position:relative;
+  z-index:1;
+  background:var(--paper);
+}
+.foot.is-revealing{
+  position:fixed;
+  left:0; right:0; bottom:0;
+  z-index:0;
+}
+
+/* One warm cast off the top edge — the light the page is leaving. */
+.foot__glow{
+  position:absolute; left:0; right:0; top:0; height:60%;
+  pointer-events:none;
+  background:
+    radial-gradient(64% 100% at 50% 0%, rgba(255,90,31,.20), transparent 72%),
+    linear-gradient(180deg, rgba(243,238,228,.07), transparent 40%);
+}
+.foot > .wrap{ position:relative; z-index:1; }
+.foot::before{
+  content:'';
+  position:absolute; left:0; right:0; top:0; height:1px;
+  background:rgba(243,238,228,.18);
+  z-index:2;
+}
+
+/* ---- the mark and the line under it ---- */
+.foot__head{ margin-bottom:clamp(40px,6vw,72px); }
+.foot__mark{
+  display:inline-flex; align-items:baseline; gap:.14em;
+  font-family:var(--display);
+  font-size:clamp(1.3rem,3vw,1.7rem);
+  letter-spacing:.02em;
+  color:var(--paper);
+  margin-bottom:.7em;
+}
+.foot__mark span{ color:var(--orange); }
+.foot__mark b{
+  font-family:var(--mono); font-size:.5rem; font-weight:600;
+  color:var(--grey); letter-spacing:.1em; transform:translateY(-.9em);
+}
+.foot__legal{ margin:0; color:var(--grey); font-size:.86rem; }
+
+/* ---- the link grid ---- */
+.foot__cols{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:clamp(26px,4vw,40px) clamp(20px,3vw,32px);
+}
+@media (min-width:760px){ .foot__cols{ grid-template-columns:repeat(4,1fr); } }
+
+.foot__cols h4{
+  margin:0 0 1.1em;
+  font-family:var(--sans);
+  font-size:.82rem; font-weight:600; letter-spacing:.01em;
+  text-transform:none;
+  color:var(--paper);
+}
+.foot__cols a,
+.foot__socials a{
+  display:block;
+  padding:.34em 0;
+  font-size:.86rem;
+  color:#B9B4AA;                      /* 8.7:1 on black */
+  cursor:pointer;
+  transition:color .22s ease;
+}
+.foot__cols a:hover,
+.foot__socials a:hover{ color:var(--orange); }
+
+/* ---- the colophon ---- */
+.foot__bar{
+  display:flex; flex-wrap:wrap; gap:12px;
+  align-items:center; justify-content:space-between;
+  margin-top:clamp(40px,6vw,72px);
+  padding-top:20px;
+  border-top:1px solid rgba(243,238,228,.12);
+  font-size:.78rem;
+  color:var(--grey);
+}
+.foot__by{ margin:0; color:var(--grey); }
+.foot__by b{ color:var(--paper); font-weight:600; }
+.foot__up{
+  color:var(--grey);
+  transition:color .22s ease;
+}
+.foot__up:hover{ color:var(--orange); }
+
+/* js/main.js parallaxes this unconditionally; it stays in the DOM so that
+   call finds a target, and stays hidden because a giant outlined wordmark
+   is exactly the register this footer is stepping out of. */
+.foot__huge{ display:none; }
+
+/* ============================================================
+   THE DOORS — the cover of the issue, splitting down the spine
+   ============================================================ */
+.door--l{
+  background:
+    linear-gradient(90deg, var(--paper) 0%, var(--paper) 70%, #EFE7D8 100%);
+  box-shadow:inset -2px 0 0 var(--black);
+}
+.door--r{
+  background:
+    linear-gradient(270deg, var(--paper) 0%, var(--paper) 70%, #EFE7D8 100%);
+  box-shadow:inset 2px 0 0 var(--black);
+}
+.door__word{ color:var(--black); }
+.door__word span{
+  color:var(--orange);
+  -webkit-text-stroke:0;
+  text-shadow:
+    2px 0 0 var(--black), -2px 0 0 var(--black),
+    0 2px 0 var(--black), 0 -2px 0 var(--black),
+    1.5px 1.5px 0 var(--black), -1.5px 1.5px 0 var(--black),
+    1.5px -1.5px 0 var(--black), -1.5px -1.5px 0 var(--black),
+    6px 6px 0 var(--black);
+}
+.doors__seam{
+  background:linear-gradient(to bottom,
+    transparent, var(--orange) 12%, #FFB48C 50%, var(--orange) 88%, transparent);
+  width:3px; margin-left:-1.5px;
+}
+.doors__glow{
+  background:radial-gradient(closest-side, rgba(255,90,31,.34), transparent 78%);
+}
+@media (max-width:700px){
+  .door--l{
+    background:
+        linear-gradient(90deg, var(--paper) 0%, var(--paper) 86%, #EFE7D8 100%);
+    box-shadow:inset -2px 0 0 var(--black);
+  }
+  .door--r{
+    background:
+        linear-gradient(270deg, var(--paper) 0%, var(--paper) 86%, #EFE7D8 100%);
+    box-shadow:inset 2px 0 0 var(--black);
+  }
+  .doors__glow{ background:radial-gradient(closest-side, rgba(255,90,31,.22), transparent 74%); }
+}
+
+/* ============================================================
+   THE OTHER PAGES IN THIS FOLDER
+   ------------------------------------------------------------
+   index.html and the variants share this class inventory, so
+   everything above already re-inks them. These are the few
+   surfaces that only exist outside the bento page.
+   ============================================================ */
+
+/* The plain hero (index.html) paints a dark veil over its WebGL
+   canvas. On paper the canvas is the thing worth seeing, so the
+   veil only lifts the copy off it. */
+.hero:not(.hero--bento) .hero__veil{
+  background:
+    radial-gradient(120% 78% at 76% 18%, rgba(255,90,31,.10), transparent 62%),
+    linear-gradient(to right, rgba(243,238,228,.90) 0%, rgba(243,238,228,.55) 46%, rgba(243,238,228,0) 78%),
+    linear-gradient(to bottom, rgba(243,238,228,.55) 0%, rgba(243,238,228,0) 34%, rgba(243,238,228,.80) 100%);
+}
+.hero:not(.hero--bento) .hero__kicker{ color:var(--mute); }
+.hero__kicker .dot{ background:var(--orange); }
+
+/* Three-speaker page: same slab, printed rather than lit. */
+.sec--speakers .spk__img{ background:var(--paper-3); }
+.sec--speakers .spk__talk{ color:var(--black); }
+
+/* ---- preloader, for the pages that use it instead of the doors ---- */
+.loader{ background:var(--paper); }
+.loader__mark span{ color:var(--spot-ink); }
+.loader__bar{ background:var(--ink-hair); }
+.loader__bar i{ background:var(--orange); }
+.loader__num{ color:var(--mute); }
+
+/* ============================================================
+   REDUCED MOTION
+   ============================================================ */
+@media (prefers-reduced-motion:reduce){
+  .hero--bento .hero__veil{
+    background:linear-gradient(180deg, rgba(231,224,210,.26), rgba(243,238,228,0) 46%);
+  }
+  .bt__glow{ opacity:.34 !important; }
+}
+
+/* ============================================================
+   WHAT YOU GET — the hero's pass-inclusions tile
+   ------------------------------------------------------------
+   Replaced eight decorative stack icons with three lines that
+   say something. Rendered by js/live-stage.js from PERKS.
+   ============================================================ */
+.btperks{
+  margin-top:auto;
+  display:grid;
+  gap:clamp(8px,1vw,12px);
+}
+.btperk{
+  display:flex; align-items:center; gap:11px;
+  min-width:0;
+}
+.btperk__i{
+  flex:none;
+  width:36px; height:36px;
+  display:grid; place-content:center;
+  border:1.5px solid var(--ink-line);
+  border-radius:10px;
+  background:rgba(255,253,249,.45);
+}
+.btperk__i svg{ width:19px; height:19px; display:block; }
+.btperk__i svg *{ stroke:var(--spot-ink); }
+
+.btperk__t{
+  min-width:0;
+  font-size:.86rem; font-weight:600; line-height:1.2;
+  color:var(--black);
+}
+.btperk__t em{
+  display:block;
+  font-style:normal; font-weight:400;
+  font-size:.68rem; letter-spacing:.01em;
+  color:var(--mute);
+  margin-top:.25em;
+}
+
+/* The speaker tile while a talk is actually running. */
+.bt--spk.is-live{ border-color:var(--black); }
+.bt--spk.is-live .btspk__name{ color:var(--black); }
+
+@media (max-width:900px){
+  .btperk__i{ width:30px; height:30px; border-radius:8px; }
+  .btperk__i svg{ width:16px; height:16px; }
+  .btperk__t{ font-size:.78rem; }
+  .btperk__t em{ font-size:.62rem; }
+}
+
+/* ============================================================
+   WHAT THE DAY GIVES YOU — the about section's offers
+   ------------------------------------------------------------
+   Sits where three hand-written notes used to be. Every line is
+   a real row in the run of show; js/live-stage.js renders it
+   from OFFERS so the two cannot drift apart silently.
+   ============================================================ */
+.offers__h{
+  font-family:var(--display);
+  font-weight:400;
+  font-size:clamp(1.05rem,2.4vw,1.35rem);
+  text-transform:uppercase;
+  letter-spacing:.01em;
+  color:var(--black);
+  margin:0 0 1.1em;
+}
+.offers{ display:grid; gap:14px; }
+
+.offer{
+  display:flex; gap:14px;
+  padding:16px 18px;
+  border:2px solid var(--black);
+  border-radius:14px;
+  background:var(--paper-2);
+  box-shadow:var(--drop-sm);
+}
+.offer__n{
+  flex:none;
+  font-family:var(--mono);
+  font-size:.62rem; font-weight:600;
+  letter-spacing:.12em;
+  color:var(--spot-ink);
+  padding-top:.25em;
+}
+.offer__t{
+  display:block;
+  font-size:.95rem; font-weight:700;
+  color:var(--black);
+  margin-bottom:.3em;
+}
+.offer__b{
+  display:block;
+  font-size:.86rem; line-height:1.5;
+  color:var(--rule);
+}
+
+@media (min-width:1100px){
+  .offers{ grid-template-columns:1fr; }
+}
+@media (max-width:700px){
+  .offer{ padding:14px 15px; gap:11px; box-shadow:2px 2px 0 var(--black); }
+}
+
+/* ============================================================
+   THE REEL — vertical cards running across the page
+   ------------------------------------------------------------
+   One CSS keyframe on one element. js/reel.js prints the cards
+   twice and the track slides exactly -50%, so the second copy
+   is under the cursor when the first finishes and the seam
+   never shows. --reel-time is written by the script from the
+   card count, so adding a card lengthens the loop instead of
+   speeding it up.
+
+   To run the strip the other way, swap the two keyframe
+   percentages — or set animation-direction:reverse here.
+   ============================================================ */
+.sec--reel{
+  position:relative;
+  overflow:hidden;
+  padding-bottom:clamp(56px,8vw,96px);
+}
+.sec--reel .sec__head{ margin-bottom:clamp(26px,4vw,44px); }
+
+.reel{
+  position:relative;
+  width:100%;
+  /* The strip is full-bleed: it should run off both edges of the page,
+     not sit inside the text column. */
+  -webkit-mask-image:linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+  mask-image:linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+}
+
+.reel__track{
+  display:flex;
+  gap:clamp(14px,2vw,24px);
+  width:max-content;
+  padding:6px 0 10px;            /* room for the flat drop under each card */
+  animation:reel-run var(--reel-time, 33s) linear infinite;
+  will-change:transform;
+}
+@keyframes reel-run{
+  from{ transform:translate3d(0,0,0); }
+  to  { transform:translate3d(-50%,0,0); }
+}
+
+/* Hovering the strip holds it, so a card can actually be looked at. */
+@media (hover:hover) and (pointer:fine){
+  .reel:hover .reel__track{ animation-play-state:paused; }
+}
+
+/* A click needs press and release on the SAME element, so the strip holds
+   still for the length of a press. Without this a tap on a phone — where
+   there is no hover to pause it — lands on whichever card slid into place
+   next, or on nothing at all. */
+.reel__track.is-held{ animation-play-state:paused; }
+
+/* ---- a card ---- */
+.reel__card{
+  flex:none;
+  margin:0; padding:0;
+  width:clamp(168px,20vw,248px);
+  display:block;
+  text-align:left;
+  background:none; border:0;
+  cursor:pointer;
+  font:inherit; color:inherit;
+  transition:transform .35s cubic-bezier(.16,1,.3,1);
+}
+@media (hover:hover) and (pointer:fine){
+  .reel__card:hover{ transform:translateY(-6px); }
+}
+.reel__card:focus-visible{ outline-offset:6px; }
+
+.reel__frame{
+  display:block;
+  position:relative;
+  aspect-ratio:9/16;
+  overflow:hidden;
+  border:3px solid var(--black);
+  border-radius:16px;
+  background:var(--paper-2);
+  box-shadow:var(--drop);
+}
+.reel__v{
+  width:100%; height:100%;
+  object-fit:cover;
+  display:block;
+}
+
+/* ---- the empty slot ----
+   A real state rather than a broken one: it reads as a frame waiting for
+   footage, which is exactly what it is. */
+.reel__slot{
+  position:absolute; inset:0;
+  display:grid;
+  place-content:center;
+  justify-items:center;
+  gap:14px;
+  background:
+    repeating-linear-gradient(135deg,
+      rgba(57,55,50,.05) 0 10px, transparent 10px 20px),
+    var(--paper-2);
+}
+.reel__play{
+  display:block;
+  width:clamp(38px,5vw,52px);
+  color:var(--spot-ink);
+  opacity:.65;
+}
+.reel__play svg{ width:100%; height:auto; display:block; }
+.reel__n{
+  font-family:var(--mono);
+  font-size:.62rem; font-weight:600;
+  letter-spacing:.2em;
+  color:var(--mute);
+}
+
+.reel__cap{
+  display:block;
+  margin-top:.8em;
+  font-size:.82rem;
+  color:var(--rule);
+}
+
+@media (max-width:700px){
+  .reel__frame{ border-width:2px; border-radius:13px; box-shadow:3px 3px 0 var(--black); }
+}
+
+/* Reduced motion: the strip stops and becomes a row you scroll yourself. */
+@media (prefers-reduced-motion:reduce){
+  .reel{
+    overflow-x:auto;
+    -webkit-mask-image:none; mask-image:none;
+    scroll-snap-type:x mandatory;
+  }
+  .reel__track{ animation:none; will-change:auto; }
+  .reel__card{ scroll-snap-align:center; }
+}
+
+/* ============================================================
+   THE REEL VIEWER — a card opened large
+   ------------------------------------------------------------
+   Same idiom as the speaker modal: scrim, card, close, Escape.
+   The frame keeps its 9:16 and is bounded by viewport HEIGHT
+   rather than width, because a vertical card sized off the
+   width would run off the bottom of a laptop screen.
+   ============================================================ */
+.rview{
+  position:fixed; inset:0; z-index:9300;
+  display:flex; align-items:center; justify-content:center;
+  padding:clamp(16px,3vw,32px);
+  visibility:hidden; opacity:0;
+  /* visibility is a discrete property: transitioned, it flips at the
+     halfway point, so the viewer is still hidden when the open handler
+     tries to move focus into it. Delay the HIDE until the fade is done
+     and let the SHOW happen on the same frame as the class. */
+  transition:opacity .3s ease, visibility 0s linear .3s;
+}
+.rview.is-open{
+  visibility:visible; opacity:1;
+  transition:opacity .3s ease, visibility 0s linear 0s;
+}
+
+.rview__scrim{
+  position:absolute; inset:0;
+  background:rgba(11,11,11,.74);
+}
+
+.rview__inner{
+  position:relative; z-index:1;
+  display:flex; align-items:center; gap:clamp(10px,2vw,22px);
+  flex-wrap:wrap; justify-content:center;
+  transform:translateY(16px) scale(.97);
+  transition:transform .4s cubic-bezier(.16,1,.3,1);
+}
+.rview.is-open .rview__inner{ transform:none; }
+
+.rview__frame{
+  position:relative;
+  aspect-ratio:9/16;
+  height:min(76svh, 620px);
+  overflow:hidden;
+  border:3px solid var(--black);
+  border-radius:18px;
+  background:var(--paper-2);
+  box-shadow:10px 10px 0 var(--black);
+}
+.rview__frame .reel__v{
+  width:100%; height:100%;
+  object-fit:cover;
+  display:block;
+}
+.rview__frame .reel__play{ width:clamp(52px,7vw,72px); }
+.rview__frame .reel__n{ font-size:.72rem; }
+
+/* ---- the controls ---- */
+.rview__x,
+.rview__nav{
+  flex:none;
+  display:grid; place-content:center;
+  width:46px; height:46px;
+  border:2px solid var(--black);
+  border-radius:12px;
+  background:var(--paper-2);
+  color:var(--black);
+  font-size:1.5rem; line-height:1;
+  cursor:pointer;
+  box-shadow:3px 3px 0 var(--black);
+  transition:background .2s ease, transform .2s ease;
+}
+.rview__x:hover,
+.rview__nav:hover{ background:var(--orange); }
+.rview__x:active,
+.rview__nav:active{ transform:translate(2px,2px); box-shadow:1px 1px 0 var(--black); }
+
+.rview__x{
+  position:absolute; top:-14px; right:-14px;
+  z-index:3;
+  border-radius:50%;
+  font-size:1.4rem;
+}
+
+.rview__meta{
+  flex-basis:100%;
+  display:flex; align-items:center; justify-content:center; gap:14px;
+  margin:6px 0 0;
+  font-size:.82rem;
+  color:var(--grey);
+}
+.rview__meta b{
+  font-family:var(--mono);
+  font-size:.7rem; font-weight:600; letter-spacing:.14em;
+  color:var(--paper);
+}
+
+/* On a phone the arrows go under the card — at 46px each they would
+   otherwise eat a third of the frame's width. */
+@media (max-width:640px){
+  .rview__inner{ gap:12px; }
+  .rview__frame{ order:-1; flex-basis:100%; height:min(66svh,520px); margin:0 auto; }
+  .rview__x{ top:-12px; right:8px; }
+  .rview__meta{ order:5; }
+}
+
+@media (prefers-reduced-motion:reduce){
+  .rview, .rview__inner{ transition:none; }
+  .rview__inner{ transform:none; }
+}
+
+/* ============================================================
+   THE TICKET — one free pass, as an admission stub
+   ------------------------------------------------------------
+   Rendered by js/ticket.js from PASS + SITE. Black stock with
+   the spot colour for the stub, the same pairing the footer
+   uses, so the two dark surfaces on the page read as a set.
+
+   Colour checks on black: paper 17:1, grey 7.3:1, orange 6.3:1
+   — orange is fine as TYPE here, which it never is on paper.
+   On the orange stub, black sits at 6.3:1.
+
+   The two notches are circles painted in the page's paper
+   colour at the perforation. A mask would cut real holes, but a
+   mask also clips the box-shadow, and the glow is half the look.
+   ============================================================ */
+.pass{ --stub:104px; --notch:30px; --r:18px; }
+
+.ticket{
+  position:relative;
+  display:grid;
+  grid-template-columns:var(--stub) 1fr;
+  max-width:1000px;
+  margin:0 auto;
+  border-radius:var(--r);
+  background:var(--black);
+  color:var(--paper);
+  box-shadow:
+    0 34px 80px -28px rgba(255,90,31,.62),
+    0 0 110px -40px rgba(255,90,31,.45);
+}
+
+/* the punched notches at the tear line */
+.ticket::before,
+.ticket::after{
+  content:'';
+  position:absolute;
+  left:calc(var(--stub) - var(--notch) / 2);
+  width:var(--notch); height:var(--notch);
+  border-radius:50%;
+  background:var(--paper);
+  z-index:2;
+}
+.ticket::before{ top:calc(var(--notch) / -2); }
+.ticket::after { bottom:calc(var(--notch) / -2); }
+
+/* ---- the stub ---- */
+.ticket__stub{
+  display:flex;
+  flex-direction:column-reverse;       /* the pass sits low, the price high */
+  align-items:center;
+  justify-content:space-between;
+  padding:28px 0;
+  background:var(--orange);
+  color:var(--black);
+  border-radius:var(--r) 0 0 var(--r);
+  border-right:2px dashed rgba(11,11,11,.55);   /* the perforation */
+}
+.stub__pass,
+.stub__price{
+  writing-mode:vertical-rl;
+  transform:rotate(180deg);            /* read bottom-to-top, like a real stub */
+}
+.stub__pass small,
+.stub__pass b{ display:block; }
+.stub__pass small{
+  font-size:.62rem; font-weight:600;
+  letter-spacing:.24em; text-transform:uppercase;
+  opacity:.72;
+}
+.stub__pass b{
+  font-size:1rem; font-weight:800;
+  letter-spacing:.06em; text-transform:uppercase;
+  margin-left:.35em;
+}
+.stub__price{
+  font-size:1.05rem; font-weight:800;
+  letter-spacing:.14em; text-transform:uppercase;
+}
+
+/* ---- the pass ---- */
+.ticket__body{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  border-radius:0 var(--r) var(--r) 0;
+  overflow:hidden;
+  /* the fine diagonal ruling of printed card stock */
+  background:
+    repeating-linear-gradient(135deg,
+      rgba(243,238,228,.028) 0 1px, transparent 1px 7px),
+    radial-gradient(120% 120% at 100% 0%, rgba(255,90,31,.10), transparent 60%);
+}
+
+.ticket__cell{ padding:clamp(24px,3.6vw,46px); }
+.ticket__cell--price{ border-right:1px dashed rgba(243,238,228,.18); }
+
+.ticket__label{
+  margin:0 0 1em;
+  font-size:.72rem; font-weight:600;
+  letter-spacing:.24em; text-transform:uppercase;
+  color:var(--grey);
+}
+.ticket__price{
+  margin:0;
+  font-family:var(--display);
+  font-size:clamp(3.2rem,7vw,5rem);
+  line-height:.92;
+  text-transform:uppercase;
+  color:var(--paper);
+}
+.ticket__note{
+  margin:.7em 0 1.4em;
+  font-size:.88rem;
+  color:var(--grey);
+}
+.ticket__chip{
+  display:inline-flex; align-items:center; gap:8px;
+  margin:0;
+  padding:7px 13px;
+  border:1.5px solid rgba(255,90,31,.55);
+  border-radius:8px;
+  background:rgba(255,90,31,.08);
+  font-size:.8rem; font-weight:600;
+  color:var(--orange);
+}
+.ticket__chip svg{ width:15px; height:15px; flex:none; }
+
+.ticket__title{
+  margin:0 0 .8em;
+  font-family:var(--display);
+  font-weight:400;
+  font-size:clamp(1.9rem,3.6vw,2.8rem);
+  line-height:1;
+  text-transform:uppercase;
+  color:var(--paper);
+}
+
+/* The site's ink button assumes it sits on paper: a black rule and a black
+   drop. On black stock both vanish and the hover fills black-on-black. So on
+   the ticket it glows instead, and fills paper. */
+.ticket__btn{
+  --bg:var(--orange); --fg:var(--black);
+  border-color:var(--orange);
+  text-transform:uppercase;
+  letter-spacing:.06em;
+  box-shadow:0 12px 30px -10px rgba(255,90,31,.8);
+}
+.ticket__btn::before{ background:var(--paper); }
+.ticket__btn:hover{ color:var(--black); }
+.ticket__btn:active{ box-shadow:0 6px 16px -8px rgba(255,90,31,.8); }
+
+.ticket__fine{
+  margin:1.3em 0 0;
+  font-size:.72rem;
+  letter-spacing:.05em; text-transform:uppercase;
+  color:var(--grey);
+}
+
+/* ---- when / time / where ---- */
+.ticket__meta{
+  grid-column:1 / -1;
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  margin:0;
+  border-top:1px dashed rgba(243,238,228,.18);
+}
+.ticket__meta > div{
+  padding:18px 14px;
+  text-align:center;
+}
+.ticket__meta > div + div{ border-left:1px solid rgba(243,238,228,.10); }
+.ticket__meta dt{
+  position:absolute; width:1px; height:1px;
+  overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap;
+}
+.ticket__meta dd{
+  margin:0;
+  font-size:.76rem; font-weight:700;
+  letter-spacing:.14em; text-transform:uppercase;
+  color:var(--paper);
+}
+
+/* ---- phones: the stub becomes a band across the top ---- */
+@media (max-width:760px){
+  .pass{ --stub-h:68px; }
+
+  .ticket{ grid-template-columns:1fr; }
+
+  .ticket::before,
+  .ticket::after{ top:calc(var(--stub-h) - var(--notch) / 2); bottom:auto; }
+  .ticket::before{ left:calc(var(--notch) / -2); }
+  .ticket::after { left:auto; right:calc(var(--notch) / -2); }
+
+  .ticket__stub{
+    height:var(--stub-h);
+    flex-direction:row;
+    padding:0 26px;
+    border-right:0;
+    border-bottom:2px dashed rgba(11,11,11,.55);
+    border-radius:var(--r) var(--r) 0 0;
+  }
+  .stub__pass,
+  .stub__price{ writing-mode:horizontal-tb; transform:none; }
+  .stub__pass b{ margin-left:0; }
+
+  .ticket__body{
+    grid-template-columns:1fr;
+    border-radius:0 0 var(--r) var(--r);
+  }
+  .ticket__cell--price{
+    border-right:0;
+    border-bottom:1px dashed rgba(243,238,228,.18);
+  }
+  .ticket__meta{ grid-template-columns:1fr; }
+  .ticket__meta > div + div{
+    border-left:0;
+    border-top:1px solid rgba(243,238,228,.10);
+  }
+}

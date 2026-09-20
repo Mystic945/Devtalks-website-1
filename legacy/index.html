@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>DevTalks 2026 — Ideas Worth Building</title>
+<!-- PAPER EDITION — the site's only page.
+     Palette: #0b0b0b black · #f3eee4 paper · #ff5a1f orange
+              #a29d94 grey · #393732 line -->
+<meta name="description" content="DevTalks 2026 — a day of short, idea-dense talks from people who actually shipped the thing. 14 November 2026, Pune." />
+<meta name="theme-color" content="#F3EEE4" />
+
+<!-- Social preview (replace assets/og.jpg with a 1200x630 image) -->
+<meta property="og:title" content="DevTalks 2026 — Ideas Worth Building" />
+<meta property="og:description" content="Eight speakers. One stage. 14 November 2026, Pune." />
+<meta property="og:image" content="assets/og.jpg" />
+<meta property="og:type" content="website" />
+
+<!-- Fonts are bundled in /fonts — no internet required -->
+<link rel="stylesheet" href="css/fonts.css" />
+<link rel="stylesheet" href="css/style-devkraft.css" />
+<link rel="stylesheet" href="css/doors.css" />
+<link rel="stylesheet" href="css/parallax.css" />
+<link rel="stylesheet" href="css/bento.css" />
+<link rel="stylesheet" href="css/hero-bento.css" />
+<!-- The palette layer. Loads last; re-inks everything above it. -->
+<link rel="stylesheet" href="css/paper.css" />
+<!-- The motion layer: card registration on scroll. -->
+<link rel="stylesheet" href="css/motion.css" />
+<!-- Speaker hover-reveal cards + schedule timeline. Loads last. -->
+<link rel="stylesheet" href="css/paper-hover-timeline.css" />
+<!-- The 3D unfurling gallery under the reel. -->
+<link rel="stylesheet" href="css/gallery.css" />
+</head>
+
+<body>
+
+<!-- ══════════════ AUDITORIUM DOORS ══════════════ -->
+<div class="doors" id="doors" aria-hidden="true">
+  <div class="door door--l">
+    <div class="door__mark">
+      <span class="door__word">DEV<span>TALKS</span></span>
+    </div>
+  </div>
+  <div class="door door--r">
+    <div class="door__mark">
+      <span class="door__word">DEV<span>TALKS</span></span>
+    </div>
+  </div>
+  <div class="doors__glow"></div>
+  <div class="doors__seam"></div>
+</div>
+<script>
+  /* Runs before first paint: if the doors already played this session,
+     hide them immediately so there is no flash of a closed door. */
+  try {
+    if (sessionStorage.getItem('devtalks-doors-seen') === '1')
+      document.getElementById('doors').classList.add('is-gone');
+  } catch (e) {}
+</script>
+
+
+
+<!-- ══════════════ NAV ══════════════ -->
+<header class="nav" id="nav">
+  <a href="#top" class="nav__logo" data-magnetic>DEV<span>TALKS</span><b>26</b></a>
+
+  <nav class="nav__links" aria-label="Primary">
+    <a href="#about"    data-nav>About</a>
+    <a href="#speakers" data-nav>Speakers</a>
+    <a href="#schedule" data-nav>Schedule</a>
+    <a href="#tickets"  data-nav>Tickets</a>
+    <a href="#sponsors" data-nav>Sponsors</a>
+    <a href="#reel"     data-nav>Reel</a>
+    <a href="#gallery"  data-nav>Gallery</a>
+    <a href="#faq"      data-nav>FAQ</a>
+  </nav>
+
+  <a href="#tickets" class="btn btn--sm nav__cta" data-magnetic>Get tickets</a>
+
+  <button class="burger" id="burger" aria-label="Open menu" aria-expanded="false">
+    <i></i><i></i>
+  </button>
+</header>
+
+<!-- ══════════════ MOBILE MENU ══════════════ -->
+<div class="menu" id="menu" aria-hidden="true">
+  <nav class="menu__links">
+    <a href="#about"><em>01</em>About</a>
+    <a href="#speakers"><em>02</em>Speakers</a>
+    <a href="#schedule"><em>03</em>Schedule</a>
+    <a href="#tickets"><em>04</em>Tickets</a>
+    <a href="#sponsors"><em>05</em>Sponsors</a>
+    <a href="#venue"><em>06</em>Venue</a>
+    <a href="#reel"><em>07</em>Reel</a>
+    <a href="#gallery"><em>08</em>Gallery</a>
+    <a href="#faq"><em>09</em>FAQ</a>
+  </nav>
+  <div class="menu__foot">
+    <a href="#tickets" class="btn btn--block">Get tickets</a>
+    <div class="menu__socials" id="menuSocials"></div>
+  </div>
+</div>
+
+<main id="top">
+
+<!-- ══════════════ HERO ══════════════ -->
+<section class="hero hero--bento" id="hero">
+  <!-- main.js always calls DevTalksHero.init(#heroCanvas); js/hero-bento.js
+       answers "no WebGL hero here" and this stays hidden. -->
+  <canvas class="hero__canvas" id="heroCanvas" aria-hidden="true"></canvas>
+
+  <div class="hero__veil" aria-hidden="true"></div>
+
+  <!-- ══ THE BENTO GRID ══
+       Dark glass tiles on a tilted plane. The cursor is the stage spotlight;
+       on a phone, the tilt of the handset moves it instead. -->
+  <div class="bento" id="bentoGrid">
+    <div class="bento__plane">
+
+      <!-- 01 · the title -->
+      <article class="bt bt--title" data-bt>
+        <div class="bt__glow" aria-hidden="true"></div>
+        <div class="bt__rim" aria-hidden="true"></div>
+        <div class="bt__in">
+          <p class="bt__label"><b>01</b> The event</p>
+          <h1 class="hero__title">
+            <span class="line"><span>DEV</span></span>
+            <span class="line"><span>TALKS<b id="heroYear">26</b></span></span>
+          </h1>
+          <p class="hero__theme" data-split id="heroTheme">Ideas Worth Building</p>
+          <p class="hero__tag" id="heroTag"></p>
+          <div class="hero__actions">
+            <a href="#tickets" class="btn" data-magnetic id="heroCta">Get tickets</a>
+            <a href="#speakers" class="btn btn--ghost" data-magnetic>See speakers</a>
+          </div>
+        </div>
+      </article>
+
+      <!-- 02 · next guest speaker -->
+      <article class="bt bt--spk" data-bt>
+        <div class="bt__glow" aria-hidden="true"></div>
+        <div class="bt__rim" aria-hidden="true"></div>
+        <div class="bt__in">
+          <p class="bt__label"><b>02</b> Next on stage</p>
+          <div id="btSpeaker"></div>
+        </div>
+      </article>
+
+      <!-- 03 · live member ticker -->
+      <article class="bt bt--tick" data-bt>
+        <div class="bt__glow" aria-hidden="true"></div>
+        <div class="bt__rim" aria-hidden="true"></div>
+        <div class="bt__in">
+          <p class="bt__label"><span class="bttick__live"><i></i>Live</span> Registrations</p>
+          <div class="bttick">
+            <span class="bttick__n" id="btTickN">0</span>
+            <span class="bttick__u">seats claimed</span>
+          </div>
+          <div class="bttick__feed" id="btTickFeed" aria-hidden="true"></div>
+        </div>
+      </article>
+
+      <!-- 04 · countdown -->
+      <article class="bt bt--cnt" data-bt>
+        <div class="bt__glow" aria-hidden="true"></div>
+        <div class="bt__rim" aria-hidden="true"></div>
+        <div class="bt__in">
+          <p class="bt__label"><b>03</b> Doors open in</p>
+          <div class="count" id="count">
+            <div class="count__cell"><strong id="cd-d">00</strong><small>days</small></div>
+            <div class="count__cell"><strong id="cd-h">00</strong><small>hrs</small></div>
+            <div class="count__cell"><strong id="cd-m">00</strong><small>min</small></div>
+            <div class="count__cell"><strong id="cd-s">00</strong><small>sec</small></div>
+          </div>
+        </div>
+      </article>
+
+      <!-- 05 · date and venue -->
+      <article class="bt bt--meta" data-bt>
+        <div class="bt__glow" aria-hidden="true"></div>
+        <div class="bt__rim" aria-hidden="true"></div>
+        <div class="bt__in">
+          <p class="bt__label"><b>04</b> When &amp; where</p>
+          <div class="hero__meta">
+            <span id="heroDate"></span>
+            <i></i>
+            <span id="heroVenue"></span>
+          </div>
+        </div>
+      </article>
+
+      <!-- 06 · what gets talked about -->
+      <article class="bt bt--stack" data-bt>
+        <div class="bt__glow" aria-hidden="true"></div>
+        <div class="bt__rim" aria-hidden="true"></div>
+        <div class="bt__in">
+          <p class="bt__label"><b>05</b> What you get</p>
+          <div class="btstack" id="btStack"></div>
+        </div>
+      </article>
+
+    </div>
+
+    <p class="bento__hint">Move your cursor to light the stage</p>
+  </div>
+
+  <div class="hero__scroll" aria-hidden="true"><span>SCROLL</span><i></i></div>
+</section>
+
+<!-- ══════════════ MARQUEE ══════════════ -->
+<div class="marquee" aria-hidden="true">
+  <div class="marquee__track" id="marqueeTrack"></div>
+</div>
+
+<!-- ══════════════ ABOUT ══════════════ -->
+<section class="sec sec--about" id="about">
+  <div class="wrap">
+    <p class="eyebrow" data-reveal><em>01</em> What is DevTalks</p>
+
+    <h2 class="big" data-split id="aboutHeadline">
+      Three people who built something real, explaining exactly how — in twenty-five minutes each.
+    </h2>
+
+    <div class="about__grid">
+      <p class="about__copy" data-reveal id="aboutIntro"></p>
+      <!-- Filled from OFFERS in js/data-3.js by js/live-stage.js -->
+      <div class="about__notes" data-reveal>
+        <h3 class="offers__h">What the day gives you</h3>
+        <div class="offers" id="offerList"></div>
+      </div>
+    </div>
+
+    <div class="stats" id="stats"></div>
+  </div>
+</section>
+
+<!-- ══════════════ SPEAKERS ══════════════ -->
+<section class="sec sec--speakers" id="speakers">
+  <div class="wrap">
+    <div class="sec__head">
+      <p class="eyebrow" data-reveal><em>02</em> The line-up</p>
+      <h2 class="big" data-split>Speakers</h2>
+      <p class="sec__sub" data-reveal>Three speakers, one stage. Hover a card to bring it forward, then tap it for the full bio.</p>
+    </div>
+    <div class="speakers" id="speakerGrid"></div>
+  </div>
+</section>
+
+<!-- Speaker modal -->
+<div class="modal" id="modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="modalName">
+  <div class="modal__scrim" data-close></div>
+  <div class="modal__card">
+    <button class="modal__x" data-close aria-label="Close">&times;</button>
+    <div class="modal__media" id="modalMedia"></div>
+    <div class="modal__body">
+      <div class="modal__tags" id="modalTags"></div>
+      <h3 id="modalName"></h3>
+      <p class="modal__role" id="modalRole"></p>
+      <p class="modal__talkLabel">Talk</p>
+      <p class="modal__talk" id="modalTalk"></p>
+      <p class="modal__bio" id="modalBio"></p>
+      <a class="modal__link" id="modalLink" target="_blank" rel="noopener">More about this speaker &rarr;</a>
+    </div>
+  </div>
+</div>
+
+<!-- Reel viewer — opened by js/reel.js when a card is clicked. Same
+     idiom as the speaker modal above: scrim, card, close, Escape. -->
+<div class="rview" id="reelView" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Reel">
+  <div class="rview__scrim" data-rclose></div>
+  <div class="rview__inner">
+    <button class="rview__x" data-rclose aria-label="Close">&times;</button>
+    <button class="rview__nav rview__nav--prev" data-rprev aria-label="Previous reel">&#8249;</button>
+    <div class="rview__stage" id="reelStage"></div>
+    <button class="rview__nav rview__nav--next" data-rnext aria-label="Next reel">&#8250;</button>
+    <p class="rview__meta"><span id="reelCap"></span><b id="reelCount"></b></p>
+  </div>
+</div>
+
+<!-- ══════════════ SCHEDULE ══════════════ -->
+<section class="sec sec--schedule" id="schedule">
+  <div class="wrap">
+    <div class="sec__head">
+      <p class="eyebrow" data-reveal><em>03</em> Run of show</p>
+      <h2 class="big" data-split>Schedule</h2>
+      <p class="sec__sub" data-reveal id="schedSub"></p>
+    </div>
+    <ol class="sched" id="schedList"></ol>
+  </div>
+</section>
+
+<!-- ══════════════ TICKETS ══════════════ -->
+<section class="sec sec--tickets" id="tickets">
+  <div class="wrap">
+    <div class="sec__head">
+      <p class="eyebrow" data-reveal><em>04</em> Registration</p>
+      <h2 class="big" data-split>Tickets</h2>
+      <p class="sec__sub" data-reveal>Free to attend. One pass, full day, lunch included. Seats are capped by the hall.</p>
+    </div>
+
+    <!-- The pass, rendered from PASS + SITE in js/data-3.js by js/ticket.js -->
+    <div class="pass" id="ticket" data-reveal></div>
+
+    <!-- js/main.js still writes the (now empty) TICKETS list here. -->
+    <div class="tiers" id="tierGrid" hidden></div>
+  </div>
+</section>
+
+<!-- ══════════════ SPONSORS ══════════════ -->
+<section class="sec sec--sponsors" id="sponsors">
+  <div class="wrap">
+    <div class="sec__head">
+      <p class="eyebrow" data-reveal><em>05</em> Backed by</p>
+      <h2 class="big" data-split>Partners</h2>
+      <p class="sec__sub" data-reveal>DevTalks runs on sponsor support — it's what keeps the day free to attend.</p>
+    </div>
+    <div class="sponsors" id="sponsorWall"></div>
+  </div>
+</section>
+
+<!-- ══════════════ VENUE ══════════════ -->
+<section class="sec sec--venue" id="venue">
+  <div class="wrap">
+    <div class="sec__head">
+      <p class="eyebrow" data-reveal><em>06</em> Getting there</p>
+      <h2 class="big" data-split>Venue</h2>
+    </div>
+    <div class="venue">
+      <div class="venue__info" data-reveal>
+        <h3 id="venueName"></h3>
+        <p id="venueAddr"></p>
+        <dl>
+          <div><dt>Date</dt><dd id="venueDate"></dd></div>
+          <div><dt>Time</dt><dd id="venueTime"></dd></div>
+          <div><dt>Nearest stations</dt><dd>Akurdi &amp; Nigdi — 10 min by auto</dd></div>
+          <div><dt>Parking</dt><dd>Free, on campus, gate 2</dd></div>
+        </dl>
+        <a class="btn btn--ghost" id="venueMap" target="_blank" rel="noopener" data-magnetic>Open in Maps</a>
+      </div>
+      <div class="venue__map" data-reveal aria-hidden="true">
+        <div class="venue__grid"></div>
+        <div class="venue__pin"><i></i><span>DevTalks</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ FAQ ══════════════ -->
+<!-- ══════════════ REEL ══════════════ -->
+<!-- Vertical cards running across the page. Cards come from REELS in
+     js/data-3.js; empty entries render as numbered slots, so the strip
+     animates before any footage exists. See js/reel.js. -->
+<section class="sec sec--reel" id="reel">
+  <div class="wrap">
+    <div class="sec__head">
+      <p class="eyebrow" data-reveal><em>07</em> On the floor</p>
+      <h2 class="big" data-split>The reel</h2>
+      <p class="sec__sub" data-reveal>Moments from the day, as they happen.</p>
+    </div>
+  </div>
+
+  <div class="reel" data-reveal>
+    <div class="reel__track" id="reelTrack"></div>
+  </div>
+</section>
+
+<!-- ══════════════ GALLERY ══════════════ -->
+<!-- A pinned panel that opens up and zooms a wall of photos into place as you
+     scroll. Photos come from GALLERY in js/data-3.js; see js/gallery.js. -->
+<section class="sec sec--gallery" id="gallery">
+  <div class="wrap">
+    <div class="sec__head">
+      <p class="eyebrow" data-reveal><em>08</em> In pictures</p>
+      <h2 class="big" data-split>Gallery</h2>
+      <p class="sec__sub" data-reveal>The day in pictures. Keep scrolling — the wall unfolds as you go.</p>
+    </div>
+  </div>
+
+  <div class="gal" id="galTrack">
+    <div class="gal__stage">
+      <div class="gal__banner" id="galBanner">
+        <div class="gal__scene">
+          <div class="gal__mask gal__mask--y"></div>
+          <div class="gal__mask gal__mask--x"></div>
+          <div class="gal__matrix" id="galMatrix" role="group" aria-label="Photo gallery"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec sec--faq" id="faq">
+  <div class="wrap">
+    <div class="sec__head">
+      <p class="eyebrow" data-reveal><em>09</em> Before you ask</p>
+      <h2 class="big" data-split>FAQ</h2>
+    </div>
+    <div class="faq" id="faqList"></div>
+  </div>
+</section>
+
+<!-- ══════════════ FINAL CTA ══════════════ -->
+<section class="final">
+  <div class="wrap">
+    <p class="final__k" data-reveal>Seats are capped at 600</p>
+    <h2 class="final__h" data-split>Come build with us.</h2>
+    <a href="#tickets" class="btn btn--lg" data-magnetic>Get your pass</a>
+  </div>
+</section>
+
+</main>
+
+<!-- ══════════════ FOOTER ══════════════ -->
+<!-- The reveal footer: it sits behind the page and is uncovered as the
+     content scrolls off the end (js/footer-reveal.js). -->
+<footer class="foot" id="siteFoot">
+  <div class="foot__glow" aria-hidden="true"></div>
+
+  <div class="wrap">
+    <div class="foot__head">
+      <a href="#top" class="foot__mark">DEV<span>TALKS</span><b>26</b></a>
+      <p class="foot__legal">&copy; <span id="year"></span> DevTalks. All rights reserved.</p>
+    </div>
+
+    <nav class="foot__cols" aria-label="Footer">
+      <div>
+        <h4>Event</h4>
+        <a href="#about">About</a>
+        <a href="#speakers">Speakers</a>
+        <a href="#schedule">Schedule</a>
+        <a href="#venue">Venue</a>
+      </div>
+      <div>
+        <h4>Attend</h4>
+        <a href="#tickets">Tickets</a>
+        <a href="#faq">FAQ</a>
+        <a id="footContact">Contact</a>
+      </div>
+      <div>
+        <h4>Partners</h4>
+        <a href="#sponsors">Sponsors</a>
+        <a id="footSponsor">Become a sponsor</a>
+      </div>
+      <div>
+        <h4>Follow</h4>
+        <div class="foot__socials" id="footSocials"></div>
+      </div>
+    </nav>
+
+    <div class="foot__bar">
+      <p class="foot__by"><span id="footCollege"></span></p>
+      <a href="#top" class="foot__up">Back to top</a>
+    </div>
+  </div>
+
+  <!-- js/main.js parallaxes .foot__huge unconditionally; leaving it in the
+       DOM and hidden keeps that from logging a missing-target warning. -->
+  <div class="foot__huge" aria-hidden="true">DEVTALKS</div>
+</footer>
+
+<!-- ══════════════ SCRIPTS ══════════════ -->
+<!-- Libraries are bundled in /vendor — the site works fully offline.
+     (GSAP 3.12.5 · ScrollTrigger 3.12.5) -->
+<script src="vendor/gsap.min.js"></script>
+<script src="vendor/ScrollTrigger.min.js"></script>
+<script src="js/data-3.js"></script>
+<script src="js/hero-bento.js"></script>
+<script src="js/doors.js"></script>
+<script src="js/ticket.js"></script>
+<script src="js/main.js"></script>
+<script src="js/parallax.js"></script>
+<script src="js/bento.js"></script>
+<!-- Paper-edition motion. Order matters: bento.js builds the topic badges,
+     register.js restructures the cards, then flow.js measures what is left.
+     js/comic-panels.js (comic-panel schedule) is unlinked in favour of the
+     vertical timeline in css/paper-hover-timeline.css — still on disk,
+     add its <script> back, with js/doodle-art.js before it, to restore
+     the panels. -->
+<script src="js/register.js"></script>
+<script src="js/live-stage.js"></script>
+<script src="js/reel.js"></script>
+<script src="js/gallery.js"></script>
+<script src="js/flow.js"></script>
+<script src="js/footer-reveal.js"></script>
+</body>
+</html>

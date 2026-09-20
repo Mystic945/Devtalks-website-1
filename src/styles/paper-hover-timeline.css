@@ -1,0 +1,198 @@
+/* ============================================================
+   DEVTALKS — SPEAKER HOVER-REVEAL + SCHEDULE TIMELINE
+   ------------------------------------------------------------
+   Loads after css/motion.css and re-treats two sections.
+
+     SPEAKERS   the glass-tilt slab becomes a full-bleed portrait
+                card; hovering one dims and softens its neighbours.
+                The scale-on-hover lives on .spk-flow — the wrapper
+                js/register.js built specifically so something
+                other than the tilt (js/bento.js) and the scroll
+                registration (js/flow.js) could own a transform.
+                flow.js hands that element back with an empty
+                inline transform once it lands (see its comment:
+                "hover and focus own their transforms cleanly from
+                here on"), so this never fights either of them.
+                The old tilt is turned off with one rule below
+                rather than by editing js/bento.js.
+
+     SCHEDULE   the comic-panel run-of-show becomes a vertical
+                timeline: a spine with a node per row. Pairs with
+                removing the <script src="js/comic-panels.js">
+                line from index.html — add it back (it is
+                still on disk, untouched) to restore the panels.
+   ============================================================ */
+
+/* ---------------------------------------------------------------
+   SPEAKERS
+   --------------------------------------------------------------- */
+
+/* the badge/number system and the 3D depth it floated on both
+   belonged to the tilt slab; retire the whole stack cleanly */
+.sec--speakers .spk__topic,
+.sec--speakers .spk__no,
+.sec--speakers .speakers__hint{ display:none; }
+
+.sec--speakers .speakers{ perspective:none; }
+.sec--speakers .spk{
+  transform:none !important;       /* retire the pointer-tilt for this page */
+  transform-style:flat;
+  aspect-ratio:3/4;
+  border-radius:18px;
+  border:1px solid var(--ink-hair);
+  box-shadow:0 1px 2px rgba(11,11,11,.05);
+  transition:opacity .45s ease, filter .45s ease,
+             box-shadow .4s var(--ease), border-color .3s ease;
+}
+.sec--speakers .spk.is-tilting{ box-shadow:0 1px 2px rgba(11,11,11,.05); }
+.sec--speakers .spk:hover,
+.sec--speakers .spk:focus-visible{
+  border-color:var(--black);
+  box-shadow:0 18px 34px -18px rgba(11,11,11,.4);
+}
+.sec--speakers .spk::before{ display:none; }   /* the ink-wash sheen belonged to the tilt */
+
+.sec--speakers .spk__img{
+  position:absolute; inset:0;
+  aspect-ratio:auto;
+  border-radius:inherit;
+  border-bottom:0;
+  transform:none;
+}
+.sec--speakers .spk__img img{
+  filter:grayscale(1) contrast(1.08) brightness(1.02);
+  transition:filter .6s ease, transform .8s var(--ease);
+}
+.sec--speakers .spk:hover .spk__img img,
+.sec--speakers .spk:focus-visible .spk__img img{
+  filter:grayscale(0) contrast(1.02);
+  transform:scale(1.045);
+}
+.sec--speakers .spk__img::after{
+  background:linear-gradient(to top,
+    rgba(11,11,11,.88) 0%, rgba(11,11,11,.4) 42%, rgba(11,11,11,0) 72%);
+}
+.sec--speakers .spk__ini{ color:rgba(243,238,228,.22); }
+
+.sec--speakers .spk__body{
+  position:absolute; left:0; right:0; bottom:0;
+  height:auto;                 /* base rule sets height:calc(100% - 0px) for the old
+                                   two-block layout; that would pin this to the top
+                                   instead of letting it hug the card's bottom edge */
+  transform:none;
+  padding:20px 18px 22px;
+  z-index:1;
+}
+.sec--speakers .spk__role{
+  color:var(--orange);
+  font-family:var(--mono);
+  font-size:.66rem; letter-spacing:.14em; text-transform:uppercase;
+  margin:0 0 .4em;
+}
+.sec--speakers .spk__name{ color:var(--paper); margin:0 0 .28em; transform:none; }
+.sec--speakers .spk__talk{
+  color:rgba(243,238,228,.82);
+  border-top:0; padding-top:0; margin:.45em 0 0;
+  opacity:0;
+  transform:translateY(6px);
+  transition:opacity .3s ease, transform .4s var(--ease);
+}
+.sec--speakers .spk:hover .spk__talk,
+.sec--speakers .spk:focus-visible .spk__talk{
+  opacity:1;
+  transform:translateY(0);
+}
+.sec--speakers .spk__more{ display:none; }     /* the whole card is the affordance now */
+
+/* ---- group hover-reveal: hovering one card dims and softens the rest ---- */
+.sec--speakers .spk-flow{
+  transition:transform .5s var(--ease);
+}
+.sec--speakers .speakers:hover .spk-flow:not(:hover):not(:focus-within),
+.sec--speakers .speakers:focus-within .spk-flow:not(:hover):not(:focus-within){
+  transform:scale(.965);
+}
+.sec--speakers .speakers:hover .spk-flow:not(:hover):not(:focus-within) .spk,
+.sec--speakers .speakers:focus-within .spk-flow:not(:hover):not(:focus-within) .spk{
+  opacity:.55;
+  filter:blur(2px) grayscale(.3);
+}
+.sec--speakers .spk-flow:hover,
+.sec--speakers .spk-flow:focus-within{
+  transform:scale(1.03);
+}
+
+@media (hover:none){
+  /* touch has no hover to reveal the talk copy or the group effect —
+     state it instead, the same way the tilt hint used to */
+  .sec--speakers .spk__talk{ opacity:1; transform:none; }
+}
+@media (prefers-reduced-motion:reduce){
+  .sec--speakers .spk-flow,
+  .sec--speakers .spk,
+  .sec--speakers .spk__img img{ transition:none; }
+}
+
+/* ---------------------------------------------------------------
+   SCHEDULE → vertical timeline
+   --------------------------------------------------------------- */
+.sec--schedule .sched{
+  position:relative;
+  border-top:0;
+  padding:0;
+}
+.sec--schedule .sched::before{                  /* the spine */
+  content:'';
+  position:absolute;
+  left:15px; top:26px; bottom:26px;
+  width:2px;
+  background:var(--ink-hair);
+}
+.sec--schedule .sched li{
+  position:relative;
+  display:block;
+  padding:18px 0 18px 44px;
+  border-bottom:0;
+  transition:background .3s ease;
+}
+.sec--schedule .sched li time,
+.sec--schedule .sched li h3,
+.sec--schedule .sched li p{
+  transition:transform .3s var(--ease);
+}
+.sec--schedule .sched li::before{               /* the node */
+  content:'';
+  position:absolute;
+  left:7px; top:23px;
+  width:18px; height:18px;
+  border-radius:50%;
+  background:var(--orange);
+  border:2px solid var(--black);
+  z-index:1;
+}
+.sec--schedule .sched li.is-break::before{
+  width:11px; height:11px;
+  left:10.5px; top:26.5px;
+  background:var(--paper-2);
+  border-color:var(--grey);
+}
+.sec--schedule .sched li:hover{
+  background:rgba(255,90,31,.07);
+}
+.sec--schedule .sched li:hover time,
+.sec--schedule .sched li:hover h3,
+.sec--schedule .sched li:hover p{
+  transform:translateX(4px);
+}
+.sec--schedule .sched time{
+  display:block;
+  margin-bottom:.35em;
+}
+.sec--schedule .sched p{ text-align:left; }
+
+@media (prefers-reduced-motion:reduce){
+  .sec--schedule .sched li,
+  .sec--schedule .sched li time,
+  .sec--schedule .sched li h3,
+  .sec--schedule .sched li p{ transition:none; }
+}
