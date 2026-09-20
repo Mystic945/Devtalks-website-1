@@ -10,7 +10,8 @@
    so "600+" never briefly reads "600".
    ============================================================ */
 
-import { SplitText } from '@/components/SplitText';
+import { ScrollReveal } from '@/components/ui/ScrollReveal';
+import { TextType } from '@/components/ui/TextType';
 import { CountAnimation } from '@/components/ui/count-animation';
 import { pad2 } from '@/lib/dom';
 import { OFFERS, SITE, STATS } from '@/data/site';
@@ -26,12 +27,30 @@ export function About() {
           <em>01</em> What is DevTalks
         </p>
 
-        <SplitText className="big" id="aboutHeadline" text={HEADLINE} />
+        <ScrollReveal
+          as="h2"
+          containerClassName="big"
+          enableBlur={true}
+          blurStrength={4}
+          baseRotation={2}
+          baseOpacity={0.08}
+        >
+          {HEADLINE}
+        </ScrollReveal>
 
         <div className="about__grid">
-          <p className="about__copy" data-reveal>
-            {SITE.intro}
-          </p>
+          <TextType
+            as="p"
+            className="about__copy"
+            text={SITE.intro}
+            startOnVisible={true}
+            loop={true}
+            pauseDuration={3000}
+            typingSpeed={18}
+            deletingSpeed={12}
+            showCursor={true}
+            cursorCharacter="▍"
+          />
 
           <div className="about__notes" data-reveal>
             <h3 className="offers__h">What the day gives you</h3>

@@ -15,7 +15,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { gsap } from '@/lib/gsap';
-import { SplitText } from '@/components/SplitText';
+import { ScrollReveal } from '@/components/ui/ScrollReveal';
 import { prefersReducedMotion } from '@/lib/dom';
 import { FAQS, type Faq as FaqEntry } from '@/data/site';
 
@@ -81,7 +81,16 @@ export function Faq() {
           <p className="eyebrow" data-reveal>
             <em>09</em> Before you ask
           </p>
-          <SplitText className="big" text="FAQ" />
+          <ScrollReveal
+            as="h2"
+            containerClassName="big"
+            enableBlur={true}
+            blurStrength={4}
+            baseRotation={2}
+            baseOpacity={0.1}
+          >
+            FAQ
+          </ScrollReveal>
         </div>
 
         <div className="faq">

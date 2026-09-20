@@ -21,7 +21,8 @@
 import { useRef, useState, type CSSProperties } from 'react';
 import { useTilt } from '@/hooks/useTilt';
 import { useCardStack } from '@/hooks/useCardStack';
-import { SplitText } from '@/components/SplitText';
+import { ScrollReveal } from '@/components/ui/ScrollReveal';
+import { TextType } from '@/components/ui/TextType';
 import { SpeakerModal } from '@/components/SpeakerModal';
 import { topicIconFor } from '@/lib/icons';
 import { initials, pad2 } from '@/lib/dom';
@@ -116,12 +117,32 @@ export function Speakers() {
             <p className="eyebrow" data-reveal>
               <em>02</em> The line-up
             </p>
-            <SplitText className="big" text="Speakers" />
-            <p className="sec__sub" data-reveal>
-              {stacked
-                ? 'Three speakers, one stage. Keep scrolling — they come up one at a time. Tap a card for the full bio.'
-                : 'Three speakers, one stage. Hover a card to bring it forward, then tap it for the full bio.'}
-            </p>
+            <ScrollReveal
+              as="h2"
+              containerClassName="big"
+              enableBlur={true}
+              blurStrength={4}
+              baseRotation={2}
+              baseOpacity={0.1}
+            >
+              Speakers
+            </ScrollReveal>
+            <TextType
+              as="p"
+              className="sec__sub"
+              text={
+                stacked
+                  ? 'Three speakers, one stage. Keep scrolling — they come up one at a time. Tap a card for the full bio.'
+                  : 'Three speakers, one stage. Hover a card to bring it forward, then tap it for the full bio.'
+              }
+              startOnVisible={true}
+              loop={true}
+              pauseDuration={2500}
+              typingSpeed={20}
+              deletingSpeed={12}
+              showCursor={true}
+              cursorCharacter="▍"
+            />
             {/* Touch has no hover, so the affordance is stated, not discovered. */}
             <p className="speakers__hint">Drag a card sideways to tilt it</p>
           </div>

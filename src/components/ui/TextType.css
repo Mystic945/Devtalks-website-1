@@ -1,0 +1,16 @@
+.text-type {
+  display: inline-block;
+  white-space: pre-wrap;
+}
+
+.text-type__cursor {
+  margin-left: 0.18rem;
+  display: inline-block;
+  opacity: 1;
+  color: var(--orange, #ff5a1f);
+  font-weight: 300;
+}
+
+.text-type__cursor--hidden {
+  display: none;
+}

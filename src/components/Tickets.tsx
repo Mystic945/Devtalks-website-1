@@ -14,7 +14,8 @@
 
 import { useRef } from 'react';
 import { useScrollScale } from '@/hooks/useScrollScale';
-import { SplitText } from '@/components/SplitText';
+import { ScrollReveal } from '@/components/ui/ScrollReveal';
+import { TextType } from '@/components/ui/TextType';
 import { TagIcon } from '@/lib/icons';
 import { linkProps } from '@/lib/links';
 import { PASS, SITE } from '@/data/site';
@@ -34,10 +35,28 @@ export function Tickets() {
           <p className="eyebrow" data-reveal>
             <em>04</em> Registration
           </p>
-          <SplitText className="big" text="Tickets" />
-          <p className="sec__sub" data-reveal>
-            Free to attend. One pass, full day, lunch included. Seats are capped by the hall.
-          </p>
+          <ScrollReveal
+            as="h2"
+            containerClassName="big"
+            enableBlur={true}
+            blurStrength={4}
+            baseRotation={2}
+            baseOpacity={0.1}
+          >
+            Tickets
+          </ScrollReveal>
+          <TextType
+            as="p"
+            className="sec__sub"
+            text="Free to attend. One pass, full day, lunch included. Seats are capped by the hall."
+            startOnVisible={true}
+            loop={true}
+            pauseDuration={2500}
+            typingSpeed={20}
+            deletingSpeed={12}
+            showCursor={true}
+            cursorCharacter="▍"
+          />
         </div>
 
         {/* Two elements, two owners: the reveal tween animates opacity and y

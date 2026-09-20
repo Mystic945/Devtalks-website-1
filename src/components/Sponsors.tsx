@@ -9,7 +9,8 @@
    chased.
    ============================================================ */
 
-import { SplitText } from '@/components/SplitText';
+import { ScrollReveal } from '@/components/ui/ScrollReveal';
+import { TextType } from '@/components/ui/TextType';
 import { SPONSORS } from '@/data/site';
 
 export function Sponsors() {
@@ -20,10 +21,28 @@ export function Sponsors() {
           <p className="eyebrow" data-reveal>
             <em>05</em> Backed by
           </p>
-          <SplitText className="big" text="Partners" />
-          <p className="sec__sub" data-reveal>
-            DevTalks runs on sponsor support — it&rsquo;s what keeps the day free to attend.
-          </p>
+          <ScrollReveal
+            as="h2"
+            containerClassName="big"
+            enableBlur={true}
+            blurStrength={4}
+            baseRotation={2}
+            baseOpacity={0.1}
+          >
+            Partners
+          </ScrollReveal>
+          <TextType
+            as="p"
+            className="sec__sub"
+            text="DevTalks runs on sponsor support — it’s what keeps the day free to attend."
+            startOnVisible={true}
+            loop={true}
+            pauseDuration={2500}
+            typingSpeed={20}
+            deletingSpeed={12}
+            showCursor={true}
+            cursorCharacter="▍"
+          />
         </div>
 
         <div className="sponsors">

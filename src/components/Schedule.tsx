@@ -10,7 +10,8 @@
    separately registering blocks.
    ============================================================ */
 
-import { SplitText } from '@/components/SplitText';
+import { ScrollReveal } from '@/components/ui/ScrollReveal';
+import { TextType } from '@/components/ui/TextType';
 import { SCHEDULE, SITE } from '@/data/site';
 
 export function Schedule() {
@@ -21,10 +22,28 @@ export function Schedule() {
           <p className="eyebrow" data-reveal>
             <em>03</em> Run of show
           </p>
-          <SplitText className="big" text="Schedule" />
-          <p className="sec__sub" data-reveal>
-            {SITE.timeLabel} &middot; {SITE.venueShort}
-          </p>
+          <ScrollReveal
+            as="h2"
+            containerClassName="big"
+            enableBlur={true}
+            blurStrength={4}
+            baseRotation={2}
+            baseOpacity={0.1}
+          >
+            Schedule
+          </ScrollReveal>
+          <TextType
+            as="p"
+            className="sec__sub"
+            text={`${SITE.timeLabel} · ${SITE.venueShort}`}
+            startOnVisible={true}
+            loop={true}
+            pauseDuration={2500}
+            typingSpeed={25}
+            deletingSpeed={15}
+            showCursor={true}
+            cursorCharacter="▍"
+          />
         </div>
 
         <ol className="sched">

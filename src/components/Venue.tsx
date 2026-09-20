@@ -10,7 +10,7 @@
    with the Maps link anyway.
    ============================================================ */
 
-import { SplitText } from '@/components/SplitText';
+import { ScrollReveal } from '@/components/ui/ScrollReveal';
 import { SITE } from '@/data/site';
 
 export function Venue() {
@@ -21,7 +21,16 @@ export function Venue() {
           <p className="eyebrow" data-reveal>
             <em>06</em> Getting there
           </p>
-          <SplitText className="big" text="Venue" />
+          <ScrollReveal
+            as="h2"
+            containerClassName="big"
+            enableBlur={true}
+            blurStrength={4}
+            baseRotation={2}
+            baseOpacity={0.1}
+          >
+            Venue
+          </ScrollReveal>
         </div>
 
         <div className="venue">
