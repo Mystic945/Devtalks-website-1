@@ -24,6 +24,7 @@
    the page underneath is complete before it fires.
    ============================================================ */
 
+
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { useIntro } from '@/hooks/useIntro';
@@ -39,6 +40,7 @@ import { useClickSpark } from '@/hooks/useClickSpark';
 
 import { Doors } from '@/components/Doors';
 import { SiteNav } from '@/components/SiteNav';
+import LandingPage from './components/landing/LandingPage';
 import { Hero } from '@/components/hero/Hero';
 import { Ribbons } from '@/components/Ribbons';
 import { EdgeTab } from '@/components/EdgeTab';
@@ -96,6 +98,8 @@ export default function App() {
       <EdgeTab />
 
       <main id="top" ref={mainRef}>
+      <LandingPage />
+
         <Hero heroRef={heroRef} ready={ready} />
         <Ribbons />
         <About />
