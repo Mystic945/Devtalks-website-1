@@ -1,0 +1,41 @@
+/* ============================================================
+   MAGIC RINGS
+   ------------------------------------------------------------
+   The canvas starts invisible and MagicRings.tsx adds `is-on`
+   once the first frame is on it, so the rings ease in rather than
+   popping in the moment the shader finishes compiling.
+   ============================================================ */
+
+.magic-rings {
+  display: block;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 1.6s ease;
+}
+
+.magic-rings.is-on {
+  opacity: 1;
+}
+
+/* ---- on the landing page ----
+   Centred on the wordmark and sized off the viewport width, the way the
+   wordmark itself is, so the rings stay the same distance from the letters
+   at every screen size. It sits behind the title (the wrap is its own
+   stacking context, so -1 means "behind the h1, above the halftone"). */
+.landing-rings {
+  --rings-size: clamp(640px, 118vw, 1500px);
+
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: var(--rings-size);
+  height: var(--rings-size);
+  transform: translate(-50%, -50%);
+  z-index: -1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .magic-rings {
+    transition: none;
+  }
+}

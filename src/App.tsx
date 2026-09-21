@@ -37,6 +37,7 @@ import { useSmoothAnchors } from '@/hooks/useSmoothAnchors';
 import { useMagnetic } from '@/hooks/useMagnetic';
 import { useParallax } from '@/hooks/useParallax';
 import { useClickSpark } from '@/hooks/useClickSpark';
+import { useKonami } from '@/hooks/useKonami';
 
 import { Doors } from '@/components/Doors';
 import { SiteNav } from '@/components/SiteNav';
@@ -67,6 +68,17 @@ export default function App() {
 
   const [ready, setReady] = useState(false);
   const onReady = useCallback(() => setReady(true), []);
+
+  /* ↑↑↓↓←→←→BA returns the site to the paper edition it shipped as.
+     Announced, because an easter egg with no feedback reads as a bug. */
+  const [edition, setEdition] = useState<string | null>(null);
+  useKonami((paper) => setEdition(paper ? 'Paper edition unlocked' : 'Dark edition'));
+
+  useEffect(() => {
+    if (!edition) return;
+    const t = setTimeout(() => setEdition(null), 2600);
+    return () => clearTimeout(t);
+  }, [edition]);
 
   useIntro(doorsRef, onReady);
 
@@ -126,6 +138,12 @@ export default function App() {
       {/* Last in the tree and fixed over everything, so a spark is never
           clipped by a section's own stacking context. */}
       <canvas className="spark" ref={sparkRef} aria-hidden="true" />
+
+      {edition && (
+        <p className="edition-toast" role="status">
+          {edition}
+        </p>
+      )}
     </>
   );
 }

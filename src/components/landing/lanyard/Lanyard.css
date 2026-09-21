@@ -1,0 +1,19 @@
+/* ============================================================
+   LANYARD
+   ------------------------------------------------------------
+   The wrapper takes whatever box its parent gives it; the
+   landing page decides where that is (see LanyardLayer.css).
+   ============================================================ */
+
+.lanyard-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+/* The canvas sits over the page, so it must not swallow a vertical swipe:
+   pan-y hands scrolling back to the browser and keeps horizontal drags for
+   the badge. */
+.lanyard-wrapper canvas {
+  touch-action: pan-y;
+}

@@ -1,0 +1,34 @@
+/* ============================================================
+   LANDING LANYARD — PLACEMENT
+   ------------------------------------------------------------
+   A column down one side of the landing page. The badge hangs
+   from the top edge (the rope starts above the frame, under the
+   nav) and can be swung around inside the column. Wider than the
+   badge so a hard throw has room; the section clips whatever
+   leaves it.
+
+   The layer only fades in once WebGL is up and the first frame is
+   on its way, so the card never appears half-built.
+   ============================================================ */
+
+.landing-lanyard {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: min(36%, 560px);
+  z-index: 6;
+
+  opacity: 0;
+  transition: opacity 1.1s ease 0.25s;
+}
+
+.landing-lanyard.is-on {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing-lanyard {
+    transition: none;
+  }
+}

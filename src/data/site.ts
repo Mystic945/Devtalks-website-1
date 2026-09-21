@@ -257,5 +257,9 @@ export const FAQS: Faq[] = [
   {
     q: 'Can my company sponsor?',
     a: "Yes. We have title, gold, silver and community tiers, plus booth-only options. Mail us and we'll send the deck within a day."
+  },
+  {
+    q: 'Be honest. Is it just for the free food?',
+    a: "Yes. We know that's why you're coming. Lunch is at 12:35, it's genuinely good, and the talks either side of it are worth staying awake for."
   }
 ];

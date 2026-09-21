@@ -22,6 +22,9 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url))
     }
   },
+  // The lanyard's card model is a .glb, which Vite does not treat as an asset
+  // on its own.
+  assetsInclude: ['**/*.glb'],
   server: {
     port: 5173,
     open: false

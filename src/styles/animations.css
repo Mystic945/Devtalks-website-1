@@ -16,6 +16,7 @@
      7 · the run of show, sideways
      8 · the hero's typed lines
      9 · the landing page: nav, float, hand-off
+    10 · the dark edition — off with .paper-edition on <html>
 
    Every section degrades the same way the rest of the site does:
    the declared state is the finished state, and the reduced-motion
@@ -777,6 +778,593 @@
 
   .landing-page {
     position: static;
+  }
+}
+
+/* ============================================================
+   10 · THE DARK EDITION
+   ------------------------------------------------------------
+   Dark black ground for the whole site except the landing page,
+   which keeps its own, and the footer, which was already black.
+
+   HOW THIS IS SCOPED, AND WHY IT MATTERS
+   Every rule below is prefixed `.page-body`. That element wraps
+   exactly the sections between the landing page and the footer,
+   so "leave the landing alone" and "leave the footer alone" are
+   guaranteed by where the rules can reach rather than by
+   remembering to exclude them.
+
+   Nothing here repoints --black or --paper. An earlier attempt
+   swapped what those two words mean, which flipped every
+   component at once — including the ones that were already
+   right — and then needed a patch each. Colours are named
+   outright here, per surface.
+
+   THE RULE
+     ground      #0b0b0b
+     surfaces    lift away from it, never toward paper
+     alphabets   white
+     numbers     orange
+   ============================================================ */
+html:not(.paper-edition) .page-body{
+  --d-ground: #0b0b0b;
+  --d-surface: #141312;
+  --d-raised: #1b1917;
+  --d-red: #3b0f13; /* speaker cards, after TEDx */
+  --d-red-lit: #e62b1e;
+  --d-ink: #ffffff;
+  --d-ink-soft: rgba(255, 255, 255, 0.78);
+  --d-ink-mute: rgba(255, 255, 255, 0.58);
+  --d-hair: rgba(255, 255, 255, 0.14);
+  --d-hair-soft: rgba(255, 255, 255, 0.08);
+
+  background: var(--d-ground);
+  color: var(--d-ink-soft);
+}
+
+/* section rules and dividers */
+html:not(.paper-edition) .page-body .sec + .sec{
+  border-top-color: var(--d-hair-soft);
+}
+
+/* ---- type: alphabets white, numbers orange ---- */
+html:not(.paper-edition) .page-body .big,
+html:not(.paper-edition) .page-body .sec__head h2,
+html:not(.paper-edition) .page-body .faq__q,
+html:not(.paper-edition) .page-body .venue__info h3,
+html:not(.paper-edition) .page-body .final__h{
+  color: var(--d-ink);
+}
+html:not(.paper-edition) .page-body .eyebrow{
+  color: var(--d-ink-mute);
+}
+html:not(.paper-edition) .page-body .eyebrow em,
+html:not(.paper-edition) .page-body .offer__n,
+html:not(.paper-edition) .page-body .stat b,
+html:not(.paper-edition) .page-body .bt__label b,
+html:not(.paper-edition) .page-body .menu__links em{
+  color: var(--orange);
+}
+html:not(.paper-edition) .page-body .sec__sub,
+html:not(.paper-edition) .page-body .about__copy,
+html:not(.paper-edition) .page-body .offer__b,
+html:not(.paper-edition) .page-body .faq__a p,
+html:not(.paper-edition) .page-body .venue__info > p,
+html:not(.paper-edition) .page-body .final__k{
+  color: var(--d-ink-soft);
+}
+html:not(.paper-edition) .page-body .offer__t,
+html:not(.paper-edition) .page-body .offers__h{
+  color: var(--d-ink);
+}
+
+/* ---- surfaces ---- */
+html:not(.paper-edition) .page-body .stat,
+html:not(.paper-edition) .page-body .offer,
+html:not(.paper-edition) .page-body .venue__map{
+  background: var(--d-surface);
+  border-color: var(--d-hair);
+}
+html:not(.paper-edition) .page-body .stat span{
+  color: var(--d-ink-mute);
+}
+html:not(.paper-edition) .page-body .faq__item{
+  border-bottom-color: var(--d-hair-soft);
+}
+html:not(.paper-edition) .page-body .venue__info dl,
+html:not(.paper-edition) .page-body .venue__info dl > div{
+  border-color: var(--d-hair-soft);
+}
+html:not(.paper-edition) .page-body .venue__info dt{
+  color: var(--orange);
+}
+html:not(.paper-edition) .page-body .venue__info dd{
+  color: var(--d-ink-soft);
+}
+
+/* ---- the bento: already dark glass, only its ink needs saying ---- */
+html:not(.paper-edition) .page-body .hero--bento{
+  background: var(--d-ground);
+}
+html:not(.paper-edition) .page-body .bt{
+  border-color: var(--d-hair);
+}
+html:not(.paper-edition) .page-body .hero__title,
+html:not(.paper-edition) .page-body .hero__theme,
+html:not(.paper-edition) .page-body .btspk__name,
+html:not(.paper-edition) .page-body .btperk__t,
+html:not(.paper-edition) .page-body .bttick__n{
+  color: var(--d-ink);
+}
+html:not(.paper-edition) .page-body .hero__tag,
+html:not(.paper-edition) .page-body .hero__meta,
+html:not(.paper-edition) .page-body .btspk__talk,
+html:not(.paper-edition) .page-body .btperk__t em{
+  color: var(--d-ink-soft);
+}
+html:not(.paper-edition) .page-body .bt__label,
+html:not(.paper-edition) .page-body .btspk__role,
+html:not(.paper-edition) .page-body .bttick__u,
+html:not(.paper-edition) .page-body .count__cell small{
+  color: var(--d-ink-mute);
+}
+
+/* the countdown digits are numbers */
+html:not(.paper-edition) .page-body .count__cell strong{
+  color: var(--orange);
+}
+html:not(.paper-edition) .page-body .count__cell{
+  background: var(--d-surface);
+  border-color: var(--d-hair);
+}
+
+/* ---- speakers: dark red cards ---- */
+html:not(.paper-edition) .page-body .sec--speakers .spk{
+  background: var(--d-red);
+  border-color: rgba(230, 43, 30, 0.42);
+}
+html:not(.paper-edition) .page-body .sec--speakers .spk__name{
+  color: var(--d-ink);
+}
+
+/* words orange, the number white — as asked */
+html:not(.paper-edition) .page-body .sec--speakers .spk__role,
+html:not(.paper-edition) .page-body .sec--speakers .spk__talk{
+  color: var(--orange);
+}
+html:not(.paper-edition) .page-body .spk__no{
+  color: var(--d-ink);
+}
+
+/* the portrait sits under a red wash instead of a neutral one */
+html:not(.paper-edition) .page-body .sec--speakers .spk__img::after{
+  background: linear-gradient(
+    to top,
+    rgba(40, 8, 10, 0.92) 0%,
+    rgba(40, 8, 10, 0.45) 44%,
+    rgba(40, 8, 10, 0) 74%
+  );
+}
+
+/* ---- the run of show ---- */
+html:not(.paper-edition) .page-body .hsched__rule{
+  background: var(--d-hair);
+}
+html:not(.paper-edition) .page-body .hstop__title{
+  color: var(--d-ink);
+}
+html:not(.paper-edition) .page-body .hstop__time{
+  color: var(--orange);
+}
+html:not(.paper-edition) .page-body .hstop__who{
+  color: var(--d-ink-mute);
+}
+html:not(.paper-edition) .page-body .hstop.is-break .hstop__title{
+  color: var(--d-ink-mute);
+}
+html:not(.paper-edition) .page-body .hsched__fade--l{
+  background: linear-gradient(
+    to right,
+    var(--d-ground) 0%,
+    var(--d-ground) 34%,
+    rgba(11, 11, 11, 0) 100%
+  );
+}
+html:not(.paper-edition) .page-body .hsched__fade--r{
+  background: linear-gradient(to left, var(--d-ground), rgba(11, 11, 11, 0));
+}
+
+/* ---- sponsors ---- */
+html:not(.paper-edition) .page-body .tierRow h3{
+  color: var(--orange);
+}
+html:not(.paper-edition) .page-body .tierRow h3::after{
+  background: var(--d-hair-soft);
+}
+html:not(.paper-edition) .page-body .logo{
+  background: var(--d-surface);
+  border-color: var(--d-hair);
+  color: var(--d-ink-soft);
+}
+html:not(.paper-edition) .page-body .tierRow--title .logo{
+  color: var(--d-ink);
+}
+
+/* ---- reel + gallery ---- */
+html:not(.paper-edition) .page-body .reel__card,
+html:not(.paper-edition) .page-body .reel__frame,
+html:not(.paper-edition) .page-body .gal__card{
+  background: var(--d-surface);
+  border-color: var(--d-hair);
+}
+html:not(.paper-edition) .page-body .reel__cap,
+html:not(.paper-edition) .page-body .reel__n{
+  color: var(--d-ink-mute);
+}
+html:not(.paper-edition) .page-body .reel__play{
+  color: var(--orange);
+}
+
+/* ---- dialogs ---- */
+html:not(.paper-edition) .page-body .modal__card,
+html:not(.paper-edition) .page-body .rview__inner{
+  background: var(--d-raised);
+  border-color: var(--d-hair);
+  color: var(--d-ink-soft);
+}
+html:not(.paper-edition) .page-body .modal__card h3,
+html:not(.paper-edition) .page-body .modal__talk{
+  color: var(--d-ink);
+}
+html:not(.paper-edition) .page-body .modal__role,
+html:not(.paper-edition) .page-body .modal__talkLabel{
+  color: var(--orange);
+}
+html:not(.paper-edition) .page-body .modal__bio{
+  color: var(--d-ink-soft);
+}
+
+/* ------------------------------------------------------------
+   10b · THE TICKET
+   After the reference: a red tear-off stub, a charcoal pass, a
+   red call to action and a green coupon note.
+
+   The notches are the detail that gives it away. They are two
+   circles punched out of the card, and a punch-out is painted
+   with whatever is *behind* the card — they were the paper
+   colour, so on a dark page they read as two white dots stuck to
+   the edge. They follow the ground now.
+   ------------------------------------------------------------ */
+html:not(.paper-edition) .page-body .ticket{
+  background: #1c1b1a;
+  color: var(--d-ink);
+}
+html:not(.paper-edition) .page-body .ticket::before,
+html:not(.paper-edition) .page-body .ticket::after{
+  background: var(--d-ground);
+}
+html:not(.paper-edition) .page-body .ticket__stub{
+  background: var(--d-red-lit);
+  color: #fff;
+  border-right-color: rgba(255, 255, 255, 0.45);
+}
+html:not(.paper-edition) .page-body .stub__pass small{
+  color: rgba(255, 255, 255, 0.72);
+}
+html:not(.paper-edition) .page-body .stub__pass b{
+  color: #fff;
+}
+
+/* the one warm note on the stub, as in the reference */
+html:not(.paper-edition) .page-body .stub__price{
+  color: #f5c518;
+}
+html:not(.paper-edition) .page-body .ticket__body{
+  background: #1c1b1a;
+}
+html:not(.paper-edition) .page-body .ticket__cell--price{
+  border-right-style: dashed;
+  border-right-color: rgba(255, 255, 255, 0.16);
+}
+html:not(.paper-edition) .page-body .ticket__label{
+  color: var(--d-ink-mute);
+}
+html:not(.paper-edition) .page-body .ticket__price,
+html:not(.paper-edition) .page-body .ticket__title{
+  color: #fff;
+}
+html:not(.paper-edition) .page-body .ticket__note,
+html:not(.paper-edition) .page-body .ticket__fine{
+  color: var(--d-ink-mute);
+}
+
+/* the coupon note reads as a saving, so it keeps its green */
+html:not(.paper-edition) .page-body .ticket__chip{
+  color: #3ddc84;
+  border-color: rgba(61, 220, 132, 0.45);
+  background: rgba(61, 220, 132, 0.07);
+}
+html:not(.paper-edition) .page-body .ticket__btn{
+  --bg: var(--d-red-lit);
+  --fg: #fff;
+  background: var(--d-red-lit);
+  color: #fff;
+  border-color: var(--d-red-lit);
+  box-shadow: 0 10px 30px -12px rgba(230, 43, 30, 0.9);
+}
+html:not(.paper-edition) .page-body .ticket__btn::before{
+  background: #fff;
+}
+html:not(.paper-edition) .page-body .ticket__btn:hover{
+  color: var(--d-red-lit);
+}
+html:not(.paper-edition) .page-body .ticket__meta{
+  border-top-color: rgba(255, 255, 255, 0.14);
+}
+html:not(.paper-edition) .page-body .ticket__meta > div + div{
+  border-left-color: rgba(255, 255, 255, 0.14);
+}
+html:not(.paper-edition) .page-body .ticket__meta dt{
+  color: var(--d-ink-mute);
+}
+html:not(.paper-edition) .page-body .ticket__meta dd{
+  color: #fff;
+}
+
+/* ------------------------------------------------------------
+   10c · BLENDING
+   The pieces that were drawn for a paper ground and would
+   otherwise sit on this one as bright patches.
+   ------------------------------------------------------------ */
+
+/* The ghost button's ink was the dark ink — invisible here. */
+html:not(.paper-edition) .page-body .btn--ghost{
+  --fg: var(--d-ink);
+  color: var(--d-ink);
+  border-color: var(--d-hair);
+}
+html:not(.paper-edition) .page-body .btn--ghost:hover{
+  color: var(--d-ground);
+}
+
+/* The second ribbon was cream stock. It becomes the unlit band, so the
+   two read as one object rather than a bright stripe across the page. */
+html:not(.paper-edition) .page-body .ribbons .marquee--b{
+  background: var(--d-raised);
+  color: var(--d-ink);
+}
+html:not(.paper-edition) .page-body .ribbons .marquee--b .marquee__track span::after{
+  background: var(--orange);
+}
+
+/* The FAQ's open/close mark and the gallery's empty slots. */
+html:not(.paper-edition) .page-body .faq__q i::before,
+html:not(.paper-edition) .page-body .faq__q i::after{
+  background: var(--orange);
+}
+html:not(.paper-edition) .page-body .gal__slot,
+html:not(.paper-edition) .page-body .reel__slot{
+  color: var(--d-ink-mute);
+}
+
+/* The mobile menu is a full-screen sheet; it was paper. */
+html:not(.paper-edition) .page-body ~ .menu,
+html:not(.paper-edition) .menu{
+  background: #0b0b0b;
+}
+html:not(.paper-edition) .menu__links a{
+  color: #fff;
+  border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+html:not(.paper-edition) .menu__socials{
+  color: rgba(255, 255, 255, 0.6);
+}
+html:not(.paper-edition) .menu__socials a:hover{
+  color: #fff;
+}
+
+/* The landing page and the page body are the same black, so the seam
+   between them is invisible — which is the point, the bento simply
+   arrives over it. The footer is that black too, with its own rounded
+   top and hairline to read as a panel rather than a continuation. */
+
+/* ------------------------------------------------------------
+   10d · THE PATCHES THAT WERE STILL PAPER
+   Found by walking .page-body and flagging any painted surface
+   whose luminance was still in paper territory. These are the
+   ones that never showed up in a selector sweep because they are
+   placeholder grounds, media frames and control chrome.
+   ------------------------------------------------------------ */
+
+/* The closing panel was a full sheet of paper. */
+html:not(.paper-edition) .page-body .final{
+  background: var(--d-ground);
+  border-top: 1px solid var(--d-hair-soft);
+}
+html:not(.paper-edition) .page-body .final__h{
+  color: var(--d-ink);
+}
+html:not(.paper-edition) .page-body .final__k{
+  color: var(--orange);
+}
+
+/* Media frames: the ground behind a portrait while it loads, and the
+   ground a gallery photo sits on. A paper frame flashes white before
+   every image on a black page. */
+html:not(.paper-edition) .page-body .spk__img{
+  background: #2a0b0e;
+}
+html:not(.paper-edition) .page-body .btspk__img{
+  background: rgba(255, 255, 255, 0.07);
+}
+html:not(.paper-edition) .page-body .btperk__i{
+  background: rgba(255, 255, 255, 0.06);
+  border-color: var(--d-hair);
+}
+html:not(.paper-edition) .page-body .modal__media,
+html:not(.paper-edition) .page-body .gal__banner,
+html:not(.paper-edition) .page-body .gal__card{
+  background: var(--d-raised);
+}
+
+/* An empty reel slot is a placeholder, not a card of stock. */
+html:not(.paper-edition) .page-body .reel__slot{
+  background: var(--d-surface);
+  border: 1px solid var(--d-hair);
+}
+
+/* Control chrome: light discs read as holes punched in the page. They
+   become glass instead — dark, hairlined, light ink. */
+html:not(.paper-edition) .page-body .modal__x,
+html:not(.paper-edition) .page-body .rview__x,
+html:not(.paper-edition) .page-body .rview__nav{
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--d-hair);
+  color: #fff;
+}
+html:not(.paper-edition) .page-body .modal__x:hover,
+html:not(.paper-edition) .page-body .rview__x:hover,
+html:not(.paper-edition) .page-body .rview__nav:hover{
+  background: var(--orange);
+  border-color: var(--orange);
+  color: #0b0b0b;
+}
+html:not(.paper-edition) .page-body .modal__tags span{
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--d-hair);
+  color: var(--d-ink-soft);
+}
+html:not(.paper-edition) .page-body .rview__meta{
+  color: var(--d-ink-soft);
+}
+html:not(.paper-edition) .page-body .rview__meta b{
+  color: var(--orange);
+}
+
+/* ------------------------------------------------------------
+   10e · THE BENTO GLASS AND THE WORDMARK
+   Two things a background-colour sweep cannot see.
+
+   The tiles are not painted with a colour at all — they are a
+   cream linear-gradient, so they stayed bright on the dark
+   ground while every solid surface around them went dark. They
+   become the same glass, lit from the same corner, in white at
+   low alpha instead of cream.
+
+   The wordmark is painted with -webkit-text-fill-color, which
+   wins over `color` outright. Setting the fill is the only way
+   to move it.
+   ------------------------------------------------------------ */
+html:not(.paper-edition) .page-body .bt{
+  background: linear-gradient(
+    150deg,
+    rgba(255, 255, 255, 0.08) 0%,
+    rgba(255, 255, 255, 0.045) 48%,
+    rgba(255, 255, 255, 0.02) 100%
+  );
+  border-color: rgba(255, 255, 255, 0.12);
+}
+html:not(.paper-edition) .page-body .bt__rim{
+  border-color: rgba(255, 255, 255, 0.22);
+}
+html:not(.paper-edition) .page-body .hero__title .line > span{
+  color: #fff;
+  -webkit-text-fill-color: #fff;
+}
+
+/* the edition superscript stays quieter than the word */
+html:not(.paper-edition) .page-body .hero__title .line > span b{
+  color: rgba(255, 255, 255, 0.55);
+  -webkit-text-fill-color: rgba(255, 255, 255, 0.55);
+}
+
+/* the small square tiles inside the tiles */
+html:not(.paper-edition) .page-body .btstack span{
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+/* The gallery's edge masks feather the wall into the page, so they have to
+   feather into the page's actual colour — they were still fading to cream,
+   which put a pale vignette around a dark wall. */
+html:not(.paper-edition) .page-body .gal__mask--y{
+  background: linear-gradient(
+    to bottom,
+    var(--d-ground) 0%,
+    rgba(11, 11, 11, 0) 14%,
+    rgba(11, 11, 11, 0) 86%,
+    var(--d-ground) 100%
+  );
+}
+html:not(.paper-edition) .page-body .gal__mask--x{
+  background: linear-gradient(
+    to right,
+    var(--d-ground) 0%,
+    rgba(11, 11, 11, 0) 12%,
+    rgba(11, 11, 11, 0) 88%,
+    var(--d-ground) 100%
+  );
+}
+
+/* The substrate. .page-body covers these, but body and main were still the
+   paper ground underneath — which shows on an overscroll bounce and as a
+   pale flash before the first paint. Neither is the landing page nor the
+   footer, so darkening them changes nothing that was asked to stay. main
+   keeps an opaque ground either way: the reveal footer is fixed behind it. */
+html:not(.paper-edition) body,
+html:not(.paper-edition) main{
+  background: #0b0b0b;
+}
+
+/* ============================================================
+   11 · THE EDITION TOAST
+   ------------------------------------------------------------
+   Shown when the Konami code flips the site between its dark and
+   paper editions. Painted in literals rather than tokens: it has
+   to be legible in both editions, and a token would flip out from
+   under it at exactly the moment it is being read.
+   ============================================================ */
+.edition-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 26px;
+  transform: translateX(-50%);
+  z-index: 9600;
+
+  margin: 0;
+  padding: 0.72em 1.25em;
+
+  background: #ff5a1f;
+  color: #0b0b0b;
+  border: 2px solid #0b0b0b;
+  border-radius: 999px;
+  box-shadow: 0 10px 34px -14px rgba(0, 0, 0, 0.9);
+
+  font-family: var(--mono, ui-monospace, monospace);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  pointer-events: none;
+
+  animation: edition-toast-in 0.42s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes edition-toast-in {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .edition-toast {
+    animation: none;
   }
 }
 
