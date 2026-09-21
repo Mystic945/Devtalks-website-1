@@ -737,33 +737,17 @@
 }
 
 /* ------------------------------------------------------------
-   9c · THE HAND-OFF TO THE BENTO
-   The reference pulls the section after its hero up by half a
-   screen and gives it an opaque ground and a higher z-index, so it
-   travels up and covers the hero rather than pushing it away.
+   9c · THE LANDING IS PART OF THE PAGE
+   It used to be stuck to the top while the rest of the site slid
+   over it. On the reference that works because the two have
+   different grounds, so the cover reads as a cover. Here both are
+   the same black, so all you saw was the wordmark frozen and then
+   sliced in half by a hard horizontal seam — a rendering fault,
+   not an effect. It scrolls with everything else now.
 
-   Here the landing page is stuck to the top instead and the hero
-   slides over it — the same effect, and it costs nothing because
-   sticky is the browser's own pin. The hero needs its own ground
-   for this: a transparent section would let the landing page show
-   through it the whole way down.
-
-   This is the reveal footer's trick in reverse, and the two do not
-   collide: the footer is fixed behind <main>, the landing page is
-   stuck inside the top of it.
+   .page-body keeps its ground regardless: it is what stops a
+   transparent section showing whatever is behind <main>.
    ------------------------------------------------------------ */
-.landing-page {
-  position: sticky;
-  top: 0;
-  z-index: 0;
-}
-
-/* Everything after the landing page rides over it as ONE opaque sheet.
-   Sticky is bounded by its containing block, and the landing page's is
-   <main> — the whole document. So it stays pinned behind everything, and
-   the only thing stopping it showing through is this ground. Giving the
-   sections their own backgrounds individually is not enough: miss one and
-   the landing page appears through it halfway down the site. */
 .page-body {
   position: relative;
   z-index: 1;
@@ -776,9 +760,6 @@
     animation: none;
   }
 
-  .landing-page {
-    position: static;
-  }
 }
 
 /* ============================================================
@@ -1256,16 +1237,23 @@ html:not(.paper-edition) .page-body .rview__meta b{
    to move it.
    ------------------------------------------------------------ */
 html:not(.paper-edition) .page-body .bt{
+  /* A near-opaque card, not a wash. The paper edition's tiles were cream at
+     88% — cards you could see the edge of. Carrying that over as 8% white on
+     a black ground left them barely there, and the 14px backdrop-blur has
+     nothing to refract when what sits behind it is already almost black.
+     These are dark cards lit from the same corner instead. */
   background: linear-gradient(
     150deg,
-    rgba(255, 255, 255, 0.08) 0%,
-    rgba(255, 255, 255, 0.045) 48%,
-    rgba(255, 255, 255, 0.02) 100%
+    #201d1a 0%,
+    #171513 48%,
+    #121110 100%
   );
-  border-color: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.16);
+  box-shadow: 0 22px 48px -30px #000;
 }
+/* the rim is the edge the spotlight lights, so it carries the warm colour */
 html:not(.paper-edition) .page-body .bt__rim{
-  border-color: rgba(255, 255, 255, 0.22);
+  border-color: rgba(255, 170, 120, 0.55);
 }
 html:not(.paper-edition) .page-body .hero__title .line > span{
   color: #fff;
@@ -1366,6 +1354,41 @@ html:not(.paper-edition) main{
   .edition-toast {
     animation: none;
   }
+}
+
+/* ------------------------------------------------------------
+   10f · THE BENTO, MATCHING THE REST OF THE PAGE
+   Three things made this section look like a different website.
+
+   THE RIM was a hard 1px inset ring in amber. The spotlight
+   raises its opacity, so on a dark tile it came up as a bright
+   strip tracing the whole card — read as a rendering artefact
+   rather than as light. It keeps the soft inner and outer bloom
+   and loses the ring.
+
+   THE VEIL laid three orange radials across the section. On
+   paper that was a warm tint; on black it washed the entire
+   grid brown while every other section stayed flat.
+
+   THE TILES now use the same surface and hairline as the cards
+   in every other section, so the bento belongs to the same page.
+   ------------------------------------------------------------ */
+html:not(.paper-edition) .page-body .bt__rim {
+  box-shadow:
+    inset 0 0 30px -8px rgba(236, 105, 27, 0.42),
+    0 0 46px -16px rgba(236, 105, 27, 0.5);
+}
+
+html:not(.paper-edition) .page-body .hero--bento .hero__veil {
+  background:
+    radial-gradient(58% 48% at 16% 14%, rgba(255, 90, 31, 0.1), transparent 66%),
+    radial-gradient(48% 44% at 88% 72%, rgba(255, 90, 31, 0.06), transparent 68%);
+}
+
+html:not(.paper-edition) .page-body .bt {
+  background: var(--d-surface);
+  border-color: var(--d-hair);
+  box-shadow: none;
 }
 
 /* ============================================================
