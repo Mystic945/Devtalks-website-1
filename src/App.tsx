@@ -98,20 +98,27 @@ export default function App() {
       <EdgeTab />
 
       <main id="top" ref={mainRef}>
-      <LandingPage />
+        <LandingPage />
 
-        <Hero heroRef={heroRef} ready={ready} />
-        <Ribbons />
-        <About />
-        <Speakers />
-        <Schedule />
-        <Tickets />
-        <Sponsors />
-        <Venue />
-        <Reel />
-        <Gallery />
-        <Faq />
-        <FinalCta />
+        {/* Everything after the landing page travels as one opaque sheet.
+            It has to be one element with one ground: the landing page is
+            stuck to the top of <main>, so any section left transparent
+            would show it through — which is exactly what happened when
+            these were loose siblings. */}
+        <div className="page-body">
+          <Hero heroRef={heroRef} ready={ready} />
+          <Ribbons />
+          <About />
+          <Speakers />
+          <Schedule />
+          <Tickets />
+          <Sponsors />
+          <Venue />
+          <Reel />
+          <Gallery />
+          <Faq />
+          <FinalCta />
+        </div>
       </main>
 
       <Footer ref={footRef} />
