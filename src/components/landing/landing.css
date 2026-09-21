@@ -1,0 +1,709 @@
+/* =========================================================
+   DEVTALKS LANDING PAGE
+   Comic / editorial hero
+   ========================================================= */
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
+
+.landing-page {
+  --black: #0b0b0b;
+  --paper: #f3eee4;
+  --orange: #ff5a1f;
+  --grey: #77736b;
+  --line: #393732;
+
+  position: relative;
+
+  /*
+    FULL SCREEN
+    The navbar sits on top of this.
+  */
+  width: 100%;
+  height: 100vh;
+  min-height: 700px;
+
+  overflow: hidden;
+
+  background: var(--black);
+  color: var(--paper);
+
+  isolation: isolate;
+}
+
+
+/* =========================================================
+   HALFTONE BACKGROUND
+   ========================================================= */
+
+.landing-page::before {
+  content: "";
+
+  position: absolute;
+  inset: 0;
+
+  background-image:
+    radial-gradient(
+      rgba(243, 238, 228, 0.22) 1px,
+      transparent 1px
+    );
+
+  background-size: 10px 10px;
+
+  opacity: 0.20;
+
+  pointer-events: none;
+
+  z-index: 0;
+}
+
+
+/* subtle centre glow */
+
+.landing-page::after {
+  content: "";
+
+  position: absolute;
+  inset: 0;
+
+  background:
+    radial-gradient(
+      ellipse at 50% 43%,
+      rgba(255, 90, 31, 0.07),
+      transparent 38%
+    );
+
+  pointer-events: none;
+
+  z-index: 0;
+}
+
+
+/* =========================================================
+   MAIN CONTENT
+   ========================================================= */
+
+.landing-inner {
+  position: relative;
+
+  z-index: 5;
+
+  width: 100%;
+  height: 100%;
+
+  padding:
+    90px
+    clamp(35px, 5vw, 90px)
+    35px;
+
+  box-sizing: border-box;
+}
+
+
+/* =========================================================
+   REMOVE / HIDE KICKER
+   ========================================================= */
+
+.landing-kicker {
+  display: none;
+}
+
+
+/* =========================================================
+   TITLE AREA
+   ========================================================= */
+
+.landing-title-wrap {
+  position: absolute;
+
+  top: 47%;
+  left: 50%;
+
+  transform: translate(-50%, -50%);
+
+  width: min(1200px, 92vw);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  z-index: 5;
+}
+
+
+/* =========================================================
+   MAIN TITLE
+   ========================================================= */
+.landing-title {
+  margin: 0;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  font-family: "Bebas Neue", sans-serif;
+
+  font-size: clamp(150px, 21vw, 330px);
+
+  line-height: 0.68;
+
+  letter-spacing: 0.015em;
+
+  transform: rotate(-2deg);
+
+  text-align: center;
+
+  white-space: nowrap;
+
+  z-index: 5;
+}
+
+
+
+
+/* =========================================================
+   DEV
+   ========================================================= */
+.landing-title span:first-child {
+  display: block;
+
+  color: var(--paper);
+
+  text-shadow:
+    7px 7px 0 rgba(243, 238, 228, 0.06);
+}
+
+
+/* =========================================================
+   TALKS
+   ========================================================= */
+.landing-title span:last-child {
+  display: block;
+
+  color: var(--orange);
+
+  text-shadow:
+    7px 7px 0 rgba(255, 90, 31, 0.08);
+}
+
+
+/* =========================================================
+   LEFT SIDE — TECH COMMUNITY
+   ========================================================= */
+
+.landing-side-word {
+  position: absolute;
+
+  left: -3%;
+
+  top: 37%;
+
+  font-family: "DM Mono", monospace;
+
+  font-size: 11px;
+
+  line-height: 1.8;
+
+  color: #77736b;
+
+  transform: rotate(-4deg);
+
+  z-index: 4;
+}
+
+.landing-side-word::after {
+  content: "";
+
+  display: block;
+
+  width: 90px;
+
+  margin-top: 5px;
+
+  border-top: 2px solid var(--orange);
+}
+
+
+/* =========================================================
+   IDEAS / CODE / PEOPLE / IMPACT CIRCLE
+   ========================================================= */
+
+.landing-stamp {
+  position: absolute;
+
+  right: -2%;
+
+  top: 31%;
+
+  width: 125px;
+  height: 125px;
+
+  border: 1px solid var(--orange);
+
+  border-radius: 50%;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 2px;
+
+  color: var(--orange);
+
+  font-family: "DM Mono", monospace;
+
+  font-size: 10px;
+
+  line-height: 1.35;
+
+  text-align: center;
+
+  transform: rotate(7deg);
+
+  z-index: 4;
+}
+
+.landing-stamp::before {
+  content: "✦";
+
+  position: absolute;
+
+  top: -25px;
+  left: 0;
+
+  color: var(--orange);
+
+  font-size: 25px;
+}
+
+
+/* =========================================================
+   BOTTOM CONTENT
+   ========================================================= */
+
+.landing-bottom {
+  position: absolute;
+
+  left: clamp(35px, 5vw, 90px);
+  right: clamp(35px, 5vw, 90px);
+
+  bottom: 65px;
+
+  display: flex;
+
+  align-items: flex-end;
+
+  justify-content: space-between;
+
+  padding-top: 20px;
+
+  z-index: 6;
+}
+
+
+/* =========================================================
+   TECHNOLOGY UNFILTERED
+   ========================================================= */
+
+.landing-manifesto {
+  margin: 0 0 10px;
+
+  font-family: "Bebas Neue", sans-serif;
+
+  font-size: clamp(28px, 3vw, 44px);
+
+  line-height: 0.85;
+
+  letter-spacing: 0.01em;
+
+  color: var(--paper);
+}
+
+.landing-manifesto em {
+  font-style: normal;
+
+  color: var(--orange);
+}
+
+
+/* =========================================================
+   DESCRIPTION
+   ========================================================= */
+
+.landing-description {
+  margin: 0;
+
+  max-width: 430px;
+
+  color: #a29d94;
+
+  font-family: "DM Mono", monospace;
+
+  font-size: 11px;
+
+  line-height: 1.55;
+}
+
+
+/* =========================================================
+   EVENT INFO
+   ========================================================= */
+
+.landing-event-info {
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: flex-end;
+
+  gap: 7px;
+
+  font-family: "DM Mono", monospace;
+
+  font-size: 9px;
+
+  color: #77736b;
+
+  text-align: right;
+}
+
+/* =========================================================
+   DOODLE FIELD
+   ========================================================= */
+
+.landing-doodle-field {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  pointer-events: none;
+  opacity: 0.32;
+  overflow: hidden;
+}
+
+
+/* =========================================================
+   INDIVIDUAL DOODLES
+   ========================================================= */
+
+.landing-doodle {
+  position: absolute;
+  display: block;
+  will-change: margin-left, margin-top;
+}
+
+
+/* =========================================================
+   FLOATING MOTION
+   ========================================================= */
+
+.q1,
+.q5,
+.q9,
+.q13,
+.q17 {
+  animation: floatLeft 5.5s ease-in-out infinite;
+}
+
+.q3,
+.q7,
+.q11,
+.q15 {
+  animation: floatRight 6s ease-in-out infinite;
+}
+
+
+/* Different timing */
+
+.q1  { animation-delay: -1s; }
+.q3  { animation-delay: -3s; }
+.q5  { animation-delay: -2s; }
+.q7  { animation-delay: -4s; }
+.q9  { animation-delay: -1.5s; }
+.q11 { animation-delay: -3.5s; }
+.q13 { animation-delay: -2.5s; }
+.q15 { animation-delay: -4.5s; }
+.q17 { animation-delay: -0.5s; }
+
+
+/* LEFT FLOAT */
+
+@keyframes floatLeft {
+  0%,
+  100% {
+    margin-left: 0;
+    margin-top: 0;
+  }
+
+  50% {
+    margin-left: -8px;
+    margin-top: -10px;
+  }
+}
+
+
+/* RIGHT FLOAT */
+
+@keyframes floatRight {
+  0%,
+  100% {
+    margin-left: 0;
+    margin-top: 0;
+  }
+
+  50% {
+    margin-left: 8px;
+    margin-top: -12px;
+  }
+}
+
+
+/* =========================================================
+   DOODLE POSITIONS
+   ========================================================= */
+
+.q1 {
+  left: 5%;
+  top: 28%;
+  transform: rotate(-12deg);
+}
+
+.q2 {
+  left: 17%;
+  top: 19%;
+  transform: rotate(15deg);
+}
+
+.q3 {
+  left: 29%;
+  top: 25%;
+  transform: rotate(-7deg);
+}
+
+.q4 {
+  left: 5%;
+  top: 66%;
+  transform: rotate(8deg);
+}
+
+.q5 {
+  left: 20%;
+  top: 73%;
+  transform: rotate(-14deg);
+}
+
+.q6 {
+  left: 36%;
+  top: 77%;
+  transform: rotate(10deg);
+}
+
+.q7 {
+  left: 43%;
+  top: 16%;
+  transform: rotate(-5deg);
+  font-size: 18px;
+}
+
+.q9 {
+  right: 8%;
+  top: 26%;
+  transform: rotate(-12deg);
+}
+
+.q10 {
+  right: 18%;
+  top: 59%;
+  transform: rotate(13deg);
+}
+
+.q11 {
+  right: 5%;
+  top: 72%;
+  transform: rotate(-8deg);
+}
+
+.q12 {
+  left: 8%;
+  top: 46%;
+  transform: rotate(-8deg);
+}
+
+.q13 {
+  right: 35%;
+  top: 80%;
+  transform: rotate(5deg);
+}
+
+.q14 {
+  right: 5%;
+  top: 48%;
+  transform: rotate(4deg);
+}
+
+.q15 {
+  left: 29%;
+  top: 65%;
+  transform: rotate(-12deg);
+}
+
+.q16 {
+  right: 14%;
+  top: 12%;
+  transform: rotate(18deg);
+}
+
+.q17 {
+  right: 31%;
+  top: 29%;
+  transform: rotate(-9deg);
+}
+
+.q18 {
+  left: 48%;
+  top: 89%;
+  transform: rotate(4deg);
+}
+
+
+/* =========================================================
+   ORANGE ACCENTS
+   ========================================================= */
+
+.q4,
+.q8,
+.q12,
+.q16 {
+  color: var(--orange);
+  opacity: 0.7;
+}
+
+
+/* =========================================================
+   SCROLL
+   ========================================================= */
+
+.landing-scroll {
+  position: absolute;
+
+  z-index: 10;
+
+  left: 50%;
+  bottom: 15px;
+
+  transform: translateX(-50%);
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  gap: 2px;
+
+  font-family: "DM Mono", monospace;
+
+  font-size: 8px;
+
+  color: #77736b;
+}
+
+.landing-scroll b {
+  color: var(--orange);
+
+  font-size: 18px;
+
+  animation: landingBounce 1.5s ease-in-out infinite;
+}
+
+@keyframes landingBounce {
+  50% {
+    transform: translateY(5px);
+  }
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 700px) {
+
+  .landing-page {
+    height: 100svh;
+    min-height: 650px;
+  }
+
+  .landing-inner {
+    padding:
+      80px
+      25px
+      25px;
+  }
+
+  .landing-title-wrap {
+    width: 95vw;
+
+    height: 300px;
+
+    top: 43%;
+  }
+
+  .landing-title {
+    font-size: 25vw;
+  }
+
+  .landing-title span:first-child {
+    top: 20px;
+  }
+
+  .landing-title span:last-child {
+    top: 115px;
+  }
+
+  .landing-side-word {
+    left: 0;
+
+    top: 27%;
+
+    font-size: 8px;
+  }
+
+  .landing-stamp {
+    right: 0;
+
+    top: 25%;
+
+    width: 80px;
+    height: 80px;
+
+    font-size: 7px;
+  }
+
+  .landing-bottom {
+    left: 25px;
+    right: 25px;
+
+    bottom: 45px;
+
+    display: block;
+  }
+
+  .landing-manifesto {
+    font-size: 25px;
+  }
+
+  .landing-description {
+    font-size: 9px;
+  }
+
+  .landing-event-info {
+    display: none;
+  }
+
+  .landing-scroll {
+    display: none;
+  }
+}
