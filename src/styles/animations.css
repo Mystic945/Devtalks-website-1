@@ -15,6 +15,8 @@
      6 · the wordmark bolt
      7 · the run of show, sideways
      8 · the hero's typed lines
+     9 · the landing page: nav, float, hand-off
+    10 · the dark edition (palette)
 
    Every section degrades the same way the rest of the site does:
    the declared state is the finished state, and the reduced-motion
@@ -631,6 +633,226 @@
    the same weight as the line it follows. */
 .hero .text-type__cursor {
   font-weight: inherit;
+}
+
+/* ============================================================
+   9 · THE LANDING PAGE
+   ------------------------------------------------------------
+   The landing section is the one dark screen on a paper site, and
+   three things follow from that.
+
+   9a · THE NAV IS LIGHT OVER IT
+   The bar only has two states: transparent at the very top of the
+   page, and `is-stuck` below 40px. `is-stuck` is already light ink
+   on a near-black bar, which reads fine anywhere. The transparent
+   state was drawn in dark ink for a paper ground — and the only
+   thing now sitting under a transparent nav is the black landing
+   page, so it was invisible. It is lit here to match.
+
+   Scoped with :has() so that removing the landing section puts the
+   dark-ink nav back rather than leaving white type on paper.
+   ============================================================ */
+body:has(.landing-page) .nav:not(.is-stuck) .nav__logo {
+  color: var(--paper);
+}
+
+body:has(.landing-page) .nav:not(.is-stuck) .nav__logo span {
+  color: var(--orange);
+}
+
+body:has(.landing-page) .nav:not(.is-stuck) .nav__logo b {
+  color: var(--grey);
+}
+
+body:has(.landing-page) .nav:not(.is-stuck) .nav__links a {
+  color: rgba(243, 238, 228, 0.72);
+}
+
+body:has(.landing-page) .nav:not(.is-stuck) .nav__links a:hover,
+body:has(.landing-page) .nav:not(.is-stuck) .nav__links a.is-active {
+  color: var(--paper);
+}
+
+body:has(.landing-page) .nav:not(.is-stuck) .burger i {
+  background: var(--paper);
+}
+
+/* ------------------------------------------------------------
+   9b · THE WORDMARK FLOATS
+   It was dead still in the middle of a moving field, which read as
+   a placeholder. The keyframe carries the -2deg the title already
+   has: transform is one property, so a float that forgot the
+   rotation would straighten the word out.
+   ------------------------------------------------------------ */
+@keyframes landing-float {
+  0%,
+  100% {
+    transform: rotate(-2deg) translate3d(0, 0, 0);
+  }
+  50% {
+    transform: rotate(-2deg) translate3d(0, -15px, 0);
+  }
+}
+
+.landing-title {
+  animation: landing-float 7s ease-in-out infinite;
+  will-change: transform;
+}
+
+/* The stamp drifts with it, a beat behind, so the two read as one
+   object breathing rather than two things moving. */
+@keyframes landing-float-soft {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(0, -8px, 0);
+  }
+}
+
+.landing-stamp {
+  animation: landing-float-soft 7s ease-in-out infinite;
+  animation-delay: -1.6s;
+}
+
+/* ------------------------------------------------------------
+   9c · THE HAND-OFF TO THE BENTO
+   The reference pulls the section after its hero up by half a
+   screen and gives it an opaque ground and a higher z-index, so it
+   travels up and covers the hero rather than pushing it away.
+
+   Here the landing page is stuck to the top instead and the hero
+   slides over it — the same effect, and it costs nothing because
+   sticky is the browser's own pin. The hero needs its own ground
+   for this: a transparent section would let the landing page show
+   through it the whole way down.
+
+   This is the reveal footer's trick in reverse, and the two do not
+   collide: the footer is fixed behind <main>, the landing page is
+   stuck inside the top of it.
+   ------------------------------------------------------------ */
+.landing-page {
+  position: sticky;
+  top: 0;
+  z-index: 0;
+}
+
+/* Everything after the landing page rides over it. */
+.landing-page ~ * {
+  position: relative;
+  z-index: 1;
+}
+
+.hero--bento {
+  background: var(--paper);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing-title,
+  .landing-stamp {
+    animation: none;
+  }
+
+  .landing-page {
+    position: static;
+  }
+}
+
+/* ============================================================
+   10 · THE DARK EDITION
+   ------------------------------------------------------------
+   The landing page is black ground, paper ink, orange spot. This
+   carries that through the rest of the site.
+
+   HOW, AND WHY IT IS ONLY A DOZEN LINES
+   paper.css uses its tokens consistently: `--black` always means
+   *the ink*, `--paper` always means *the ground*, and a remap
+   block underneath restates them as --ink / --ink-2 / --line /
+   --mute for the sheets that came before it. So the whole edition
+   inverts by swapping what those two words point at and restating
+   the derived inks for a dark ground. Nothing below this block is
+   edited; delete it and the paper edition comes back exactly.
+
+   The landing page is unaffected either way — landing.css defines
+   its own --black/--paper locally, so it keeps its own ground.
+
+   CONTRAST
+   The orange is the one colour that does not simply invert. On
+   paper it had to be darkened to set type (--spot-ink #A83A0B,
+   5.5:1). On black the brand orange itself clears 5.6:1, so the
+   spot ink goes back to being the brand colour.
+   ============================================================ */
+:root {
+  /* the two that carry everything */
+  --black: #f3eee4; /* the ink is now light */
+  --paper: #0f0e0d; /* the ground is now dark */
+
+  /* derived surfaces: each step lifts away from the ground rather
+     than sinking into it, which is the inverse of the paper edition */
+  --paper-2: #171614; /* card stock  */
+  --paper-3: #201d1a; /* raised      */
+
+  /* orange sets type unaided on a dark ground — 5.6:1 on #0f0e0d */
+  --spot-ink: #ff5a1f;
+
+  --ink-line: rgba(243, 238, 228, 0.42);
+  --ink-hair: rgba(243, 238, 228, 0.16);
+
+  /* the remapped tokens the older sheets read */
+  --ink: #0f0e0d;
+  --ink-2: #171614;
+  --ink-3: #201d1a;
+  --line: rgba(243, 238, 228, 0.42);
+  --line-2: rgba(243, 238, 228, 0.16);
+  --mute: #c9c3b8; /* 11.2:1 on the ground */
+  --mute-2: #a59f95; /*  7.3:1 on the ground */
+  --grey: #a59f95;
+  --rule: #d4cec3;
+
+  /* icon strokes follow the ink */
+  --hero-a: #f3eee4;
+  --hero-b: #ff5a1f;
+}
+
+/* The comic drop was a flat black block offset from a card on paper.
+   Offsetting light from a dark card would glow; the drop becomes the
+   deepest ink instead, so cards still sit above the ground. */
+:root {
+  --drop: 6px 6px 0 #000;
+  --drop-sm: 3px 3px 0 #000;
+}
+
+/* The bento tiles are glass over a dark plane already, so they need
+   their rim back now the ground beneath them is dark too. */
+.bt {
+  border-color: rgba(243, 238, 228, 0.12);
+}
+
+/* The ribbons' second band was paper-on-paper; on a dark ground it
+   reads as the lit band, so it takes the ink instead. */
+.ribbons .marquee--b {
+  background: var(--paper-2);
+  color: var(--paper-3);
+}
+
+.ribbons .marquee--b .marquee__track span {
+  color: #f3eee4;
+}
+
+/* The gallery's edge wash and the timeline's fades are painted with the
+   literal paper colour in their own sheets; point them at the ground. */
+.hsched__fade--l {
+  background: linear-gradient(
+    to right,
+    var(--paper) 0%,
+    var(--paper) 34%,
+    rgba(15, 14, 13, 0) 100%
+  );
+}
+
+.hsched__fade--r {
+  background: linear-gradient(to left, var(--paper), rgba(15, 14, 13, 0));
 }
 
 /* ============================================================

@@ -157,6 +157,32 @@ longer wants one. `prefers-reduced-motion` gets the same vertical layout.
 fully styled. The deck falls back to the row on its own below 860px or on a
 short screen.
 
+### The dark edition
+
+The landing page Siya added is black ground / paper ink / orange spot, and
+section 10 of `animations.css` carries that through the rest of the site.
+
+It is about a dozen lines, because `paper.css` is consistent about its tokens:
+`--black` always means *the ink*, `--paper` always means *the ground*, and a
+remap block underneath restates them as `--ink` / `--line` / `--mute` for the
+older sheets. Inverting the edition is therefore a matter of swapping what
+those two words point at and restating the derived inks for a dark ground.
+**Nothing below that block is edited — delete it and the paper edition returns
+exactly.**
+
+The landing page is unaffected either way: `landing.css` scopes its own
+`--black` / `--paper` to `.landing-page`.
+
+Two things invert rather than darken: the ticket and the footer were black
+blocks on paper, so they are now light blocks on dark. That is coherent — they
+remain the page's accent blocks — but it is the part worth a second look.
+
+Contrast was measured on rendered elements, not assumed: the worst pair is
+7.3:1 (schedule times) and most body copy sits at 11–16:1. The orange is the
+one colour that does not simply invert — on paper it had to be darkened to
+`#A83A0B` to set type, and on black the brand `#ff5a1f` clears 5.6:1 on its
+own, so `--spot-ink` goes back to being the brand colour.
+
 ### Styles
 
 `src/styles/index.css` imports the stylesheets in a **load-bearing order**:
