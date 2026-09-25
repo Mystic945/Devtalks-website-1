@@ -1,6 +1,7 @@
-import { useEffect, useRef, useState, type RefObject } from 'react';
+import { useCallback, useEffect, useRef, useState, type RefObject } from 'react';
 import MagicRings from './MagicRings';
 import LanyardLayer from './LanyardLayer';
+import { prefersReducedMotion } from '@/lib/dom';
 import './landing.css';
 
 /* The landing page is `position: sticky` and stays pinned behind the page
@@ -40,6 +41,17 @@ function useCovered(ref: RefObject<HTMLElement>) {
 export default function LandingPage() {
   const pageRef = useRef<HTMLElement>(null);
   const covered = useCovered(pageRef);
+
+  // The landing page is `position: sticky`, so the next section (.page-body)
+  // is what actually scrolls up over it — scrollIntoView on that, rather than
+  // a fixed pixel amount, lands exactly past the landing screen regardless of
+  // its height on this viewport (it varies: 100vh, floored at 700px).
+  const scrollPastLanding = useCallback(() => {
+    document.querySelector('.page-body')?.scrollIntoView({
+      behavior: prefersReducedMotion() ? 'auto' : 'smooth',
+      block: 'start'
+    });
+  }, []);
 
   return (
     <section className="landing-page" ref={pageRef}>
@@ -130,10 +142,10 @@ export default function LandingPage() {
 
       <LanyardLayer paused={covered} />
 
-      <div className="landing-scroll">
+      <button type="button" className="landing-scroll" onClick={scrollPastLanding} aria-label="Scroll to the rest of the page">
         <span>SCROLL</span>
         <b>↓</b>
-      </div>
+      </button>
 
     </section>
   );

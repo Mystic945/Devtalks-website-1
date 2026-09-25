@@ -586,6 +586,15 @@
    ========================================================= */
 
 .landing-scroll {
+  /* button reset — this is a real button now (it scrolls the page), not
+     decoration, so it needs to give up the browser's default chrome */
+  appearance: none;
+  background: none;
+  border: 0;
+  margin: 0;
+  padding: 6px 10px;
+  cursor: pointer;
+
   position: absolute;
 
   z-index: 10;
@@ -608,6 +617,13 @@
   font-size: 8px;
 
   color: #77736b;
+
+  transition: color 0.2s ease;
+}
+
+.landing-scroll:hover,
+.landing-scroll:focus-visible {
+  color: var(--paper);
 }
 
 .landing-scroll b {
