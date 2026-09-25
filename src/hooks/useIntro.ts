@@ -64,9 +64,12 @@ export function useIntro(
     const el = doorsRef.current;
 
     let handed = false;
+    let backstop: ReturnType<typeof setTimeout> | null = null;
+
     const handOver = () => {
       if (handed) return;
       handed = true;
+      if (backstop) clearTimeout(backstop);
       onReady();
     };
 
@@ -85,6 +88,23 @@ export function useIntro(
     }
 
     document.body.classList.add('is-locked');
+
+    /* NEVER TRAP THE PAGE BEHIND THE INTRO.
+       `ready` is what releases the hero timeline and every [data-reveal] on
+       the site, and [data-reveal] starts at opacity 0 in CSS. So if this
+       timeline never reaches its handOver call, the whole page stays blank
+       behind a closed door.
+
+       That is not hypothetical: GSAP advances on requestAnimationFrame, and
+       rAF does not run in a background tab or under aggressive power saving.
+       A page opened in a background tab on a phone would sit invisible.
+
+       setTimeout is not rAF, so it fires regardless. The static build had
+       the same guard for the same reason. */
+    backstop = setTimeout(() => {
+      finish();
+      handOver();
+    }, 2600);
 
     const q = <T extends Element>(sel: string) => el.querySelector<T>(sel);
     const L = q<HTMLElement>('.door--l');
@@ -148,6 +168,7 @@ export function useIntro(
       .call(handOver, undefined, TIMING.seam + TIMING.judder + TIMING.handoff);
 
     return () => {
+      if (backstop) clearTimeout(backstop);
       tl.kill();
       document.body.classList.remove('is-locked');
     };

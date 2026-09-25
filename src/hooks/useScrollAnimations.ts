@@ -36,16 +36,44 @@ export function useScrollAnimations(play: boolean): void {
     const splits = all<HTMLElement>('[data-split]');
     const counts = all<HTMLElement>('[data-count]');
 
-    if (prefersReducedMotion()) {
+    /* The static page: every animated element in its finished state. Used
+       both for reduced motion and as the failsafe below. */
+    const showEverything = () => {
       reveals.forEach((el) => {
         el.style.opacity = '1';
         el.style.transform = 'none';
       });
+      splits.forEach((el) => {
+        el.querySelectorAll<HTMLElement>('.word > i').forEach((w) => {
+          w.style.transform = 'none';
+          w.style.filter = '';
+        });
+      });
       counts.forEach((b) => {
         b.textContent = (b.dataset.count ?? '') + (b.dataset.suffix ?? '');
       });
+    };
+
+    if (prefersReducedMotion()) {
+      showEverything();
       return;
     }
+
+    /* FAILSAFE: [data-reveal] starts at opacity 0 in CSS and is animated up
+       by GSAP — and GSAP advances on requestAnimationFrame. Where rAF never
+       ticks (a background tab, aggressive power saving, some webviews) the
+       tweens never run and the page sits blank rather than merely unanimated.
+
+       So: ask for one frame. If it has not arrived, animation is not
+       available here and the page is shown the way reduced motion shows it.
+       Content visibility must never depend on an animation. */
+    let ticked = false;
+    const probe = requestAnimationFrame(() => {
+      ticked = true;
+    });
+    const failsafe = setTimeout(() => {
+      if (!ticked) showEverything();
+    }, 2500);
 
     const ctx = gsap.context(() => {
       // Generic reveals (the hero's timeline owns its own)
@@ -134,6 +162,10 @@ export function useScrollAnimations(play: boolean): void {
       });
     });
 
-    return () => ctx.revert();
+    return () => {
+      cancelAnimationFrame(probe);
+      clearTimeout(failsafe);
+      ctx.revert();
+    };
   }, [play]);
 }

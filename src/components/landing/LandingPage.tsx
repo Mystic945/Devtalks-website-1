@@ -76,17 +76,17 @@ export default function LandingPage() {
             paused={covered}
             color="#ff5a1f"
             colorTwo="#a83a0b"
-            ringCount={6}
+            ringCount={5}
             speed={0.8}
-            attenuation={14}
-            lineThickness={1.4}
+            attenuation={20}
+            lineThickness={1}
             baseRadius={0.17}
             radiusStep={0.055}
             scaleRate={0.06}
-            opacity={0.55}
-            noiseAmount={0.05}
+            opacity={0.3}
+            noiseAmount={0.03}
             ringGap={1.5}
-            edgeFade={0.3}
+            edgeFade={0.26}
           />
 
           <h1 className="landing-title">
