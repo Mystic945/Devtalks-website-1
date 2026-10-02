@@ -143,7 +143,6 @@ export default function LandingPage() {
       <LanyardLayer paused={covered} />
 
       <button type="button" className="landing-scroll" onClick={scrollPastLanding} aria-label="Scroll to the rest of the page">
-        
         <b>↓</b>
       </button>
 

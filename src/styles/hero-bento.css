@@ -19,17 +19,8 @@
 
 .hero--bento{
   min-height:100svh;
-  display:flex; align-items:center;
-  padding:calc(var(--nav-h, 76px) + 22px) 0 44px;
+  background:#000;
   overflow:hidden;
-}
-.hero--bento .hero__canvas{ display:none; }
-
-/* the veil is what keeps the stage dark before the spotlight arrives */
-.hero--bento .hero__veil{
-  background:
-    radial-gradient(120% 90% at 50% 0%, rgba(236,105,27,.10), transparent 60%),
-    linear-gradient(180deg, rgba(0,0,0,.30), rgba(0,0,0,.72));
 }
 
 /* ---- the grid ----

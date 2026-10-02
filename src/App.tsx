@@ -42,7 +42,6 @@ import { useKonami } from '@/hooks/useKonami';
 import { Doors } from '@/components/Doors';
 import { SiteNav } from '@/components/SiteNav';
 import LandingPage from './components/landing/LandingPage';
-import { Hero } from '@/components/hero/Hero';
 import { Ribbons } from '@/components/Ribbons';
 import { EdgeTab } from '@/components/EdgeTab';
 import { About } from '@/components/About';
@@ -118,7 +117,6 @@ export default function App() {
             would show it through — which is exactly what happened when
             these were loose siblings. */}
         <div className="page-body">
-          <Hero heroRef={heroRef} ready={ready} />
           <Ribbons />
           <About />
           <Speakers />
