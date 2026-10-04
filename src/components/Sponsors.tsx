@@ -19,7 +19,7 @@ export function Sponsors() {
       <div className="wrap">
         <div className="sec__head">
           <p className="eyebrow" data-reveal>
-            <em>05</em> Backed by
+            <em>04</em> Backed by
           </p>
           <ScrollReveal
             as="h2"

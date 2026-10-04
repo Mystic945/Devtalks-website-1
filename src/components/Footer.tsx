@@ -28,7 +28,7 @@ const COLUMNS = [
   {
     head: 'Attend',
     links: [
-      { href: '#tickets', label: 'Tickets' },
+      { href: '/tickets', label: 'Tickets' },
       { href: '#faq', label: 'FAQ' }
     ]
   }

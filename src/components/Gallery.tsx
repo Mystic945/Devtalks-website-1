@@ -72,7 +72,7 @@ export function Gallery() {
       <div className="wrap">
         <div className="sec__head">
           <p className="eyebrow" data-reveal>
-            <em>08</em> In pictures
+            <em>07</em> In pictures
           </p>
           <SplitText className="big" text="Gallery" />
           <p className="sec__sub" data-reveal>

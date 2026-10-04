@@ -86,7 +86,7 @@ export function Reel() {
         <div className="wrap">
           <div className="sec__head">
             <p className="eyebrow" data-reveal>
-              <em>07</em> On the floor
+              <em>06</em> On the floor
             </p>
             <SplitText className="big" text="The reel" />
             <p className="sec__sub" data-reveal>

@@ -28,7 +28,11 @@ export const linkProps = (href: string): LinkProps =>
 
 /** Props for any "Get tickets" / "Register" control. */
 export const ticketProps = (): LinkProps =>
-  linkProps(SITE.registerUrl && SITE.registerUrl !== '#tickets' ? SITE.registerUrl : '#tickets');
+  linkProps(
+    SITE.registerUrl && SITE.registerUrl !== '#tickets'
+      ? SITE.registerUrl
+      : '/tickets'
+  );
 
 /** Social links, in the order they are declared, with the labels the footer
  *  and the mobile menu both print. */
