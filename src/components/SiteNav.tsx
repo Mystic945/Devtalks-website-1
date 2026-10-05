@@ -20,7 +20,7 @@ const NAV_LINKS = [
   { href: '#about', label: 'About' },
   { href: '#speakers', label: 'Speakers' },
   { href: '#schedule', label: 'Schedule' },
-  { href: '#tickets', label: 'Tickets' },
+  { href: '/tickets', label: 'Tickets' },
   { href: '#sponsors', label: 'Sponsors' },
   { href: '#reel', label: 'Reel' },
   { href: '#faq', label: 'FAQ' }
@@ -30,7 +30,7 @@ const MENU_LINKS = [
   { href: '#about', label: 'About' },
   { href: '#speakers', label: 'Speakers' },
   { href: '#schedule', label: 'Schedule' },
-  { href: '#tickets', label: 'Tickets' },
+  { href: '/tickets', label: 'Tickets' },
   { href: '#sponsors', label: 'Sponsors' },
   { href: '#venue', label: 'Venue' },
   { href: '#reel', label: 'Reel' },

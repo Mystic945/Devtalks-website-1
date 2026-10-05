@@ -1462,3 +1462,34 @@ html:not(.paper-edition) .page-body .bt {
     display: none;
   }
 }
+
+/* Standalone Tickets page spacing */
+.tickets-page .sec--tickets {
+  padding-top: 60px;
+  padding-bottom: 30px;
+}
+
+.tickets-page .sec__head {
+  margin-bottom: 25px;
+}
+
+.tickets-page .pass {
+  margin-top: 0;
+}
+
+/* Make the standalone ticket more compact */
+.tickets-page .ticket {
+  max-width: 900px;
+}
+
+.tickets-page .ticket__cell {
+  padding: 28px;
+}
+
+.tickets-page .ticket__stub {
+  padding: 20px 0;
+}
+
+.tickets-page .ticket__meta > div {
+  padding: 12px 10px;
+}

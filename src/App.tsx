@@ -48,7 +48,7 @@ import { EdgeTab } from '@/components/EdgeTab';
 import { About } from '@/components/About';
 import { Speakers } from '@/components/Speakers';
 import { Schedule } from '@/components/Schedule';
-import { Tickets } from '@/components/Tickets';
+import TicketsPage from './components/tickets/TicketsPage';
 import { Sponsors } from '@/components/Sponsors';
 import { Venue } from '@/components/Venue';
 import { Reel } from '@/components/Reel';
@@ -58,7 +58,7 @@ import { Footer } from '@/components/Footer';
 
 import { SITE } from '@/data/site';
 
-export default function App() {
+function MainApp() {
   const doorsRef = useRef<HTMLDivElement>(null);
   const heroRef = useRef<HTMLElement>(null);
   const mainRef = useRef<HTMLElement>(null);
@@ -122,7 +122,6 @@ export default function App() {
           <About />
           <Speakers />
           <Schedule />
-          <Tickets />
           <Sponsors />
           <Venue />
           <Reel />
@@ -144,4 +143,14 @@ export default function App() {
       )}
     </>
   );
+}
+
+export default function App() {
+  const path = window.location.pathname;
+
+  if (path === '/tickets') {
+    return <TicketsPage />;
+  }
+
+  return <MainApp />;
 }
