@@ -118,13 +118,16 @@
 .loop__twist span{ display: block; }
 .loop__twist-b{ color: var(--loop-orange); }
 
+/* Only the stage has a strip to drag. */
+.loop__hint{ display: none; }
+
 /* ---------- the stage (live) ---------- */
 
 /* Scroll length. Long enough that each stop gets a proper dwell; shorter
    on a phone, where a flick covers more ground. */
-.loop.is-live{ height: 680svh; }
+.loop.is-live{ height: 740svh; }
 @media (max-width: 760px){
-  .loop.is-live{ height: 560svh; }
+  .loop.is-live{ height: 620svh; }
 }
 
 .loop.is-live .loop__stage{
@@ -157,7 +160,32 @@
   z-index: 1;
   width: 100%;
   height: 100%;
+  /* As on the main site: a sideways swipe turns the strip, an up-and-down
+     one is still the page's to scroll. */
+  touch-action: pan-y;
 }
+
+/* Once the scroll has let go, the strip can be handled. The words above it
+   take no pointer events, so the whole stage is the handle. */
+.loop.is-free .loop__canvas{ cursor: grab; }
+.loop.is-free .loop__stage{
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Said once, quietly, and withdrawn the moment it has been acted on. */
+.loop.is-live .loop__hint{
+  display: block;
+  margin: 22px 0 0;
+  font-family: var(--sans, sans-serif);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--loop-orange);
+  transition: opacity .6s cubic-bezier(.19, 1, .22, 1);
+}
+.loop.is-touched .loop__hint{ opacity: 0; }
 
 /* The opening line, centred in the haze — the reference's "Scroll through
    doom". It leaves as the strip arrives. */

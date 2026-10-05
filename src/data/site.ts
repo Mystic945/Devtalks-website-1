@@ -276,3 +276,16 @@ export const LOOP: LoopStop[] = [
     body: "What you ship becomes somebody else's idea, and the loop goes round again."
   }
 ];
+
+/* The line under the loading bar. One is shown per visit, a different one
+   each time, so they have to stand alone and be true. They are set in a
+   pixel face where every character is a full em wide: keep each under
+   about 70 characters or it runs to a fourth line on a phone. */
+export const BOOT_TIPS: string[] = [
+  'Did you know? A Möbius strip has one side and one edge.',
+  'Tip: Cut one down the middle. You get one longer loop, not two.',
+  'Did you know? Found twice in 1858: by Listing, then by Möbius.',
+  'Tip: Conveyor belts use the twist so both faces wear evenly.',
+  'Did you know? The recycling symbol is a Möbius loop.',
+  'Pro tip: Scroll on. Ours you can ride, then drag.'
+];

@@ -31,6 +31,11 @@
    than turning the word. Scroll is eased into dwell points so each
    chapter settles in front of you before the next one slides in.
 
+   AFTERWARDS IT IS YOURS
+   Once the camera has pulled back, the scroll lets go and the strip
+   can be handled: drag to roll, tilt and throw it. The feel is the
+   strip on the main site's, constant for constant — lib/stripPlay.
+
    ROBUSTNESS
    The section is a plain, readable list until the first frame has
    actually rendered; only then does it gain `is-live` and become
@@ -45,6 +50,7 @@ import * as THREE from 'three';
 import { ScrollTrigger } from '@/lib/gsap';
 import { clamp, lerp, prefersReducedMotion, seg } from '@/lib/dom';
 import { createWarpLayer } from '@/lib/warpLayer';
+import { createStripPlay } from '@/lib/stripPlay';
 
 /* ---- geometry ---- */
 const STRIP = {
@@ -73,14 +79,23 @@ const RIDE = {
   lead: 0.16 // how far the camera trails behind the point it looks at
 } as const;
 
+/* How far the strip can be tilted by hand, as a lean either way from where
+   the closing view leaves it. The main site allows about half a radian each
+   way; its strip is a long flat ellipse and this one is a circle, which
+   tilted that far open would fill the screen behind the headline. So the
+   walls are closer. They are soft, as there: a hard flick still carries
+   past them and eases back. */
+const PLAY_TILT = [-0.3, 0.3] as const;
+
 /* ---- scroll beats, as shares of the section's scroll length ---- */
 const BEATS = {
   introOut: [0.015, 0.07], // the opening line fades
-  descend: [0.03, 0.17], // overview → first stop
-  ride: [0.17, 0.8], // once round the strip
-  ascend: [0.8, 0.92], // last stop → overview
-  finale: [0.9, 0.95], // the headline lands above the finished loop
-  outro: [0.93, 0.98] // and the closing line under it
+  descend: [0.03, 0.16], // overview → first stop
+  ride: [0.16, 0.74], // once round the strip
+  ascend: [0.74, 0.85], // last stop → overview
+  finale: [0.83, 0.88], // the headline lands above the finished loop
+  outro: [0.86, 0.91] // and the closing line under it
+  // …and from there to 1 nothing moves but what the visitor moves
 } as const;
 
 type Vec = THREE.Vector3;
@@ -338,7 +353,78 @@ export function useMobius(outerRef: RefObject<HTMLElement>, stops: number): void
     const rimMat = new THREE.MeshBasicMaterial({ color: INK.orange });
     const rim = new THREE.Mesh(rimGeo, rimMat);
 
-    scene.add(band, rim);
+    // one object, so it can be turned by hand once the scroll lets go of it
+    const strip = new THREE.Group();
+    strip.add(band, rim);
+    scene.add(strip);
+
+    /* The paper gives under the pointer and breathes in still air. Both are
+       done in the vertex shader, the way the main site does them, and both
+       move a whole cross-line of the band together so it bends like paper
+       and never dents like rubber. A point's place on the spine is its
+       azimuth, so the band and the rim need no extra attribute to agree. */
+    const flex = {
+      uFlexTime: { value: 0 },
+      uAir: { value: 0 },
+      uPush: { value: 0 },
+      uAspect: { value: 1 },
+      uPointerNdc: { value: new THREE.Vector2(9, 9) },
+      uCamObj: { value: new THREE.Vector3() }
+    };
+    const bendy = (shader: { uniforms: Record<string, unknown>; vertexShader: string }) => {
+      Object.assign(shader.uniforms, flex);
+      shader.vertexShader = shader.vertexShader
+        .replace(
+          '#include <common>',
+          `#include <common>
+uniform float uFlexTime;
+uniform float uAir;
+uniform float uPush;
+uniform float uAspect;
+uniform vec2 uPointerNdc;
+uniform vec3 uCamObj;`
+        )
+        .replace(
+          '#include <begin_vertex>',
+          `#include <begin_vertex>
+{
+  float th = atan(position.z, position.x);
+  vec3 outward = vec3(cos(th), 0.0, sin(th));
+  float air = sin(2.0 * th - uFlexTime * 0.32) * 0.6 + sin(3.0 * th + 1.3 + uFlexTime * 0.21) * 0.4;
+  vec3 drift = vec3(0.0, air * uAir, 0.0) + outward * (sin(th * 2.0 + uFlexTime * 0.18) * uAir * 0.5);
+  vec3 spine = outward * ${STRIP.radius.toFixed(3)} + drift;
+  vec4 clipS = projectionMatrix * modelViewMatrix * vec4(spine, 1.0);
+  vec2 ndc = clipS.xy / clipS.w;
+  float d = length((ndc - uPointerNdc) * vec2(uAspect, 1.0));
+  float give = exp(-d * d / 0.09) * uPush * 0.18;
+  transformed += drift + normalize(spine - uCamObj) * give;
+}`
+        );
+    };
+    bandMat.onBeforeCompile = bendy;
+    rimMat.onBeforeCompile = bendy;
+
+    const play = createStripPlay();
+    let free = false; // the scroll has let go
+    let grip = 0; // 0 while riding, 1 once the loop is the visitor's
+    const qCam = new THREE.Quaternion();
+    const qCamInv = new THREE.Quaternion();
+    const qHand = new THREE.Quaternion();
+    const qLag = new THREE.Quaternion();
+    const qSpin = new THREE.Quaternion();
+    const qGoal = new THREE.Quaternion();
+    const qRest = new THREE.Quaternion();
+    const hand = new THREE.Euler(0, 0, 0, 'ZYX');
+    const lagAxis = new THREE.Vector3();
+    const ndc = new THREE.Vector2(9, 9);
+
+    /* The gap the finished loop has to itself: under the headline, over the
+       closing line. Measured from layout, which no transform touches. */
+    let room = 0;
+    const measureRoom = () => {
+      if (!finale || !outro) return;
+      room = Math.max(0, outro.offsetTop - (finale.offsetTop + finale.offsetHeight) - 40);
+    };
 
     /* ---- light: a cool room, an orange key, and a lamp on the camera ---- */
     scene.add(new THREE.AmbientLight(0xffffff, 0.35));
@@ -387,6 +473,7 @@ export function useMobius(outerRef: RefObject<HTMLElement>, stops: number): void
       warp.resize(w, h, portrait);
 
       // the lines rewrap at a new width, so they are painted again
+      measureRoom();
       if (warpReady) {
         if (repaint) clearTimeout(repaint);
         repaint = setTimeout(() => {
@@ -444,7 +531,7 @@ export function useMobius(outerRef: RefObject<HTMLElement>, stops: number): void
     let current = 0;
     const n = Math.max(1, stops);
 
-    const draw = (p: number, time: number) => {
+    const draw = (p: number, time: number, dt: number) => {
       const far = Math.max(14, rideDist + 8);
 
       // The overviews breathe a little, so the loop is never quite still.
@@ -475,13 +562,87 @@ export function useMobius(outerRef: RefObject<HTMLElement>, stops: number): void
         /* Aimed a touch above the loop's centre and held well back, so the
            finished loop sits between the headline and the closing line
            without touching either. */
-        const overOut = overview(0.5 - sway, 0.42, outroReach, A, 0.15);
+        // No sway here: this view is the frame the hand turns the strip in.
+        const overOut = overview(0.5, 0.42, outroReach, A, 0.15);
+        qCam.copy(overOut.quat);
         blend(Bp, overOut, w);
         (scene.fog as THREE.Fog).near = lerp(rideDist * 0.75, outroReach - 1.5, w);
         (scene.fog as THREE.Fog).far = lerp(far, outroReach + 8.5, w);
       }
 
       lamp.position.copy(camera.position);
+
+      /* ---- in the visitor's hands ----
+         The main site's strip, in its own terms: rock, yaw and tilt happen
+         in the camera's frame (its strip faces a fixed camera), the lag
+         leans the loop about a line in its own plane, and the roll turns
+         it about its own axis. Composed in that order here and eased in by
+         `grip`, so scrolling back up hands the strip back to the ride. */
+      grip = THREE.MathUtils.smoothstep(away, 0.55, 1);
+      const nowFree = away > 0.98;
+      if (nowFree !== free) {
+        free = nowFree;
+        outer.classList.toggle('is-free', free);
+        if (!free) canvas.style.cursor = '';
+      }
+      if (grip <= 0) {
+        play.reset();
+        strip.quaternion.identity();
+        strip.position.set(0, 0, 0);
+        strip.scale.setScalar(1);
+        flex.uAir.value = 0;
+        flex.uPush.value = 0;
+      } else {
+        const m = play.step(dt / 1000, free, PLAY_TILT[0], PLAY_TILT[1]);
+        const tSec = time / 1000;
+        flex.uFlexTime.value = tSec;
+
+        hand.set(m.tilt, m.yaw + (free ? 0.1 * clamp(ndc.x, -1, 1) : 0), 0.025 * Math.sin(0.27 * tSec));
+        qHand.setFromEuler(hand);
+        qCamInv.copy(qCam).invert();
+
+        // the line the lag leans about: 0.6 rad round from the camera's right
+        v1.set(1, 0, 0).applyQuaternion(qCam); // right
+        v2.crossVectors(UP, v1); // away from the camera, along the floor
+        lagAxis.copy(v1).multiplyScalar(Math.cos(0.6)).addScaledVector(v2, -Math.sin(0.6)).normalize();
+        qLag.setFromAxisAngle(lagAxis, 0.25 * m.lag);
+        qSpin.setFromAxisAngle(UP, -m.roll);
+
+        qGoal.copy(qCam).multiply(qHand).multiply(qCamInv).multiply(qLag).multiply(qSpin);
+        strip.quaternion.copy(qRest).slerp(qGoal, grip);
+        strip.position.set(0, grip * 0.013 * Math.sin(0.2 * tSec), 0);
+
+        /* THE VIEW GIVES IT ROOM
+           The main site's strip turns in a canvas of its own. This one turns
+           between a headline and a closing line, and it is a circle: opened
+           up or swung round, it stands much taller than it rests. So as it
+           grows it is drawn smaller, by exactly enough to stay in the gap —
+           the camera stepping back to keep it in frame. At rest this is 1
+           and changes nothing.
+
+           `tall` is how tall the loop stands on screen for its radius: the
+           height of the box round the ellipse a tilted circle projects to. */
+        const stand = (q: THREE.Quaternion) => {
+          v1.copy(UP).applyQuaternion(q).applyQuaternion(qCamInv); // the loop's axis, as the camera sees it
+          const flat = Math.hypot(v1.x, v1.y) || 1;
+          return Math.hypot(v1.x / flat, (v1.z * v1.y) / flat);
+        };
+        const tallNow = stand(strip.quaternion);
+        const tallRest = stand(qRest);
+        const perUnit = stageH / (2 * outroReach * Math.tan(THREE.MathUtils.degToRad(RIDE.fov / 2)));
+        const restPx = 2 * (STRIP.radius + STRIP.half) * tallRest * perUnit;
+        const allow = restPx > 0 && room > 0 ? Math.max(1.05, room / restPx) : 1.25;
+        const fit = clamp((allow * tallRest) / Math.max(tallNow, 1e-4), 0.4, 1);
+        strip.scale.setScalar(lerp(1, fit, grip));
+
+        flex.uAir.value = grip * (0.036 + 0.072 * Math.abs(m.lag));
+        flex.uPush.value = m.push;
+        flex.uAspect.value = stageW / Math.max(1, stageH);
+        flex.uPointerNdc.value.copy(ndc);
+        strip.updateMatrixWorld();
+        flex.uCamObj.value.copy(camera.position);
+        strip.worldToLocal(flex.uCamObj.value);
+      }
 
       /* On a tall screen the picture is lifted a tenth of the way up while
          riding, so the band sits in the top half and the words underneath
@@ -546,12 +707,13 @@ export function useMobius(outerRef: RefObject<HTMLElement>, stops: number): void
       // critically damped-ish follow: smooth on a wheel, honest on a drag
       current += (target - current) * (1 - Math.exp(-dt / 90));
       if (Math.abs(target - current) < 1e-4) current = target;
-      draw(current, now);
+      draw(current, now, dt);
 
       if (!started) {
         started = true;
         outer.classList.add('is-live');
         ScrollTrigger.refresh();
+        measureRoom();
 
         /* Painted only now, against the stage layout. The page's own text
            is hidden only once its replacement exists. */
@@ -567,7 +729,9 @@ export function useMobius(outerRef: RefObject<HTMLElement>, stops: number): void
          battery — nobody is watching a loop breathe on a phone. */
       const overviewing = current < BEATS.ride[0] || current > BEATS.ride[1];
       // ...unless there are words on screen: the glass never stops moving.
-      const moving = current !== target || (overviewing && !coarse) || warp.showing();
+      // ...or the strip is in someone's hands, or still coasting from them.
+      const moving =
+        current !== target || (overviewing && !coarse) || warp.showing() || grip > 0 || play.busy;
       if (visible && moving) raf = requestAnimationFrame(tick);
     };
 
@@ -603,7 +767,7 @@ export function useMobius(outerRef: RefObject<HTMLElement>, stops: number): void
 
     const onLost = (e: Event) => {
       e.preventDefault();
-      outer.classList.remove('is-live', 'is-warped');
+      outer.classList.remove('is-live', 'is-warped', 'is-free');
       ScrollTrigger.refresh();
     };
     canvas.addEventListener('webglcontextlost', onLost);
@@ -615,11 +779,38 @@ export function useMobius(outerRef: RefObject<HTMLElement>, stops: number): void
       const r = stage.getBoundingClientRect();
       const inside = x >= r.left && x <= r.right && y >= r.top && y <= r.bottom;
       warp.pointer(x - r.left, y - r.top, inside);
+      ndc.set(((x - r.left) / r.width) * 2 - 1, -(((y - r.top) / r.height) * 2 - 1));
       if (inside && visible) wake();
     };
     const onPointer = (e: PointerEvent) => {
       if (e.pointerType !== 'touch') aim(e.clientX, e.clientY);
+      if (play.dragging) {
+        play.move(e.clientX, e.clientY);
+        wake();
+      }
     };
+
+    /* Taking hold of the strip. Only once the scroll has let go — before
+       that a press on the stage is just a press on the page. */
+    const onDown = (e: PointerEvent) => {
+      if (!free || (e.pointerType === 'mouse' && e.button !== 0)) return;
+      play.down(e.clientX, e.clientY);
+      canvas.style.cursor = 'grabbing';
+      outer.classList.add('is-touched');
+      wake();
+    };
+    const onUp = () => {
+      if (!play.dragging) return;
+      play.up();
+      canvas.style.cursor = '';
+    };
+    const onEnter = () => play.over(true);
+    const onLeave = () => play.over(false);
+    canvas.addEventListener('pointerdown', onDown);
+    canvas.addEventListener('pointerenter', onEnter);
+    canvas.addEventListener('pointerleave', onLeave);
+    window.addEventListener('pointerup', onUp);
+    window.addEventListener('pointercancel', onUp);
     const onTouch = (e: TouchEvent) => {
       const t0 = e.touches[0];
       if (t0) aim(t0.clientX, t0.clientY);
@@ -643,13 +834,19 @@ export function useMobius(outerRef: RefObject<HTMLElement>, stops: number): void
       trigger.kill();
       canvas.removeEventListener('webglcontextlost', onLost);
       window.removeEventListener('pointermove', onPointer);
+      canvas.removeEventListener('pointerdown', onDown);
+      canvas.removeEventListener('pointerenter', onEnter);
+      canvas.removeEventListener('pointerleave', onLeave);
+      window.removeEventListener('pointerup', onUp);
+      window.removeEventListener('pointercancel', onUp);
+      canvas.style.cursor = '';
       window.removeEventListener('touchstart', onTouch);
       window.removeEventListener('touchmove', onTouch);
       window.removeEventListener('touchend', onRelease);
       window.removeEventListener('touchcancel', onRelease);
       document.documentElement.removeEventListener('mouseleave', onRelease);
       if (repaint) clearTimeout(repaint);
-      outer.classList.remove('is-live', 'is-warped');
+      outer.classList.remove('is-live', 'is-warped', 'is-free', 'is-touched');
       [intro, outro, finale, ...cards].forEach((el) => el?.removeAttribute('style'));
       warp.dispose();
       bandGeo.dispose();

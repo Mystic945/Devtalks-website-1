@@ -88,6 +88,10 @@ export function Loop() {
           <p className="loop__note" data-warp>
             That&rsquo;s a Möbius strip. It&rsquo;s also how this works.
           </p>
+          {/* The strip is in the visitor's hands from here; say so once. */}
+          <p className="loop__hint" aria-hidden="true">
+            Drag to twist
+          </p>
         </div>
       </div>
     </section>

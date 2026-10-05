@@ -18,8 +18,8 @@
    the first scroll measures against a page that has since grown.
 
    THE INTRO HANDOFF
-   The doors hand over with `ready`, which is what starts the hero
-   timeline and the scroll reveals. Nothing renders differently
+   The boot screen (components/Boot) hands over with `ready`, which is
+   what starts the scroll reveals. Nothing renders differently
    because of it — it is a starting gun, not a loading state, and
    the page underneath is complete before it fires.
    ============================================================ */
@@ -27,7 +27,6 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-import { useIntro } from '@/hooks/useIntro';
 import { useHeroIntro } from '@/hooks/useHeroIntro';
 import { useScrollAnimations } from '@/hooks/useScrollAnimations';
 import { useScrollTriggerSync } from '@/hooks/useScrollTriggerSync';
@@ -39,7 +38,7 @@ import { useParallax } from '@/hooks/useParallax';
 import { useClickSpark } from '@/hooks/useClickSpark';
 import { useKonami } from '@/hooks/useKonami';
 
-import { Doors } from '@/components/Doors';
+import { Boot } from '@/components/Boot';
 import { SiteNav } from '@/components/SiteNav';
 import LandingPage from './components/landing/LandingPage';
 import { Loop } from '@/components/Loop';
@@ -59,7 +58,6 @@ import { Footer } from '@/components/Footer';
 import { SITE } from '@/data/site';
 
 function MainApp() {
-  const doorsRef = useRef<HTMLDivElement>(null);
   const heroRef = useRef<HTMLElement>(null);
   const mainRef = useRef<HTMLElement>(null);
   const footRef = useRef<HTMLElement>(null);
@@ -78,8 +76,6 @@ function MainApp() {
     const t = setTimeout(() => setEdition(null), 2600);
     return () => clearTimeout(t);
   }, [edition]);
-
-  useIntro(doorsRef, onReady);
 
   useEffect(() => {
     if (ready) document.body.classList.add('is-ready');
@@ -104,7 +100,7 @@ function MainApp() {
 
   return (
     <>
-      <Doors ref={doorsRef} />
+      <Boot onReady={onReady} />
       <SiteNav />
       <EdgeTab />
 

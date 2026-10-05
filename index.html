@@ -23,10 +23,9 @@
 
 <body>
 
-<!-- The static edition needed a pre-paint script here to hide the door
-     overlay on a repeat visit. React does not: the doors do not exist until
-     it renders them, and its first render already knows whether the intro
-     has played this session. See src/hooks/useIntro.ts. -->
+<!-- The intro is the 8-bit loading screen in src/components/Boot.tsx. It
+     needs nothing here: it does not exist until React renders it, and its
+     first render already knows whether it has played this session. -->
 <div id="root"></div>
 <script type="module" src="/src/main.tsx"></script>
 

@@ -714,52 +714,6 @@ main{
 .foot__huge{ display:none; }
 
 /* ============================================================
-   THE DOORS — the cover of the issue, splitting down the spine
-   ============================================================ */
-.door--l{
-  background:
-    linear-gradient(90deg, var(--paper) 0%, var(--paper) 70%, #EFE7D8 100%);
-  box-shadow:inset -2px 0 0 var(--black);
-}
-.door--r{
-  background:
-    linear-gradient(270deg, var(--paper) 0%, var(--paper) 70%, #EFE7D8 100%);
-  box-shadow:inset 2px 0 0 var(--black);
-}
-.door__word{ color:var(--black); }
-.door__word span{
-  color:var(--orange);
-  -webkit-text-stroke:0;
-  text-shadow:
-    2px 0 0 var(--black), -2px 0 0 var(--black),
-    0 2px 0 var(--black), 0 -2px 0 var(--black),
-    1.5px 1.5px 0 var(--black), -1.5px 1.5px 0 var(--black),
-    1.5px -1.5px 0 var(--black), -1.5px -1.5px 0 var(--black),
-    6px 6px 0 var(--black);
-}
-.doors__seam{
-  background:linear-gradient(to bottom,
-    transparent, var(--orange) 12%, #FFB48C 50%, var(--orange) 88%, transparent);
-  width:3px; margin-left:-1.5px;
-}
-.doors__glow{
-  background:radial-gradient(closest-side, rgba(255,90,31,.34), transparent 78%);
-}
-@media (max-width:700px){
-  .door--l{
-    background:
-        linear-gradient(90deg, var(--paper) 0%, var(--paper) 86%, #EFE7D8 100%);
-    box-shadow:inset -2px 0 0 var(--black);
-  }
-  .door--r{
-    background:
-        linear-gradient(270deg, var(--paper) 0%, var(--paper) 86%, #EFE7D8 100%);
-    box-shadow:inset 2px 0 0 var(--black);
-  }
-  .doors__glow{ background:radial-gradient(closest-side, rgba(255,90,31,.22), transparent 74%); }
-}
-
-/* ============================================================
    THE OTHER PAGES IN THIS FOLDER
    ------------------------------------------------------------
    index.html and the variants share this class inventory, so

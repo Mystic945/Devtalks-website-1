@@ -13,7 +13,6 @@
 
 @import './fonts.css';
 @import './style-devkraft.css';
-@import './doors.css';
 @import './parallax.css';
 @import './bento.css';
 @import './hero-bento.css';
@@ -25,3 +24,4 @@
    any of the sheets above without editing them. */
 @import './animations.css';
 @import './loop.css';
+@import './boot.css';

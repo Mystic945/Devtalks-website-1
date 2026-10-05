@@ -1,0 +1,88 @@
+/* ============================================================
+   DEVTALKS — THE BOOT SCREEN
+   ------------------------------------------------------------
+   The 8-bit loading screen that opens the site, and the grid of
+   squares it leaves in. The screen's own layout is Tailwind
+   classes inside the component (components/ui/8bit-loading-screen);
+   this sheet gives it the three things those classes assume and
+   this project does not supply globally: a pixel face, the
+   shadcn colour tokens, and the exit.
+
+   BLACK AND WHITE, AND NOTHING ELSE
+   Black ground, white type, white bar, a neutral grey for the
+   quieter lines. No orange: the site's colour arrives with the
+   site. The tokens are set on .boot only, so they reach nothing
+   outside the loading screen.
+   ============================================================ */
+
+.boot{
+  /* channels, so Tailwind can apply alpha: bg-primary/20 */
+  --background: 0 0 0;
+  --foreground: 255 255 255;
+  --primary: 255 255 255;
+  --muted-foreground: 161 161 161;
+
+  color: rgb(var(--foreground));
+}
+
+/* The component marks its type `retro`. The face itself is inlined by
+   Boot.tsx, so it is there for the first frame. */
+.retro{
+  font-family: 'Press Start 2P', ui-monospace, 'Courier New', monospace;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+/* Scanlines, barely: a dark line every third pixel. Enough that the white
+   reads as lit phosphor rather than as flat CSS white. */
+.boot::after{
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0) 0 2px,
+    rgba(0, 0, 0, 0.28) 2px 3px
+  );
+}
+
+/* READY holds still. The pulse was the waiting; this is the answer. */
+.boot.is-ready h2{ animation: none; }
+
+/* The squares take over from here. They are a separate layer laid over the
+   whole screen, so the loader underneath simply stops being drawn. */
+.boot.is-leaving{ visibility: hidden; }
+
+/* ---------- the exit: the screen, in squares ---------- */
+
+.boot-tiles{
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: grid;
+  /* the page underneath is already the visitor's */
+  pointer-events: none;
+}
+.boot-tiles i{
+  display: block;
+  background: #000;
+  /* a hairline of overlap, or sub-pixel seams show the page through the grid */
+  outline: 1px solid #000;
+  animation-name: boot-tile;
+  animation-timing-function: steps(1, end);
+  animation-fill-mode: forwards;
+}
+.boot-tiles i.is-hot{ animation-name: boot-tile-hot; }
+
+/* steps(1, end): each stretch holds its starting value and jumps at its
+   end. So a square is there, and then it is not; a hot one is black, then
+   white, then not. Nothing fades. */
+@keyframes boot-tile{
+  to{ opacity: 0; }
+}
+@keyframes boot-tile-hot{
+  0%  { background: #000; outline-color: #000; }
+  50% { background: #fff; outline-color: #fff; }
+  100%{ background: #fff; outline-color: #fff; opacity: 0; }
+}

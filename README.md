@@ -95,8 +95,9 @@ Two related habits, for the same reason:
 
 The site ships two generations of motion, kept apart on purpose:
 
-- **The original build's**, ported unchanged — door intro, spotlight bento,
-  card tilt, scroll registration, parallax, reveal footer.
+- **The original build's**, ported unchanged — card tilt, scroll registration,
+  parallax, reveal footer. (Its door intro has been replaced; see *The boot
+  screen* below.)
 - **The layer added afterwards**, adapted from
   [syahrilarfianalmazril.my.id](https://www.syahrilarfianalmazril.my.id/).
   All of its CSS is in `src/styles/animations.css` and nothing in it edits the
@@ -156,6 +157,34 @@ longer wants one. `prefers-reduced-motion` gets the same vertical layout.
 fully styled. The deck falls back to the row on its own below 860px or on a
 short screen.
 
+### The boot screen
+
+The intro is an 8-bit loading screen ([`Boot.tsx`](src/components/Boot.tsx)),
+which replaced the two auditorium doors. The screen itself is 8bitcn's
+loading screen and progress bar, in `src/components/ui/8bit-*.tsx`; `Boot` is
+what decides when it plays, for how long, and how it leaves.
+
+- **It is an effect, not a gate.** Nothing waits for it. Three seconds of bar,
+  a beat on READY, then the screen switches off in squares from the middle
+  outwards — about 3.9s in all. The numbers are `TIMING` at the top of
+  `Boot.tsx`.
+- **Black and white only.** The site's orange arrives with the site. The
+  colours are four variables on `.boot` in `styles/boot.css`.
+- **The line under the bar is a fact about Möbius strips**, a different one
+  each visit. They are `BOOT_TIPS` in `site.ts`.
+- **Once per tab session**, never under reduced motion, and it runs on timers
+  with a backstop, so a browser that has stopped painting cannot leave the
+  page locked behind it.
+
+Two things to know if you paste in more shadcn-style components:
+
+- `animate-pulse` is mapped to a keyframe called `tw-pulse` in
+  `tailwind.config.ts`. The site's own sheets already own the name `pulse`
+  (the orange ring round the live dot), and without the rename every pulsing
+  component gets that ring instead of a fade.
+- Tailwind's preflight is off, so a pasted component needs `border-solid` on
+  anything bordered and `m-0` on bare headings and paragraphs.
+
 ### The loop
 
 Straight after the landing page, where the bento grid was, is a Möbius strip
@@ -191,6 +220,24 @@ a third. The lens follows the cursor, or a finger on a phone. The knobs are
 
 The ending is the headline — *We don't just bend the rules. We twist them.* —
 which lands above the finished loop once the camera has pulled back.
+
+**Then the strip is the visitor's.** From there to the end of the section
+nothing is scripted: the strip can be grabbed and turned. The feel is the
+strip in the hero of the main site
+([mobius-puce.vercel.app](https://mobius-puce.vercel.app/)), carried over
+constant for constant in [`lib/stripPlay.ts`](src/lib/stripPlay.ts) — a
+sideways drag rolls it (0.009 rad/px) and yaws it a little, an up-and-down
+drag tilts it, it coasts when let go and settles to a slow idle turn, the
+loop leans as it is turned hard, and the paper gives under the pointer. On a
+phone a sideways swipe turns it and an up-and-down one still scrolls the
+page (`touch-action: pan-y`), exactly as there.
+
+Two things are this site's own, both because this strip is a circle between
+two blocks of text rather than a flat ellipse in a canvas of its own: the
+tilt walls are ±0.3 rad (`PLAY_TILT`) instead of about ±0.5, and as the strip
+opens up it is drawn smaller by just enough to stay in the gap between the
+headline and the closing line. Scrolling back up eases it back into the
+ride.
 
 ### The dark edition
 

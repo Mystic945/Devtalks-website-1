@@ -7,8 +7,10 @@
    badge so a hard throw has room; the section clips whatever
    leaves it.
 
-   The layer only fades in once WebGL is up and the first frame is
-   on its way, so the card never appears half-built.
+   The layer is transparent until the badge is let go (see
+   LanyardLayer.tsx), then comes up quickly while the badge is
+   already swinging: a short fade under a moving object, so it
+   neither blinks on nor drifts in.
    ============================================================ */
 
 .landing-lanyard {
@@ -20,7 +22,7 @@
   z-index: 6;
 
   opacity: 0;
-  transition: opacity 1.1s ease 0.25s;
+  transition: opacity 0.35s ease;
 }
 
 .landing-lanyard.is-on {
