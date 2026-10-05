@@ -42,6 +42,7 @@ import { useKonami } from '@/hooks/useKonami';
 import { Doors } from '@/components/Doors';
 import { SiteNav } from '@/components/SiteNav';
 import LandingPage from './components/landing/LandingPage';
+import { Loop } from '@/components/Loop';
 import { Ribbons } from '@/components/Ribbons';
 import { EdgeTab } from '@/components/EdgeTab';
 import { About } from '@/components/About';
@@ -51,7 +52,6 @@ import { Tickets } from '@/components/Tickets';
 import { Sponsors } from '@/components/Sponsors';
 import { Venue } from '@/components/Venue';
 import { Reel } from '@/components/Reel';
-import { Gallery } from '@/components/Gallery';
 import { Faq } from '@/components/Faq';
 import { FinalCta } from '@/components/FinalCta';
 import { Footer } from '@/components/Footer';
@@ -117,6 +117,7 @@ export default function App() {
             would show it through — which is exactly what happened when
             these were loose siblings. */}
         <div className="page-body">
+          <Loop />
           <Ribbons />
           <About />
           <Speakers />
@@ -125,7 +126,6 @@ export default function App() {
           <Sponsors />
           <Venue />
           <Reel />
-          <Gallery />
           <Faq />
           <FinalCta />
         </div>

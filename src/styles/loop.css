@@ -1,0 +1,373 @@
+/* ============================================================
+   DEVTALKS — THE LOOP
+   ------------------------------------------------------------
+   Two editions of one section:
+
+     .loop            the list. Four short chapters in flow. This
+                      is what reduced motion and no-WebGL get, and
+                      what everyone sees for the instant before the
+                      first frame renders.
+     .loop.is-live    the stage. A tall box for scroll length and a
+                      sticky full-screen stage inside it, with the
+                      canvas behind and the words over it.
+
+   The ground is the landing page's — the same black, the same
+   halftone dots, the same faint orange glow at the centre — so
+   scrolling off the landing does not cross a seam: the dots carry
+   on and the strip comes up out of the dark under them.
+   ============================================================ */
+
+.loop{
+  --loop-ground: #0b0b0b;
+  --loop-paper: #f3eee4;
+  --loop-orange: #ff5a1f;
+
+  position: relative;
+  background: var(--loop-ground);
+  color: var(--loop-paper);
+  isolation: isolate;
+}
+
+/* ---------- the list (default) ---------- */
+
+.loop__stage{
+  position: relative;
+  padding: clamp(88px, 12vw, 160px) var(--gut, 24px);
+}
+
+.loop__canvas,
+.loop__rail{
+  display: none;
+}
+
+.loop__intro{
+  max-width: var(--maxw, 1320px);
+  margin: 0 auto clamp(40px, 6vw, 72px);
+}
+.loop__line{
+  margin: 0;
+  font-family: 'Bebas Neue', var(--display, sans-serif);
+  font-size: clamp(56px, 9vw, 96px);
+  line-height: 0.9;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+}
+.loop__cue{ display: none; }
+
+.loop__cards{
+  max-width: var(--maxw, 1320px);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+  gap: clamp(32px, 4vw, 56px) clamp(24px, 3vw, 40px);
+}
+.loop__card{
+  padding-top: 18px;
+  border-top: 1px solid rgba(243, 238, 228, 0.16);
+}
+.loop__title{
+  margin: 0 0 12px;
+  font-family: var(--display, sans-serif);
+  font-weight: 400;
+  font-size: clamp(28px, 3vw, 40px);
+  line-height: 0.95;
+  text-transform: uppercase;
+  text-wrap: balance;
+}
+.loop__body{
+  margin: 0;
+  max-width: 36ch;
+  font-family: var(--sans, sans-serif);
+  font-size: 16px;
+  line-height: 1.6;
+  color: rgba(243, 238, 228, 0.74);
+}
+
+.loop__outro{
+  max-width: var(--maxw, 1320px);
+  margin: clamp(48px, 7vw, 96px) auto 0;
+}
+.loop__last{
+  margin: 0;
+  font-family: var(--display, sans-serif);
+  font-size: clamp(32px, 4.4vw, 60px);
+  line-height: 0.95;
+  text-transform: uppercase;
+}
+.loop__note{
+  margin: 14px 0 0;
+  font-family: var(--sans, sans-serif);
+  font-size: 15px;
+  color: rgba(243, 238, 228, 0.6);
+}
+
+/* The headline. One sentence on two lines, the turn in orange. */
+.loop__finale{
+  max-width: var(--maxw, 1320px);
+  margin: clamp(48px, 7vw, 96px) auto 0;
+}
+.loop__twist{
+  margin: 0;
+  font-family: var(--display, sans-serif);
+  font-weight: 400;
+  font-size: clamp(40px, 6vw, 96px);
+  line-height: 0.92;
+  letter-spacing: 0.004em;
+  text-transform: uppercase;
+}
+.loop__twist span{ display: block; }
+.loop__twist-b{ color: var(--loop-orange); }
+
+/* ---------- the stage (live) ---------- */
+
+/* Scroll length. Long enough that each stop gets a proper dwell; shorter
+   on a phone, where a flick covers more ground. */
+.loop.is-live{ height: 680svh; }
+@media (max-width: 760px){
+  .loop.is-live{ height: 560svh; }
+}
+
+.loop.is-live .loop__stage{
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  padding: 0;
+  overflow: hidden;
+}
+
+/* The landing page's halftone and centre glow, continued. */
+.loop.is-live .loop__stage::before{
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 50% 46%, rgba(255, 90, 31, 0.07), transparent 42%),
+    radial-gradient(rgba(243, 238, 228, 0.045) 1px, transparent 1px) 0 0 / 10px 10px;
+}
+
+/* The shade under the words is drawn in the canvas (lib/warpLayer): it has
+   to sit between the strip and the words, and both are in there now. */
+
+.loop.is-live .loop__canvas{
+  display: block;
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+}
+
+/* The opening line, centred in the haze — the reference's "Scroll through
+   doom". It leaves as the strip arrives. */
+.loop.is-live .loop__intro{
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  margin: 0;
+  max-width: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 26px;
+  pointer-events: none;
+  will-change: opacity, transform;
+}
+.loop.is-live .loop__line{
+  width: 100%;
+  text-align: center;
+  font-size: clamp(18px, 1.6vw, 24px);
+  letter-spacing: 0.42em;
+  color: rgba(243, 238, 228, 0.86);
+}
+.loop.is-live .loop__cue{
+  display: block;
+  width: 1px;
+  height: 56px;
+  background: linear-gradient(to bottom, rgba(243, 238, 228, 0), var(--loop-orange));
+  transform-origin: top;
+  animation: loop-cue 2.2s cubic-bezier(.19, 1, .22, 1) infinite;
+}
+@keyframes loop-cue{
+  0%   { transform: scaleY(0); opacity: 1; }
+  60%  { transform: scaleY(1); opacity: 1; }
+  100% { transform: scaleY(1); opacity: 0; }
+}
+
+/* The chapters: one at a time, low on the screen, alternating sides. */
+.loop.is-live .loop__cards{
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  max-width: none;
+  margin: 0;
+  display: block;
+  pointer-events: none;
+}
+.loop.is-live .loop__card{
+  position: absolute;
+  bottom: clamp(48px, 9vh, 96px);
+  left: var(--gut, 24px);
+  width: min(560px, calc(100% - var(--gut, 24px) * 2));
+  padding: 0;
+  border: 0;
+  opacity: 0;
+  visibility: hidden;
+  will-change: opacity, transform;
+}
+.loop.is-live .loop__card[data-side="r"]{
+  left: auto;
+  right: calc(var(--gut, 24px) + 96px);
+  text-align: right;
+}
+.loop.is-live .loop__card[data-side="r"] .loop__body{ margin-left: auto; }
+
+.loop.is-live .loop__title{
+  margin-bottom: 16px;
+  font-size: clamp(44px, 6vw, 96px);
+  line-height: 0.9;
+  letter-spacing: 0.004em;
+}
+.loop.is-live .loop__body{
+  font-size: clamp(16px, 1.25vw, 18px);
+  color: rgba(243, 238, 228, 0.78);
+}
+
+/* The rail: where you are on the strip. */
+.loop.is-live .loop__rail{
+  display: flex;
+  position: absolute;
+  z-index: 3;
+  right: var(--gut, 24px);
+  top: 50%;
+  transform: translateY(-50%);
+  gap: 18px;
+  pointer-events: none;
+}
+.loop__rail ol{
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+.loop__rail li{
+  text-shadow: 0 1px 10px rgba(11, 11, 11, 0.9), 0 0 2px rgba(11, 11, 11, 0.9);
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  font-family: var(--sans, sans-serif);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  color: rgba(243, 238, 228, 0.34);
+  transition: color .5s cubic-bezier(.19, 1, .22, 1);
+}
+.loop__rail b{
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.06em;
+}
+.loop__rail li.is-on{ color: var(--loop-paper); }
+.loop__rail li.is-on b{ color: var(--loop-orange); }
+
+.loop__track{
+  position: relative;
+  width: 1px;
+  background: rgba(243, 238, 228, 0.14);
+}
+.loop__track::after{
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--loop-orange);
+  transform-origin: top;
+  transform: scaleY(var(--loop-p, 0));
+}
+
+/* The headline, over the finished loop. */
+.loop.is-live .loop__finale{
+  position: absolute;
+  top: clamp(104px, 15vh, 164px);
+  left: 0;
+  right: 0;
+  z-index: 3;
+  max-width: none;
+  margin: 0;
+  padding: 0 var(--gut, 24px);
+  text-align: center;
+  opacity: 0;
+  pointer-events: none;
+  will-change: opacity, transform;
+}
+.loop.is-live .loop__twist{ font-size: clamp(36px, 5.4vw, 88px); }
+
+/* Once the canvas is drawing the words, the page's own copy of them goes
+   transparent: still there to select and to be read aloud, just not
+   painted twice. A fill, not a colour, because the canvas reads the
+   colour to paint with. */
+.loop.is-warped [data-warp]{
+  -webkit-text-fill-color: transparent;
+  text-shadow: none;
+}
+
+/* The closing line, centred, once the camera has pulled back. */
+.loop.is-live .loop__outro{
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: clamp(56px, 11vh, 120px);
+  z-index: 3;
+  max-width: none;
+  margin: 0;
+  padding: 0 var(--gut, 24px);
+  text-align: center;
+  opacity: 0;
+  pointer-events: none;
+  will-change: opacity, transform;
+}
+/* Under the headline it is the coda, so it steps down. */
+.loop.is-live .loop__last{ font-size: clamp(22px, 2.4vw, 34px); line-height: 1; }
+
+/* ---------- phones ---------- */
+@media (max-width: 760px){
+  .loop.is-live .loop__card,
+  .loop.is-live .loop__card[data-side="r"]{
+    left: var(--gut, 18px);
+    right: var(--gut, 18px);
+    width: auto;
+    bottom: 96px;
+    text-align: left;
+  }
+  .loop.is-live .loop__card[data-side="r"] .loop__body{ margin-left: 0; }
+
+  /* The rail lies down along the bottom edge. */
+  .loop.is-live .loop__rail{
+    top: auto;
+    bottom: 28px;
+    left: var(--gut, 18px);
+    right: var(--gut, 18px);
+    transform: none;
+    flex-direction: column-reverse;
+    gap: 10px;
+  }
+  .loop__rail ol{
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .loop__rail li{ font-size: 10px; letter-spacing: 0.14em; gap: 6px; }
+  .loop__track{ width: auto; height: 1px; }
+  .loop__track::after{
+    transform-origin: left;
+    transform: scaleX(var(--loop-p, 0));
+  }
+}
+
+@media (prefers-reduced-motion: reduce){
+  .loop__cue{ animation: none; }
+}
+

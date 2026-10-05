@@ -14,7 +14,7 @@
    WHY STICKY AND NOT ScrollTrigger's pin
    ScrollTrigger can pin for you, but it does it by wrapping the
    element in a generated container and swapping in a spacer. On
-   a page that already has a sticky card deck, a scrubbed gallery
+   a page that already has a sticky card deck, a pinned WebGL loop
    and a fixed reveal footer, that is one more thing rewriting
    layout behind everyone's back. `position: sticky` is the
    browser's own pin, it runs on the compositor, and it is what

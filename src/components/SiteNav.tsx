@@ -23,7 +23,6 @@ const NAV_LINKS = [
   { href: '#tickets', label: 'Tickets' },
   { href: '#sponsors', label: 'Sponsors' },
   { href: '#reel', label: 'Reel' },
-  { href: '#gallery', label: 'Gallery' },
   { href: '#faq', label: 'FAQ' }
 ] as const;
 
@@ -35,7 +34,6 @@ const MENU_LINKS = [
   { href: '#sponsors', label: 'Sponsors' },
   { href: '#venue', label: 'Venue' },
   { href: '#reel', label: 'Reel' },
-  { href: '#gallery', label: 'Gallery' },
   { href: '#faq', label: 'FAQ' }
 ] as const;
 

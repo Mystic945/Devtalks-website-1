@@ -1,8 +1,8 @@
 # DevTalks 2026
 
 The event site for DevTalks 2026 — The Developers Club, D.Y. Patil Institute of
-Technology, Pimpri. One page: hero, line-up, run of show, pass, partners, venue,
-reel, gallery, FAQ.
+Technology, Pimpri. One page: landing, the loop, line-up, run of show, pass, partners,
+venue, reel, FAQ.
 
 Built with **Vite + React + TypeScript**. All the motion is GSAP and plain
 `requestAnimationFrame`; there is no UI framework and no component library, so
@@ -50,7 +50,7 @@ A few things worth knowing:
 - **`SITE.registerUrl`** is where every "Get tickets" button points. While it is
   `#tickets` the buttons scroll to the ticket section; paste a real form URL in
   and all of them open it in a new tab instead.
-- **Speaker photos and gallery images** go in `public/assets/`. Reference them
+- **Speaker photos** go in `public/assets/`. Reference them
   from `site.ts` as `/assets/…`.
 - **The reel** ships with six blank entries on purpose, so the strip animates
   before any footage exists. Fill in `src` on an entry and that slot becomes a
@@ -96,7 +96,7 @@ Two related habits, for the same reason:
 The site ships two generations of motion, kept apart on purpose:
 
 - **The original build's**, ported unchanged — door intro, spotlight bento,
-  card tilt, scroll registration, parallax, gallery scrub, reveal footer.
+  card tilt, scroll registration, parallax, reveal footer.
 - **The layer added afterwards**, adapted from
   [syahrilarfianalmazril.my.id](https://www.syahrilarfianalmazril.my.id/).
   All of its CSS is in `src/styles/animations.css` and nothing in it edits the
@@ -115,10 +115,9 @@ The site ships two generations of motion, kept apart on purpose:
 | Typed lines | Section sub-lines | `ui/TextType` |
 | Pinned horizontal timeline (`horizontal-timeline`) | The run of show | `useHorizontalTimeline` |
 
-Two of the reference's signature effects were **not** added, because the site
-already does them: the gallery banner opening from a rounded frame to full
-bleed is `animated-scroll`, and the reveal footer is the same slide-over the
-reference uses for its closing CTA.
+One of the reference's signature effects was **not** added, because the site
+already does it: the reveal footer is the same slide-over the reference uses
+for its closing CTA.
 
 #### The run of show, sideways
 
@@ -134,7 +133,7 @@ Two decisions worth keeping:
 
 - **Sticky, not ScrollTrigger's `pin`.** GSAP can pin for you, but it does it
   by wrapping the element in a generated container and swapping in a spacer.
-  On a page that already has a sticky card deck, a scrubbed gallery and a
+  On a page that already has a sticky card deck, a pinned WebGL loop and a
   fixed reveal footer, that is one more thing rewriting layout behind
   everyone's back. Sticky is the browser's own pin and it is what the
   reference uses; the hook only measures and moves.
@@ -156,6 +155,42 @@ longer wants one. `prefers-reduced-motion` gets the same vertical layout.
 [`src/components/Speakers.tsx`](src/components/Speakers.tsx). Both layouts are
 fully styled. The deck falls back to the row on its own below 860px or on a
 short screen.
+
+### The loop
+
+Straight after the landing page, where the bento grid was, is a Möbius strip
+you scroll through — [`Loop.tsx`](src/components/Loop.tsx),
+[`useMobius.ts`](src/hooks/useMobius.ts), `styles/loop.css` — built after the
+camera fly-through on [scrollthroughdoom.netlify.app](https://scrollthroughdoom.netlify.app/).
+The strip carries the landing page's four words; the camera comes down out of
+the dark, stops at each one while its paragraph surfaces, and pulls back to
+show the whole loop. The words and paragraphs are `LOOP` in `site.ts`.
+
+The strip is built over two laps, each offset to its own side, so the text
+runs round both faces and meets itself with no seam — a Möbius strip has one
+side, and the print proves it. The orange rim is its single edge.
+
+It is a plain list until its first WebGL frame renders, and stays one under
+reduced motion or without WebGL. On a phone it renders at 1.5× (1.25× on a
+four-core handset), fits the whole loop across the width at the start and the
+end, lifts the picture into the top half so the words have the bottom, and
+stops drawing whenever the scroll is still and no words are on screen.
+
+**The words are warped.** Every line of copy in the section is drawn through
+React Bits' [WarpText](https://reactbits.dev) glass — the same fbm
+distortion, cursor lens, ripple and RGB split — but as quads in the strip's
+own renderer ([`lib/warpLayer.ts`](src/lib/warpLayer.ts)) rather than one
+`<WarpText />` per line. The component opens a WebGL context per instance;
+eleven of them on top of the strip and the landing page's two is past what a
+phone allows, and the browser's answer is to kill the oldest. Any element
+with `data-warp` inside the stage is picked up: it stays real text in the
+page and only its fill goes transparent once its quad has been painted.
+Strength is scaled by font size, so a headline bends fully and a paragraph by
+a third. The lens follows the cursor, or a finger on a phone. The knobs are
+`WARP` at the top of that file. The numbered rail is left alone on purpose.
+
+The ending is the headline — *We don't just bend the rules. We twist them.* —
+which lands above the finished loop once the camera has pulled back.
 
 ### The dark edition
 
@@ -186,8 +221,8 @@ own, so `--spot-ink` goes back to being the brand colour.
 ### Styles
 
 `src/styles/index.css` imports the stylesheets in a **load-bearing order**:
-`paper.css` re-inks everything above it, the timeline and gallery sheets
-override both, and `animations.css` loads last so it can override any of them
+`paper.css` re-inks everything above it, the timeline sheet
+overrides both, and `animations.css` loads last so it can override any of them
 without editing them. There is a note at the top of that file; read it before
 reordering anything.
 

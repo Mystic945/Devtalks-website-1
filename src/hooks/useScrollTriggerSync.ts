@@ -7,14 +7,14 @@
 
      • useFooterReveal gives <main> a bottom margin the size of
        the footer, which is several hundred pixels
-     • the gallery's own track is 5400px tall and the photos
-       inside it land late
+     • the loop and the run of show only become tall once their
+       own effects have measured, and the photos land late
 
    The static site did not have this problem: every script ran on
    one `devtalks:content` event, after the whole page existed. In
-   React the gallery's effect runs while it mounts — before the
+   React each section's effect runs while it mounts — before the
    footer has been measured and before the reveals exist — so
-   without this hook every trigger below the gallery is computed
+   without this hook every trigger below them is computed
    against a document that is thousands of pixels too short, and
    simply never fires.
 

@@ -190,8 +190,8 @@
    3 · THE TICKET'S ARRIVAL
    ------------------------------------------------------------
    The pass comes in slightly small and settles at full size as
-   it reaches reading height — the same gesture the gallery banner
-   makes when it opens, at the scale of one card.
+   it reaches reading height — a banner opening, at the scale of
+   one card.
 
    Only a transform, and only while it is travelling: useScrollScale
    clears the property the moment it lands.
@@ -971,10 +971,9 @@ html:not(.paper-edition) .page-body .tierRow--title .logo{
   color: var(--d-ink);
 }
 
-/* ---- reel + gallery ---- */
+/* ---- reel ---- */
 html:not(.paper-edition) .page-body .reel__card,
-html:not(.paper-edition) .page-body .reel__frame,
-html:not(.paper-edition) .page-body .gal__card{
+html:not(.paper-edition) .page-body .reel__frame{
   background: var(--d-surface);
   border-color: var(--d-hair);
 }
@@ -1118,12 +1117,11 @@ html:not(.paper-edition) .page-body .ribbons .marquee--b .marquee__track span::a
   background: var(--orange);
 }
 
-/* The FAQ's open/close mark and the gallery's empty slots. */
+/* The FAQ's open/close mark and the reel's empty slots. */
 html:not(.paper-edition) .page-body .faq__q i::before,
 html:not(.paper-edition) .page-body .faq__q i::after{
   background: var(--orange);
 }
-html:not(.paper-edition) .page-body .gal__slot,
 html:not(.paper-edition) .page-body .reel__slot{
   color: var(--d-ink-mute);
 }
@@ -1169,8 +1167,8 @@ html:not(.paper-edition) .page-body .final__k{
   color: var(--orange);
 }
 
-/* Media frames: the ground behind a portrait while it loads, and the
-   ground a gallery photo sits on. A paper frame flashes white before
+/* Media frames: the ground behind a portrait or a still while it
+   loads. A paper frame flashes white before
    every image on a black page. */
 html:not(.paper-edition) .page-body .spk__img{
   background: #2a0b0e;
@@ -1182,9 +1180,7 @@ html:not(.paper-edition) .page-body .btperk__i{
   background: rgba(255, 255, 255, 0.06);
   border-color: var(--d-hair);
 }
-html:not(.paper-edition) .page-body .modal__media,
-html:not(.paper-edition) .page-body .gal__banner,
-html:not(.paper-edition) .page-body .gal__card{
+html:not(.paper-edition) .page-body .modal__media{
   background: var(--d-raised);
 }
 
@@ -1270,28 +1266,6 @@ html:not(.paper-edition) .page-body .hero__title .line > span b{
 html:not(.paper-edition) .page-body .btstack span{
   background: rgba(255, 255, 255, 0.06);
   border-color: rgba(255, 255, 255, 0.12);
-}
-
-/* The gallery's edge masks feather the wall into the page, so they have to
-   feather into the page's actual colour — they were still fading to cream,
-   which put a pale vignette around a dark wall. */
-html:not(.paper-edition) .page-body .gal__mask--y{
-  background: linear-gradient(
-    to bottom,
-    var(--d-ground) 0%,
-    rgba(11, 11, 11, 0) 14%,
-    rgba(11, 11, 11, 0) 86%,
-    var(--d-ground) 100%
-  );
-}
-html:not(.paper-edition) .page-body .gal__mask--x{
-  background: linear-gradient(
-    to right,
-    var(--d-ground) 0%,
-    rgba(11, 11, 11, 0) 12%,
-    rgba(11, 11, 11, 0) 88%,
-    var(--d-ground) 100%
-  );
 }
 
 /* The substrate. .page-body covers these, but body and main were still the

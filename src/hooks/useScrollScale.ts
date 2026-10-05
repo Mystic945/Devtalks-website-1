@@ -11,10 +11,8 @@
    the ticket section would add a screen of scroll in front of
    the one thing on this page people came to click.
 
-   The gallery already performs the full version of this gesture —
-   its banner opens from a rounded frame to full bleed in
-   src/hooks/useGallery.ts — so this is the same move at the
-   scale of one card, rather than a second copy of it.
+   It is the gesture of a banner opening from a rounded frame to
+   full bleed, at the scale of one card.
    ============================================================ */
 
 import { useEffect, type RefObject } from 'react';

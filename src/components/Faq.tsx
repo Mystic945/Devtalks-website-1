@@ -79,7 +79,7 @@ export function Faq() {
       <div className="wrap">
         <div className="sec__head">
           <p className="eyebrow" data-reveal>
-            <em>09</em> Before you ask
+            <em>08</em> Before you ask
           </p>
           <ScrollReveal
             as="h2"

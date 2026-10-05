@@ -20,8 +20,8 @@
 @import './paper.css';
 @import './motion.css';
 @import './paper-hover-timeline.css';
-@import './gallery.css';
 
 /* Everything added after the React port. Last, so it can override
    any of the sheets above without editing them. */
 @import './animations.css';
+@import './loop.css';

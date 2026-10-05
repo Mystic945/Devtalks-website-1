@@ -22,7 +22,6 @@ export interface Speaker { name: string; role: string; org: string; talk: string
 export interface Perk    { icon: 'play' | 'cup' | 'mic'; label: string; note: string }
 export interface Offer   { title: string; body: string }
 export interface Reel    { src: string; poster: string; label: string }
-export interface GalleryShot { src: string; label: string }
 export interface SchedRow{ time: string; title: string; who: string; kind: 'talk' | 'break' }
 export interface Pass    { tag: string; kind: string; price: string; priceNote: string; chip: string; cta: string; fine: string; url: string }
 export interface SponsorTier { tier: string; items: { name: string; logo: string; url: string }[] }
@@ -148,21 +147,6 @@ export const REELS: Reel[] = [
   { src: '', poster: '', label: '' }
 ];
 
-export const GALLERY: GalleryShot[] = [
-  { src: '/assets/gallery/g-01.jpg', label: '' },
-  { src: '/assets/gallery/g-02.jpg', label: '' },
-  { src: '/assets/gallery/g-03.jpg', label: '' },
-  { src: '/assets/gallery/g-04.jpg', label: '' },
-  { src: '/assets/gallery/g-05.jpg', label: '' },
-  { src: '/assets/gallery/g-06.jpg', label: '' },
-  { src: '/assets/gallery/g-07.jpg', label: '' },
-  { src: '/assets/gallery/g-08.jpg', label: '' },
-  { src: '/assets/gallery/g-09.jpg', label: '' },
-  { src: '/assets/gallery/g-10.jpg', label: '' },
-  { src: '/assets/gallery/g-11.jpg', label: '' },
-  { src: '/assets/gallery/g-12.jpg', label: '' }
-];
-
 export const SCHEDULE: SchedRow[] = [
   {
     time: '09:15',
@@ -261,5 +245,34 @@ export const FAQS: Faq[] = [
   {
     q: 'Be honest. Is it just for the free food?',
     a: "Yes. We know that's why you're coming. Lunch is at 12:35, it's genuinely good, and the talks either side of it are worth staying awake for."
+  }
+];
+
+/* The loop — the four stops the camera makes as it rides the Möbius strip.
+   `word` is what is printed on the strip itself, so keep it short: it has
+   to fit one quarter of the band. Order matters; it is the order the strip
+   carries them in, and the last one leads back round to the first. */
+export interface LoopStop { word: string; title: string; body: string }
+
+export const LOOP: LoopStop[] = [
+  {
+    word: 'IDEAS',
+    title: 'It starts as a talk',
+    body: "Someone on stage says the thing you've been half-thinking for a month. Out loud, with slides."
+  },
+  {
+    word: 'CODE',
+    title: "Then it's code",
+    body: "You go home and build it. Badly at first, then less badly. That's the whole job."
+  },
+  {
+    word: 'PEOPLE',
+    title: "Then it's people",
+    body: 'The person beside you in the lunch queue is stuck on the same bug. Now there are two of you.'
+  },
+  {
+    word: 'IMPACT',
+    title: "Then it's impact",
+    body: "What you ship becomes somebody else's idea, and the loop goes round again."
   }
 ];
