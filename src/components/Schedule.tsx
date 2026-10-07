@@ -48,7 +48,7 @@ export function Schedule() {
             <div className="wrap">
               <div className="sec__head">
                 <p className="eyebrow" data-reveal>
-                  <em>03</em> Run of show
+                  <em>02</em> Run of show
                 </p>
                 <SplitText className="big" text="Schedule" />
                 <p className="sec__sub" data-reveal>

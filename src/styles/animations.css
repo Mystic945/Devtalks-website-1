@@ -1493,3 +1493,175 @@ html:not(.paper-edition) .page-body .bt {
 .tickets-page .ticket__meta > div {
   padding: 12px 10px;
 }
+
+/* ============================================================
+   12 · PARTNERS — ONE TITLE, SIX MORE
+   ------------------------------------------------------------
+   The title partner gets one box the full width of the page: it
+   was capped at 460px, which made the most important name on the
+   wall the same size as a card. The six under it sit three
+   across (two on a phone), so they always make whole rows — the
+   original four-across grid would leave them as four and two.
+   ============================================================ */
+.sponsors .tierRow--title .logos{
+  grid-template-columns: 1fr;
+}
+.sponsors .tierRow--title .logo{
+  min-height: clamp(200px, 26vw, 320px);
+  font-size: clamp(1.7rem, 3.6vw, 3rem);
+}
+.sponsors .tierRow--title .logo img{
+  max-height: clamp(90px, 12vw, 150px);
+}
+
+.sponsors .tierRow:not(.tierRow--title) .logos{
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+@media (min-width: 640px){
+  .sponsors .tierRow:not(.tierRow--title) .logos{
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+.sponsors .tierRow:not(.tierRow--title) .logo{
+  min-height: clamp(104px, 11vw, 148px);
+}
+
+/* ============================================================
+   13 · THE VENUE MAP
+   ------------------------------------------------------------
+   A white map in a black page: OpenStreetMap's tiles, washed to
+   white, slid so the venue is at the centre of the box, our pin on
+   top. Markup and the tile
+   arithmetic are in components/Venue.tsx.
+
+   The tiles are a fixed grid larger than the box and the box
+   clips them, so the map never rescales with the layout — the
+   streets stay the size they were drawn at, and the venue stays
+   in the middle at any width.
+   ============================================================ */
+.venue__map--live,
+html:not(.paper-edition) .page-body .venue__map--live{
+  /* the colour the tiles' land comes out at, so a tile that has not
+     arrived yet is a blank piece of the same map rather than a dark hole */
+  background: #f8f8f7;
+  min-height: 320px;
+  max-height: 500px;
+  isolation: isolate;
+}
+html:not(.paper-edition) .page-body .venue__map--live{
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
+.venue__tiles{
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  display: grid;
+  /* pulled back by the venue's position in the grid; scaled about that same
+     point, so a hover leans in on the pin and nowhere else */
+  transform: translate(calc(-1 * var(--map-x)), calc(-1 * var(--map-y))) scale(var(--map-zoom, 1));
+  transform-origin: var(--map-x) var(--map-y);
+  transition: transform 0.9s cubic-bezier(.19, 1, .22, 1);
+}
+.venue__tiles img{
+  display: block;
+  width: 256px;
+  height: 256px;
+  /* The tiles arrive in OpenStreetMap's colours — cream land, green parks,
+     orange main roads. Greyscale takes the colour out and the lift in
+     brightness takes the land to white, leaving roads, buildings and names
+     as shades of grey: a white map, in the page's own black-and-white. */
+  filter: grayscale(1) brightness(1.06) contrast(1.02);
+  -webkit-user-select: none;
+  user-select: none;
+}
+@media (hover: hover){
+  .venue__map--live:hover{ --map-zoom: 1.06; }
+}
+
+/* The pin: the page's orange on the map's white, exactly on the spot. */
+.venue__marker{
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 2;
+  pointer-events: none;
+}
+.venue__marker i{
+  position: absolute;
+  left: -10px;
+  top: -10px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--orange, #ff5a1f);
+  border: 3px solid #fff;
+  box-shadow: 0 3px 10px rgba(11, 11, 11, 0.32);
+}
+.venue__marker i::after{
+  content: "";
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  animation: venue-ping 2.4s cubic-bezier(.19, 1, .22, 1) infinite;
+}
+@keyframes venue-ping{
+  0%  { box-shadow: 0 0 0 0 rgba(255, 90, 31, 0.5); }
+  100%{ box-shadow: 0 0 0 22px rgba(255, 90, 31, 0); }
+}
+.venue__marker span{
+  position: absolute;
+  left: 0;
+  top: 20px;
+  transform: translateX(-50%);
+  padding: 7px 10px 6px;
+  border-radius: 4px;
+  background: #0b0b0b;
+  color: #f3eee4;
+  font-family: var(--sans, sans-serif);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.venue__maplink{
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  border-radius: inherit;
+}
+.venue__maplink:focus-visible{
+  outline: 3px solid var(--orange, #ff5a1f);
+  outline-offset: -5px;
+}
+
+/* The map makers' credit. Small, but legible and above the link: its own
+   links have to be clickable. */
+.venue__credit{
+  position: absolute;
+  right: 6px;
+  bottom: 6px;
+  z-index: 4;
+  margin: 0;
+  padding: 3px 7px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.86);
+  color: #4a4a48;
+  font-family: var(--sans, sans-serif);
+  font-size: 10px;
+  line-height: 1.4;
+}
+.venue__credit a{
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce){
+  .venue__tiles{ transition: none; }
+  .venue__marker i::after{ animation: none; }
+}

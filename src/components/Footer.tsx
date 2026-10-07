@@ -19,7 +19,6 @@ const COLUMNS = [
   {
     head: 'Event',
     links: [
-      { href: '#about', label: 'About' },
       { href: '#speakers', label: 'Speakers' },
       { href: '#schedule', label: 'Schedule' },
       { href: '#venue', label: 'Venue' }

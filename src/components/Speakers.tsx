@@ -115,7 +115,7 @@ export function Speakers() {
         <div className="wrap">
           <div className="sec__head">
             <p className="eyebrow" data-reveal>
-              <em>02</em> The line-up
+              <em>01</em> The line-up
             </p>
             <ScrollReveal
               as="h2"

@@ -34,6 +34,14 @@ export const ticketProps = (): LinkProps =>
       : '/tickets'
   );
 
+/** How each network writes its own name. Anything not listed is capitalised. */
+const NAMES: Record<string, string> = {
+  x: 'X / Twitter',
+  linkedin: 'LinkedIn',
+  youtube: 'YouTube',
+  github: 'GitHub'
+};
+
 /** Social links, in the order they are declared, with the labels the footer
  *  and the mobile menu both print. */
 export const socialLinks = (): Array<{ key: string; label: string; href: string }> =>
@@ -42,5 +50,5 @@ export const socialLinks = (): Array<{ key: string; label: string; href: string 
     .map(([key, href]) => ({
       key,
       href,
-      label: key === 'x' ? 'X / Twitter' : key.charAt(0).toUpperCase() + key.slice(1)
+      label: NAMES[key] ?? key.charAt(0).toUpperCase() + key.slice(1)
     }));

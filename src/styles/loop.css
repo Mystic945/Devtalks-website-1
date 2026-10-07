@@ -263,8 +263,13 @@
   color: rgba(243, 238, 228, 0.78);
 }
 
-/* The rail: where you are on the strip. */
+/* The rail: where you are on the strip. It sits on a dark plate of its own:
+   the band that passes behind it is gold, and pale grey labels on gold are
+   not labels. */
 .loop.is-live .loop__rail{
+  padding: 14px 14px 14px 12px;
+  border-radius: 6px;
+  background: rgba(11, 11, 11, 0.66);
   display: flex;
   position: absolute;
   z-index: 3;

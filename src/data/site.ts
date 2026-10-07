@@ -11,7 +11,7 @@ export interface Site {
   eventName: string; edition: string; theme: string; tagline: string; intro: string;
   /** Countdown target. Format: YYYY-MM-DDTHH:MM:SS+05:30 */
   date: string; dateLabel: string; timeLabel: string;
-  venue: string; venueLine2: string; venueShort: string; mapLink: string;
+  venue: string; venueLine2: string; venueShort: string; mapLink: string; mapLat: number; mapLng: number;
   club: string; college: string;
   /** Where every "Get tickets" button points. Paste your form link here. */
   registerUrl: string; sponsorMail: string; contactMail: string;
@@ -20,7 +20,6 @@ export interface Site {
 export interface Stat    { value: number; suffix: string; label: string }
 export interface Speaker { name: string; role: string; org: string; talk: string; photo: string; bio: string; icon: string; tags: string[]; link: string }
 export interface Perk    { icon: 'play' | 'cup' | 'mic'; label: string; note: string }
-export interface Offer   { title: string; body: string }
 export interface Reel    { src: string; poster: string; label: string }
 export interface SchedRow{ time: string; title: string; who: string; kind: 'talk' | 'break' }
 export interface Pass    { tag: string; kind: string; price: string; priceNote: string; chip: string; cta: string; fine: string; url: string }
@@ -39,18 +38,22 @@ export const SITE: Site = {
   venue: 'Main Auditorium, D.Y. Patil Institute of Technology',
   venueLine2: 'Sector 29, Nigdi Pradhikaran, Pimpri-Chinchwad, Pune 411044',
   venueShort: 'DYPIT, Pimpri · Pune',
-  mapLink: 'https://maps.google.com/?q=D.Y.+Patil+Institute+of+Technology+Pimpri+Pune',
+  /* The pin: Dr. D. Y. Patil Vidyapeeth Auditorium. mapLink is where
+     "Open in Maps" and the map itself go; mapLat / mapLng are where the mini
+     map in the venue section is centred. Change all three together. */
+  mapLink: 'https://maps.app.goo.gl/6T9hhDc8sQQhfZ36A',
+  mapLat: 18.6244881,
+  mapLng: 73.8221362,
   club: 'The Developers Club',
   college: 'D.Y. Patil Institute of Technology, Pimpri',
   registerUrl: '#tickets',
   sponsorMail: 'mailto:devtalks@dypit.ac.in?subject=DevTalks%202026%20Sponsorship',
   contactMail: 'mailto:devtalks@dypit.ac.in',
+  /* Instagram and LinkedIn only. The footer and the mobile menu both print
+     whatever is listed here, in this order. */
   socials: {
-    instagram: 'https://instagram.com/',
-    linkedin: 'https://linkedin.com/',
-    x: 'https://x.com/',
-    youtube: 'https://youtube.com/',
-    github: 'https://github.com/'
+    instagram: 'https://www.instagram.com/devkraft.dpu/',
+    linkedin: 'https://www.linkedin.com/company/dev-kraft/?originalSubdomain=in'
   }
 };
 
@@ -118,25 +121,6 @@ export const PERKS: Perk[] = [
 
 /** "What the day gives you" in the About section. Each line is a real
     row in SCHEDULE below — change one, change the other. */
-export const OFFERS: Offer[] = [
-  {
-    title: 'Three long-form talks',
-    body: 'Twenty-five minutes each. One speaker, one idea, start to finish.'
-  },
-  {
-    title: 'Q&A after every talk',
-    body: 'Twenty minutes with the person who actually built the thing.'
-  },
-  {
-    title: 'All three on stage',
-    body: 'The speakers come back together to close the day and take questions.'
-  },
-  {
-    title: 'Demo floor & booths',
-    body: 'Student projects and sponsor teams on the ground floor all afternoon.'
-  }
-];
-
 /** Leave src and poster empty and the card renders as a numbered slot. */
 export const REELS: Reel[] = [
   { src: '', poster: '', label: '' },
@@ -181,34 +165,20 @@ export const PASS: Pass = {
   url: ''
 };
 
+/* One title partner and six partners. The first row is always drawn as the
+   big box; give an entry a `logo` path and it shows the image instead of
+   the name, and a `url` and the box becomes a link. */
 export const SPONSORS: SponsorTier[] = [
   { tier: 'Title Partner', items: [{ name: 'Your Brand Here', logo: '', url: '' }] },
   {
-    tier: 'Gold Partners',
+    tier: 'Partners',
     items: [
+      { name: 'Sponsor One', logo: '', url: '' },
       { name: 'Sponsor Two', logo: '', url: '' },
       { name: 'Sponsor Three', logo: '', url: '' },
-      { name: 'Sponsor Four', logo: '', url: '' }
-    ]
-  },
-  {
-    tier: 'Silver Partners',
-    items: [
+      { name: 'Sponsor Four', logo: '', url: '' },
       { name: 'Sponsor Five', logo: '', url: '' },
-      { name: 'Sponsor Six', logo: '', url: '' },
-      { name: 'Sponsor Seven', logo: '', url: '' },
-      { name: 'Sponsor Eight', logo: '', url: '' }
-    ]
-  },
-  {
-    tier: 'Community Partners',
-    items: [
-      { name: 'Community One', logo: '', url: '' },
-      { name: 'Community Two', logo: '', url: '' },
-      { name: 'Community Three', logo: '', url: '' },
-      { name: 'Community Four', logo: '', url: '' },
-      { name: 'Community Five', logo: '', url: '' },
-      { name: 'Community Six', logo: '', url: '' }
+      { name: 'Sponsor Six', logo: '', url: '' }
     ]
   }
 ];

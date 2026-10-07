@@ -20,12 +20,18 @@
    browser's own pin, it runs on the compositor, and it is what
    the reference uses. All this hook does is measure and move.
 
-   THE ONE NUMBER THAT MATTERS
+   TWO NUMBERS
    distance = how far the track has to travel for its last card to
-   reach the right edge. The section's height is then that plus
-   one screen, so the pin lasts exactly as long as the travel and
-   not a pixel more. Derive it, never hard-code it: the schedule
-   is content, and someone will add a row.
+   reach the right edge. Derived, never hard-coded: the schedule is
+   content, and someone will add a row.
+
+   travel = how much SCROLL that takes. These used to be the same
+   number, one pixel of track per pixel of scroll, which made the
+   pin as long as the day is wide — nearly five screens, and it felt
+   it. Now the pin lasts a fixed four scrolls (CONFIG) however many
+   stops there are, and the track simply covers its distance in that
+   time. Add a row and the track moves a little faster; the section
+   does not get longer.
 
    Tuning knobs are in CONFIG.
    ============================================================ */
@@ -36,7 +42,12 @@ import { prefersReducedMotion } from '@/lib/dom';
 
 const CONFIG = {
   /** px of breathing room after the last card before the pin releases */
-  tailPad: 80
+  tailPad: 80,
+  /** The pin lasts this many scrolls… */
+  scrolls: 4,
+  /** …a scroll being one flick of a wheel or swipe of a trackpad, taken as
+   *  this share of the screen's height. 4 × 0.5 = two screens of scrolling. */
+  perScroll: 0.5
 } as const;
 
 /** Below this the track is laid out as a vertical list instead — see
@@ -84,14 +95,17 @@ export function useHorizontalTimeline(
       return;
     }
 
-    let distance = 0;
+    let distance = 0; // how far the track moves
+    let travel = 0; // how much scrolling that takes
 
     /* Measured, never assumed. scrollWidth is the track's full laid-out
        width including the cards that overflow the stage. */
     const measure = () => {
       distance = Math.max(0, track.scrollWidth - stage.clientWidth + CONFIG.tailPad);
+      // Never slower than one-to-one: a short track keeps its own length.
+      travel = Math.min(distance, CONFIG.scrolls * CONFIG.perScroll * window.innerHeight);
       // Scroll length = one screen of pin, plus the travel.
-      outer.style.height = `${stage.offsetHeight + distance}px`;
+      outer.style.height = `${stage.offsetHeight + travel}px`;
     };
 
     const draw = (progress: number) => {
@@ -104,7 +118,7 @@ export function useHorizontalTimeline(
     const trigger = ScrollTrigger.create({
       trigger: outer,
       start: 'top top',
-      end: () => `+=${distance}`,
+      end: () => `+=${travel}`,
       scrub: true,
       invalidateOnRefresh: true,
       onRefresh: () => {

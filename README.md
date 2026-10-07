@@ -1,8 +1,8 @@
 # DevTalks 2026
 
 The event site for DevTalks 2026 — The Developers Club, D.Y. Patil Institute of
-Technology, Pimpri. One page: landing, the loop, line-up, run of show, pass, partners,
-venue, reel, FAQ.
+Technology, Pimpri. One page: landing, the loop, line-up, run of show, partners,
+venue, FAQ — plus the pass on its own page at `/tickets`.
 
 Built with **Vite + React + TypeScript**. All the motion is GSAP and plain
 `requestAnimationFrame`; there is no UI framework and no component library, so
@@ -52,9 +52,20 @@ A few things worth knowing:
   and all of them open it in a new tab instead.
 - **Speaker photos** go in `public/assets/`. Reference them
   from `site.ts` as `/assets/…`.
-- **The reel** ships with six blank entries on purpose, so the strip animates
-  before any footage exists. Fill in `src` on an entry and that slot becomes a
-  playing clip; nothing else has to change.
+- **The reel is parked until after the event.** It is off the page and out of
+  the nav, but `Reel.tsx`, its viewer, its hook, its styles and `REELS` are all
+  still here. To bring it back: import `Reel` in `App.tsx` and render it where
+  the comment marks the spot, add `{ href: '#reel', label: 'Reel' }` to the two
+  link lists in `SiteNav.tsx`, and fill in `src` on the `REELS` entries.
+- **Partners** are one title partner and six partners, the first two rows of
+  `SPONSORS`. Give an entry a `logo` and it shows the image instead of the
+  name; a `url` makes the box a link.
+- **The venue map** is centred on `SITE.mapLat` / `SITE.mapLng`, and both it
+  and the "Open in Maps" button go to `SITE.mapLink`. Change all three
+  together. The map is not an embed: it is fifteen OpenStreetMap tiles in a
+  grid, washed to white in CSS, with the site's own pin on top — no script, no
+  cookies, loaded only when it nears the screen. OpenStreetMap's credit in the
+  corner is a condition of using the tiles; leave it there.
 
 ---
 
@@ -138,11 +149,14 @@ Two decisions worth keeping:
   fixed reveal footer, that is one more thing rewriting layout behind
   everyone's back. Sticky is the browser's own pin and it is what the
   reference uses; the hook only measures and moves.
-- **The travel is derived, never hard-coded.** `distance = track.scrollWidth
-  − stage.clientWidth + tailPad`, and the outer box's height is one screen
-  plus that. Add a row to `SCHEDULE` and the pin lengthens to match. At 1280px
-  the fourteen stops measure 4521px of track, 3336px of travel, 4136px of
-  section.
+- **The track's distance is derived; the scroll it takes is fixed.**
+  `distance = track.scrollWidth − stage.clientWidth + tailPad` is how far the
+  track moves. It used to take exactly that much scrolling — nearly five
+  screens — which felt long. The pin now lasts four scrolls however many
+  stops there are: `scrolls × perScroll` in the hook's `CONFIG`, a scroll
+  being taken as half a screen, so two screens in all. Add a row to `SCHEDULE`
+  and the track moves a little faster; the section does not get longer. At
+  1440×900 that is 3726px of track in 1800px of scroll.
 
 **Below 900px it is a vertical timeline again** — the same markup, laid out as
 a column with the spine on the left and every detail visible, because a pinned
@@ -197,7 +211,19 @@ show the whole loop. The words and paragraphs are `LOOP` in `site.ts`.
 
 The strip is built over two laps, each offset to its own side, so the text
 runs round both faces and meets itself with no seam — a Möbius strip has one
-side, and the print proves it. The orange rim is its single edge.
+side, and the print proves it. The pale rim is its single edge.
+
+**The band is gold, and it is Kurukshetra's.** The strip matches the one on
+the main site: beaten gold with the field of Kurukshetra cut into it in dark
+ink, carrying the same four words at the same size. Along each edge a border
+of arrowheads (where a ruler used to be); in the gap before each word an
+emblem — the chakra, the bow with its arrow nocked, the mace, two swords
+behind a shield; and under everything an army on the march: spearmen, archers
+and horsemen under the words, chariots, elephants and standard-bearers in the
+gaps where there is headroom. It is all drawn with canvas paths in
+[`lib/kurukshetraBand.ts`](src/lib/kurukshetraBand.ts) — no images — from a
+seeded sequence, so the army is irregular but the same on every visit. To
+change the words, edit `LOOP`; the army rearranges itself round them.
 
 It is a plain list until its first WebGL frame renders, and stays one under
 reduced motion or without WebGL. On a phone it renders at 1.5× (1.25× on a

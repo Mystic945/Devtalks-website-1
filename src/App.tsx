@@ -44,13 +44,11 @@ import LandingPage from './components/landing/LandingPage';
 import { Loop } from '@/components/Loop';
 import { Ribbons } from '@/components/Ribbons';
 import { EdgeTab } from '@/components/EdgeTab';
-import { About } from '@/components/About';
 import { Speakers } from '@/components/Speakers';
 import { Schedule } from '@/components/Schedule';
 import TicketsPage from './components/tickets/TicketsPage';
 import { Sponsors } from '@/components/Sponsors';
 import { Venue } from '@/components/Venue';
-import { Reel } from '@/components/Reel';
 import { Faq } from '@/components/Faq';
 import { FinalCta } from '@/components/FinalCta';
 import { Footer } from '@/components/Footer';
@@ -115,12 +113,13 @@ function MainApp() {
         <div className="page-body">
           <Loop />
           <Ribbons />
-          <About />
           <Speakers />
           <Schedule />
           <Sponsors />
           <Venue />
-          <Reel />
+          {/* The reel goes back in here after the event, once there is footage:
+              import { Reel } from '@/components/Reel' and render <Reel />. The
+              component, its viewer and its styles are all still in the repo. */}
           <Faq />
           <FinalCta />
         </div>

@@ -82,9 +82,9 @@ export function useScrollAnimations(play: boolean): void {
         gsap.to(el, {
           opacity: 1,
           y: 0,
-          duration: 0.9,
+          duration: 0.6,
           ease: 'power3.out',
-          scrollTrigger: { trigger: el, start: 'top 88%', once: true }
+          scrollTrigger: { trigger: el, start: 'top 94%', once: true }
         });
       });
 
@@ -106,10 +106,10 @@ export function useScrollAnimations(play: boolean): void {
             yPercent: 0,
             y: 0,
             filter: 'blur(0px)',
-            duration: 1,
+            duration: 0.7,
             ease: 'expo.out',
-            stagger: 0.03,
-            scrollTrigger: { trigger: el, start: 'top 86%', once: true },
+            stagger: 0.02,
+            scrollTrigger: { trigger: el, start: 'top 94%', once: true },
             onComplete: () => {
               words.forEach((w) => {
                 w.style.filter = '';

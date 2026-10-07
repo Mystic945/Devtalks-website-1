@@ -412,8 +412,9 @@ export function createWarpLayer(
       // the same shade the CSS had, deeper on a tall screen
       const u = scrimMat.uniforms;
       u.uReach.value = portrait ? 0.62 : 0.52;
-      u.uFloor.value = portrait ? 0.96 : 0.9;
-      u.uMid.value = portrait ? 0.86 : 0.55;
+      // deeper than it was: the band behind the words is gold now, not near-black
+      u.uFloor.value = portrait ? 0.97 : 0.94;
+      u.uMid.value = portrait ? 0.9 : 0.74;
       u.uMidAt.value = portrait ? 0.45 : 0.4;
       scrim.scale.set(w, h, 1);
       scrim.position.set(w / 2, -h / 2, 0);
@@ -434,9 +435,12 @@ export function createWarpLayer(
         it.w = box.w;
         it.h = box.h;
         // room for the glass to push glyphs past the box without clipping
-        /* A headline can take the full bend; a paragraph takes a third of
-           it, or sixteen-pixel text stops being readable. */
-        const amp = Math.min(1, Math.max(0.3, fs / 64));
+        /* A headline can take the full bend; small type takes far less. The
+           lens moves every line by the same number of pixels, and what is a
+           ripple across a 90px headline is a third of the height of a 15px
+           note — it tore letters out of the closing lines. So the share
+           falls off faster than the type does. */
+        const amp = Math.min(1, Math.max(0.1, Math.pow(fs / 64, 1.5)));
         it.mat.uniforms.uAmp.value = amp;
         // room for the furthest the glass can push a glyph, so none is clipped
         const reach = (WARP.warp * 0.3 + WARP.strength * 1.4) * H * amp;

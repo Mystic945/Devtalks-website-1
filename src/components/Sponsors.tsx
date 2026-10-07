@@ -1,8 +1,9 @@
 /* ============================================================
    DEVTALKS — PARTNERS
    ------------------------------------------------------------
-   One row per tier. The first row is the title sponsor and is
-   drawn larger; every row after it shares one treatment.
+   Two rows: the title partner, in one box the full width of the
+   page, and six partners under it, three across. The first row of
+   SPONSORS is always the title; the grid is in animations.css §12.
 
    A partner with no logo file yet prints its name instead, so the
    wall is never a row of empty boxes while the artwork is being
@@ -19,7 +20,7 @@ export function Sponsors() {
       <div className="wrap">
         <div className="sec__head">
           <p className="eyebrow" data-reveal>
-            <em>04</em> Backed by
+            <em>03</em> Backed by
           </p>
           <ScrollReveal
             as="h2"

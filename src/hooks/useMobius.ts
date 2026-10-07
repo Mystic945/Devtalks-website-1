@@ -22,8 +22,17 @@
        lap one. The text therefore runs continuously round both
        faces and meets itself with no seam — which is the whole
        point of a one-sided surface.
-     • the orange rim is the strip's single boundary curve, also
+     • the bright rim is the strip's single boundary curve, also
        traced over 4π. It is one closed line.
+
+   WHAT IT IS MADE OF
+   Gold, like the strip on the main site (Kurukshetra), with that
+   site's subject cut into it: an army on the march under the words,
+   an emblem of the war in each gap, a border of arrowheads where
+   the ruler used to be. The artwork is lib/kurukshetraBand; this
+   file only lights it. The page round it stays black, and the fog
+   is still the page's black, so the gold comes up out of the dark
+   and goes back into it.
 
    THE RIDE
    The camera keeps the current word face-on and upright, so as it
@@ -51,6 +60,7 @@ import { ScrollTrigger } from '@/lib/gsap';
 import { clamp, lerp, prefersReducedMotion, seg } from '@/lib/dom';
 import { createWarpLayer } from '@/lib/warpLayer';
 import { createStripPlay } from '@/lib/stripPlay';
+import { paintBand } from '@/lib/kurukshetraBand';
 
 /* ---- geometry ---- */
 const STRIP = {
@@ -62,13 +72,15 @@ const STRIP = {
   rim: 0.016 // rim tube radius
 } as const;
 
-/* ---- palette: the landing page's, so the strip sits in the same night ---- */
+/* ---- palette ----
+   The ground is the page's, so the strip fades into the same night. The rim
+   and the light on the band are the gold's: a pale, polished edge, a warm
+   key and a cooler fill, the way metal is lit. */
 const INK = {
   ground: 0x0b0b0b,
-  band: '#151413',
-  paper: '#f3eee4',
-  orange: '#ff5a1f',
-  ember: '#a83a0b'
+  rim: '#ffe2a0',
+  key: '#ffe0b0',
+  fill: '#fff5e2'
 } as const;
 
 /* ---- camera ---- */
@@ -76,7 +88,12 @@ const RIDE = {
   fov: 38,
   /** world units of band the camera keeps across the narrower screen axis */
   frame: 2.75,
-  lead: 0.16 // how far the camera trails behind the point it looks at
+  lead: 0.16, // how far the camera trails behind the point it looks at
+  /** Mid-lap, nothing nearer the camera than this share of its distance to
+   *  the band is drawn — see THE FAR SIDE in the frame loop. Wide screens
+   *  and tall ones need different shares; the comment there says why. */
+  clearWide: 0.5,
+  clearTall: 0.75
 } as const;
 
 /* How far the strip can be tilted by hand, as a lean either way from where
@@ -190,59 +207,6 @@ function buildRim(): THREE.BufferGeometry {
   return new THREE.TubeGeometry(curve, 1400, STRIP.rim, 6, true);
 }
 
-/** One lap of print: the four words, a ruler along each edge. */
-function paintBand(words: string[]): HTMLCanvasElement {
-  const W = 4096;
-  const H = 256;
-  const cv = document.createElement('canvas');
-  cv.width = W;
-  cv.height = H;
-  const g = cv.getContext('2d');
-  if (!g) return cv;
-
-  g.fillStyle = INK.band;
-  g.fillRect(0, 0, W, H);
-
-  // the rulers — fine ticks, a longer one every eighth
-  g.fillStyle = 'rgba(243,238,228,0.22)';
-  for (let x = 0; x < W; x += 32) {
-    const long = x % 256 === 0;
-    const len = long ? 18 : 8;
-    g.fillRect(x, 10, 2, len);
-    g.fillRect(x, H - 10 - len, 2, len);
-  }
-  g.fillRect(0, 9, W, 1);
-  g.fillRect(0, H - 10, W, 1);
-
-  const slot = W / words.length;
-  g.textAlign = 'center';
-  g.textBaseline = 'middle';
-  g.font = '400 168px Anton, "Arial Narrow", sans-serif';
-
-  words.forEach((word, i) => {
-    const cx = slot * i + slot / 2;
-    g.fillStyle = INK.paper;
-    // a little tracking, by hand: canvas letterSpacing is not everywhere yet
-    const chars = [...word];
-    const track = 10;
-    const widths = chars.map((ch) => g.measureText(ch).width);
-    const total = widths.reduce((s, w) => s + w, 0) + track * (chars.length - 1);
-    let x = cx - total / 2;
-    chars.forEach((ch, k) => {
-      g.fillText(ch, x + widths[k] / 2, H / 2 + 6);
-      x += widths[k] + track;
-    });
-
-    // the joint between two words: an orange bead
-    g.fillStyle = INK.orange;
-    g.beginPath();
-    g.arc(slot * i, H / 2, 7, 0, Math.PI * 2);
-    g.fill();
-  });
-
-  return cv;
-}
-
 const easeInOut = (x: number): number =>
   x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
 
@@ -293,13 +257,20 @@ export function useMobius(outerRef: RefObject<HTMLElement>, stops: number): void
        lower still. The scene is one mesh, so this is where the cost is. */
     const coarse = window.matchMedia('(pointer: coarse)').matches;
     const modest = (navigator.hardwareConcurrency || 8) <= 4;
-    const dprCap = coarse ? (modest ? 1.25 : 1.5) : 2;
+    /* 1.5× on a desktop as well. It was 2×, which on a high-density laptop is
+       four times the pixels of 1× through a lit, double-sided material — and
+       most laptops draw this on integrated graphics. Past 1.5× the extra is
+       not visible on a moving band; the frame rate it costs is. */
+    const dprCap = coarse && modest ? 1.25 : 1.5;
+    let ratio = Math.min(window.devicePixelRatio || 1, dprCap);
 
     let renderer: THREE.WebGLRenderer;
     try {
       renderer = new THREE.WebGLRenderer({
         canvas,
-        antialias: !modest,
+        // Multisampling is for coarse pixels. At 1.5× the pixels are already
+        // fine enough, and MSAA on top is the dearest thing in the frame.
+        antialias: !modest && ratio < 1.5,
         alpha: true,
         powerPreference: coarse ? 'default' : 'high-performance'
       });
@@ -307,7 +278,7 @@ export function useMobius(outerRef: RefObject<HTMLElement>, stops: number): void
       return; // no WebGL: the list stays
     }
 
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, dprCap));
+    renderer.setPixelRatio(ratio);
     renderer.setClearColor(0x000000, 0);
     renderer.outputColorSpace = THREE.SRGBColorSpace;
 
@@ -342,15 +313,18 @@ export function useMobius(outerRef: RefObject<HTMLElement>, stops: number): void
       map: tex,
       emissiveMap: tex,
       emissive: new THREE.Color(0xffffff),
-      emissiveIntensity: 0.42,
-      roughness: 0.62,
-      metalness: 0.18,
+      /* A little of the print glows on its own, so the dark figures keep
+         their edges where the band turns away from the light. Much less
+         than the old dark band needed: gold is already bright. */
+      emissiveIntensity: 0.22,
+      roughness: 0.5,
+      metalness: 0.22,
       side: THREE.DoubleSide
     });
     const band = new THREE.Mesh(bandGeo, bandMat);
 
     const rimGeo = buildRim();
-    const rimMat = new THREE.MeshBasicMaterial({ color: INK.orange });
+    const rimMat = new THREE.MeshBasicMaterial({ color: INK.rim });
     const rim = new THREE.Mesh(rimGeo, rimMat);
 
     // one object, so it can be turned by hand once the scroll lets go of it
@@ -426,13 +400,15 @@ uniform vec3 uCamObj;`
       room = Math.max(0, outro.offsetTop - (finale.offsetTop + finale.offsetHeight) - 40);
     };
 
-    /* ---- light: a cool room, an orange key, and a lamp on the camera ---- */
-    scene.add(new THREE.AmbientLight(0xffffff, 0.35));
-    const key = new THREE.DirectionalLight(INK.orange, 1.7);
+    /* ---- light: a dim room, a warm key, a paler fill, a lamp on the camera.
+       Turned down from the dark band's levels: the same light on gold burnt
+       it out to white. */
+    scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+    const key = new THREE.DirectionalLight(INK.key, 1.3);
     key.position.set(-4, 3, 2);
-    const fill = new THREE.DirectionalLight(INK.paper, 0.6);
+    const fill = new THREE.DirectionalLight(INK.fill, 0.5);
     fill.position.set(4, 5, -3);
-    const lamp = new THREE.PointLight(0xffe2cf, 1.4, 14, 1.3);
+    const lamp = new THREE.PointLight(0xfff0d6, 1.05, 14, 1.3);
     scene.add(key, fill, lamp);
 
     /* The text is printed after the font has actually arrived; until then the
@@ -530,6 +506,10 @@ uniform vec3 uCamObj;`
     let shown = -1;
     let current = 0;
     const n = Math.max(1, stops);
+
+    const written = new WeakMap<HTMLElement, string>();
+    const track = outer.querySelector<HTMLElement>('.loop__track');
+    let railWas = '';
 
     const draw = (p: number, time: number, dt: number) => {
       const far = Math.max(14, rideDist + 8);
@@ -656,12 +636,51 @@ uniform vec3 uCamObj;`
         camera.updateProjectionMatrix();
       }
 
+      /* THE FAR SIDE, OUT OF THE WAY
+         The camera rides a few units off the band, along its normal. The
+         half-twist turns that normal over during the lap, and halfway —
+         between CODE and PEOPLE — it points across the hole in the middle
+         of the loop. The loop is only 4.4 units wide and the camera is 4
+         off the band (9 on a phone), so there the camera is right up
+         against the opposite side of the strip, or past it, and that side
+         came across the picture in front of the word.
+
+         The ride itself is right and is not changed. Instead the camera
+         stops drawing what is nearer than it should be looking: its near
+         plane is brought out to a share of the riding distance for the
+         middle of the lap, and eased back to nothing on either side, where
+         the camera is above or below the loop and close views are wanted.
+         The share differs by screen shape because the intruder does. On a
+         wide screen the camera is inside the loop and the far side is
+         within a unit of it, while the band it is looking at curls back to
+         about two-thirds of the distance at the edges of the picture — so
+         a half clears one and keeps the other. On a tall screen the camera
+         is beyond the loop looking back through it; the far side is about
+         half-way and the picture is too narrow to see the band curl, so
+         three-quarters is safe. */
+      const mid =
+        p > BEATS.ride[0] && p < BEATS.ride[1]
+          ? THREE.MathUtils.smoothstep(u, 0.18, 0.34) * (1 - THREE.MathUtils.smoothstep(u, 0.66, 0.82))
+          : 0;
+      const wide = THREE.MathUtils.smoothstep(stageW / Math.max(1, stageH), 0.6, 1);
+      const near = lerp(0.05, lerp(RIDE.clearTall, RIDE.clearWide, wide) * rideDist, mid);
+      if (Math.abs(near - camera.near) > 0.002) {
+        camera.near = near;
+        camera.updateProjectionMatrix();
+      }
+
       /* ---- the words over the picture ---- */
+      /* Seven blocks, sixty times a second, and for most of the scroll six of
+         them have not changed. Each is written only when its value has. */
       const show = (el: HTMLElement | null, o: number, dy: number) => {
         if (!el) return;
+        warp.setGroup(el, o, dy);
+        const key = o.toFixed(3) + '|' + dy.toFixed(1);
+        if (written.get(el) === key) return;
+        written.set(el, key);
         el.style.opacity = o.toFixed(3);
         el.style.transform = `translate3d(0,${dy.toFixed(1)}px,0)`;
-        warp.setGroup(el, o, dy);
+        el.style.visibility = o < 0.01 ? 'hidden' : 'visible';
       };
 
       const oIn = 1 - seg(p, BEATS.introOut[0], BEATS.introOut[1]);
@@ -676,7 +695,6 @@ uniform vec3 uCamObj;`
         const centre = (k + 0.5) / n;
         const o = live ? 1 - smooth(0.055, 0.1, Math.abs(u - centre)) : 0;
         show(card, o, (1 - o) * 22);
-        card.style.visibility = o < 0.01 ? 'hidden' : 'visible';
       });
 
       const at = live ? clamp(Math.floor(u * n), 0, n - 1) : -1;
@@ -684,7 +702,14 @@ uniform vec3 uCamObj;`
         marks.forEach((m, k) => m.classList.toggle('is-on', k === at));
         shown = at;
       }
-      stage.style.setProperty('--loop-p', u.toFixed(4));
+      /* On the rail's own track, not on the stage: a custom property set on
+         the stage re-resolves the style of everything inside it, every
+         frame, to move one hairline. */
+      const railAt = u.toFixed(3);
+      if (railAt !== railWas) {
+        railWas = railAt;
+        (track || stage).style.setProperty('--loop-p', railAt);
+      }
 
       warp.update(time);
       renderer.render(scene, camera);
@@ -700,12 +725,38 @@ uniform vec3 uCamObj;`
     let visible = false;
     let started = false;
 
+    let pace = 16; // smoothed ms per frame, while frames are consecutive
+    let paced = 0;
+    let streak = false;
+
     const tick = (now: number) => {
       raf = 0;
       const dt = Math.min(64, now - last);
       last = now;
-      // critically damped-ish follow: smooth on a wheel, honest on a drag
-      current += (target - current) * (1 - Math.exp(-dt / 90));
+      /* Follow the scroll closely. This was a 90ms ease, which smooths the
+         steps of a mouse wheel but reads as the picture arriving late —
+         worse the slower the frame rate. 55ms still rounds a wheel step
+         and no longer feels behind the hand. */
+      current += (target - current) * (1 - Math.exp(-dt / 55));
+
+      /* SHED RESOLUTION BEFORE DROPPING FRAMES
+         Nobody can tell this site which GPU it is on. So it watches its own
+         frames: if they have been running slow for half a second, it draws
+         a quarter-step fewer pixels and looks again. Down to 1× and never
+         back up — a picture that sharpens and softens by turns is worse
+         than one that is steadily a little softer. Only consecutive frames
+         count, so a pause in scrolling is not mistaken for a slow frame. */
+      if (streak && dt < 60) {
+        pace += (dt - pace) * 0.08;
+        if (++paced > 30 && pace > 21 && ratio > 1) {
+          ratio = Math.max(1, ratio - 0.25);
+          renderer.setPixelRatio(ratio);
+          renderer.setSize(stageW, stageH, false);
+          paced = 0;
+          pace = 16;
+        }
+      }
+      streak = true;
       if (Math.abs(target - current) < 1e-4) current = target;
       draw(current, now, dt);
 
@@ -733,6 +784,7 @@ uniform vec3 uCamObj;`
       const moving =
         current !== target || (overviewing && !coarse) || warp.showing() || grip > 0 || play.busy;
       if (visible && moving) raf = requestAnimationFrame(tick);
+      else streak = false;
     };
 
     function wake() {
@@ -747,7 +799,13 @@ uniform vec3 uCamObj;`
         visible = entry.isIntersecting;
         if (visible) wake();
       },
-      { rootMargin: '200px 0px' }
+      /* On screen, and not a pixel before. This used to reach 200px past the
+         viewport, and the section starts exactly one screen down — so it
+         counted as visible from the top of the page, and the strip was
+         being drawn at full rate underneath the landing page, alongside
+         the landing's own two WebGL scenes. The first frame is compiled at
+         load regardless, so there is nothing to warm up by starting early. */
+      { rootMargin: '-1px 0px' }
     );
     io.observe(outer);
 

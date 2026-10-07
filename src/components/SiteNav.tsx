@@ -17,23 +17,17 @@ import { socialLinks, ticketProps } from '@/lib/links';
 
 /** The bar's links. The mobile menu adds Venue, which the bar has no room for. */
 const NAV_LINKS = [
-  { href: '#about', label: 'About' },
   { href: '#speakers', label: 'Speakers' },
   { href: '#schedule', label: 'Schedule' },
-  { href: '/tickets', label: 'Tickets' },
   { href: '#sponsors', label: 'Sponsors' },
-  { href: '#reel', label: 'Reel' },
   { href: '#faq', label: 'FAQ' }
 ] as const;
 
 const MENU_LINKS = [
-  { href: '#about', label: 'About' },
   { href: '#speakers', label: 'Speakers' },
   { href: '#schedule', label: 'Schedule' },
-  { href: '/tickets', label: 'Tickets' },
   { href: '#sponsors', label: 'Sponsors' },
   { href: '#venue', label: 'Venue' },
-  { href: '#reel', label: 'Reel' },
   { href: '#faq', label: 'FAQ' }
 ] as const;
 
