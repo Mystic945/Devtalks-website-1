@@ -132,38 +132,49 @@ const TALL: Record<Kind, boolean> = {
   elephant: true
 };
 
+/* The three parts every figure is built from. */
+
+/** A foot soldier: legs mid-stride, a wedge of a torso, a head. */
+function figMan(g: Ctx, cx: number, base: number, stride = 1): void {
+  const { dot, line, poly } = pen(g);
+  line(cx, base - 16, cx - 5 * stride, base, 3);
+  line(cx, base - 16, cx + 6 * stride, base, 3);
+  poly(cx - 7, base - 31, cx + 7, base - 31, cx, base - 14);
+  dot(cx, base - 36.5, 4.3);
+}
+
+/** A horse, nose at the right, about 62 wide from x0, standing on y. */
+function figHorse(g: Ctx, x0: number, y: number): void {
+  const { line, poly, curve } = pen(g);
+  g.beginPath();
+  g.ellipse(x0 + 27, y - 17, 17, 7.2, 0, 0, TAU);
+  g.fill();
+  poly(x0 + 38, y - 22, x0 + 48, y - 35, x0 + 53, y - 31, x0 + 44, y - 13); // neck
+  poly(x0 + 48, y - 35, x0 + 59, y - 33, x0 + 60, y - 29, x0 + 51, y - 28); // head
+  poly(x0 + 48, y - 35, x0 + 49, y - 39, x0 + 51, y - 35); // ear
+  line(x0 + 39, y - 13, x0 + 44, y, 2.6);
+  line(x0 + 36, y - 12, x0 + 33, y, 2.6);
+  line(x0 + 16, y - 13, x0 + 11, y, 2.6);
+  line(x0 + 19, y - 12, x0 + 22, y, 2.6);
+  curve(x0 + 10, y - 20, x0 + 2, y - 18, x0 + 3, y - 6, 2.4); // tail
+}
+
+/** A pennant on a pole, streaming back from the direction of march. */
+function figStandard(g: Ctx, px: number, foot: number, top: number): void {
+  const { dot, line, poly } = pen(g);
+  line(px, foot, px, top, 2);
+  poly(px, top, px, top + 12, px - 22, top + 6);
+  dot(px, top - 1.5, 2);
+}
+
 function drawUnit(g: Ctx, u: Unit) {
   const { dot, line, poly, curve, ring } = pen(g);
   const y: number = LAY.ground;
   const x = u.x;
 
-  /** A foot soldier: legs mid-stride, a wedge of a torso, a head. */
-  const man = (cx: number, base = y, stride = 1) => {
-    line(cx, base - 16, cx - 5 * stride, base, 3);
-    line(cx, base - 16, cx + 6 * stride, base, 3);
-    poly(cx - 7, base - 31, cx + 7, base - 31, cx, base - 14);
-    dot(cx, base - 36.5, 4.3);
-  };
-  /** A horse, nose at the right, about 62 wide from x0. */
-  const horse = (x0: number) => {
-    g.beginPath();
-    g.ellipse(x0 + 27, y - 17, 17, 7.2, 0, 0, TAU);
-    g.fill();
-    poly(x0 + 38, y - 22, x0 + 48, y - 35, x0 + 53, y - 31, x0 + 44, y - 13); // neck
-    poly(x0 + 48, y - 35, x0 + 59, y - 33, x0 + 60, y - 29, x0 + 51, y - 28); // head
-    poly(x0 + 48, y - 35, x0 + 49, y - 39, x0 + 51, y - 35); // ear
-    line(x0 + 39, y - 13, x0 + 44, y, 2.6);
-    line(x0 + 36, y - 12, x0 + 33, y, 2.6);
-    line(x0 + 16, y - 13, x0 + 11, y, 2.6);
-    line(x0 + 19, y - 12, x0 + 22, y, 2.6);
-    curve(x0 + 10, y - 20, x0 + 2, y - 18, x0 + 3, y - 6, 2.4); // tail
-  };
-  /** A pennant on a pole, streaming back from the direction of march. */
-  const standard = (px: number, foot: number, top: number) => {
-    line(px, foot, px, top, 2);
-    poly(px, top, px, top + 12, px - 22, top + 6);
-    dot(px, top - 1.5, 2);
-  };
+  const man = (cx: number, base = y, stride = 1) => figMan(g, cx, base, stride);
+  const horse = (x0: number) => figHorse(g, x0, y);
+  const standard = (px: number, foot: number, top: number) => figStandard(g, px, foot, top);
 
   switch (u.kind) {
     case 'spear': {
@@ -373,19 +384,10 @@ function swords(g: Ctx, cx: number, cy: number, R: number, gold: string) {
   }
 }
 
-/* ---------- the band ---------- */
+/* ---------- the metal and its edges ---------- */
 
-export function paintBand(words: string[]): HTMLCanvasElement {
-  const cv = document.createElement('canvas');
-  cv.width = W;
-  cv.height = H;
-  const g = cv.getContext('2d');
-  if (!g) return cv;
-  const rnd = seeded(77);
-  g.lineCap = 'round';
-  g.lineJoin = 'round';
-
-  /* ---- the metal ---- */
+/** The metal: a gradient across the band, beaten and grained. */
+function beat(g: Ctx, rnd: () => number): void {
   const metal = g.createLinearGradient(0, 0, 0, H);
   metal.addColorStop(0, GOLD[0]);
   metal.addColorStop(0.3, GOLD[1]);
@@ -423,6 +425,37 @@ export function paintBand(words: string[]): HTMLCanvasElement {
     g.lineTo(x + 16 + rnd() * 70, y + (rnd() - 0.5) * 3);
     g.stroke();
   }
+}
+
+/** Along each edge: a rule, arrowheads pointing in, and a finer rule. */
+function borders(g: Ctx): void {
+  const { poly } = pen(g);
+  const step = W / 170;
+  for (const [y0, dir] of [[LAY.borderTop, 1], [LAY.borderBottom, -1]] as const) {
+    g.fillRect(0, y0 - 1, W, 2.2);
+    for (let k = 0; k < 170; k++) {
+      const x = k * step;
+      poly(x + 3, y0 + dir * 4, x + step - 3, y0 + dir * 4, x + step / 2, y0 + dir * 13);
+    }
+    g.globalAlpha = 0.55;
+    g.fillRect(0, y0 + dir * 17 - 0.7, W, 1.4);
+    g.globalAlpha = 1;
+  }
+}
+
+/* ---------- the band ---------- */
+
+export function paintBand(words: string[]): HTMLCanvasElement {
+  const cv = document.createElement('canvas');
+  cv.width = W;
+  cv.height = H;
+  const g = cv.getContext('2d');
+  if (!g) return cv;
+  const rnd = seeded(77);
+  g.lineCap = 'round';
+  g.lineJoin = 'round';
+
+  beat(g, rnd);
 
   /* ---- where the words go ---- */
   const slot = W / Math.max(1, words.length);
@@ -447,18 +480,7 @@ export function paintBand(words: string[]): HTMLCanvasElement {
     g.strokeStyle = fill;
     const { poly, dot, line } = pen(g);
 
-    // the borders: a rule, arrowheads pointing in, a finer rule
-    const step = W / 170;
-    for (const [y0, dir] of [[LAY.borderTop, 1], [LAY.borderBottom, -1]] as const) {
-      g.fillRect(0, y0 - 1, W, 2.2);
-      for (let k = 0; k < 170; k++) {
-        const x = k * step;
-        poly(x + 3, y0 + dir * 4, x + step - 3, y0 + dir * 4, x + step / 2, y0 + dir * 13);
-      }
-      g.globalAlpha = 0.55;
-      g.fillRect(0, y0 + dir * 17 - 0.7, W, 1.4);
-      g.globalAlpha = 1;
-    }
+    borders(g);
 
     // the words
     g.font = '400 168px Anton, "Arial Narrow", sans-serif';
@@ -519,6 +541,219 @@ export function paintBand(words: string[]): HTMLCanvasElement {
 
   inked(1.5, 1.6, SHINE);
   inked(0, 0, `rgba(${INK}, 0.9)`);
+
+  return cv;
+}
+
+/* ============================================================
+   THE FRIEZE AND THE BOSS — the footer's band
+   ------------------------------------------------------------
+   The strip carries words, so its army is small and marches under
+   them. The band across the foot of the page carries nothing but
+   the war, and is drawn for that:
+
+     • the same metal and the same arrowhead border — it is the
+       same gold, and should look it
+     • no words and no emblems, so the army has the whole height:
+       the same figures, nearly twice the size, mixed freely — the
+       tall ones no longer have to wait for a gap
+     • volleys of arrows in the sky above them, flying the way the
+       army marches
+
+   One painting, used for both halves of the band: the page shows
+   it once as drawn and once mirrored, so two hosts advance on each
+   other from either side (see components/ArmyBand).
+
+   The BOSS is what they advance on: a round shield of the same
+   gold with the chakra cut into it, which sits over the middle of
+   the band like the buckle on a belt. It is shaded from its centre
+   outwards and from nowhere else, so that it can be turned slowly
+   without its highlights turning with it.
+   ============================================================ */
+
+const FRIEZE = {
+  scale: 1.9, // how much bigger than on the strip the figures are drawn
+  sky: [44, 76] // the band of height the arrows fly in
+} as const;
+
+/** Raise the footer's host: files of foot, pairs of horse, and the tall
+ *  things wherever they fall. K is how much larger than the strip's they are. */
+function levy(rnd: () => number, K: number): Unit[] {
+  const host: Unit[] = [];
+  let x = 16;
+  while (x < W - 40) {
+    const roll = rnd();
+    const kind: Kind =
+      roll < 0.3 ? 'spear' : roll < 0.44 ? 'archer' : roll < 0.64 ? 'rider' : roll < 0.75 ? 'flag' : roll < 0.89 ? 'chariot' : 'elephant';
+    const file =
+      kind === 'spear'
+        ? 3 + Math.floor(rnd() * 3)
+        : kind === 'archer'
+          ? 2 + Math.floor(rnd() * 2)
+          : kind === 'rider'
+            ? 1 + Math.floor(rnd() * 2)
+            : 1;
+    for (let n = 0; n < file; n++) {
+      if (x + WIDTH[kind] * K > W - 10) break;
+      host.push({ kind, x, v: rnd() });
+      x += (WIDTH[kind] - (kind === 'spear' ? 4 : 0)) * K;
+    }
+    x += (9 + rnd() * 13) * K;
+  }
+  return host;
+}
+
+/** Draw one of the host where it stands, scaled up about its feet. */
+function deploy(g: Ctx, host: Unit[], K: number): void {
+  for (const u of host) {
+    g.save();
+    g.translate(u.x, LAY.ground);
+    g.scale(K, K);
+    g.translate(0, -LAY.ground);
+    drawUnit(g, { ...u, x: 0 });
+    g.restore();
+  }
+}
+
+export function paintFrieze(): HTMLCanvasElement {
+  const cv = document.createElement('canvas');
+  cv.width = W;
+  cv.height = H;
+  const g = cv.getContext('2d');
+  if (!g) return cv;
+  g.lineCap = 'round';
+  g.lineJoin = 'round';
+
+  beat(g, seeded(77));
+
+  const rnd = seeded(1858);
+  const K = FRIEZE.scale;
+
+  const host = levy(rnd, K);
+
+  /* the volleys: a handful of arrows close together, a dozen times along the band */
+  const flights: Array<{ x: number; y: number; len: number; tilt: number }> = [];
+  for (let i = 0; i < 13; i++) {
+    const vx = rnd() * W;
+    const vy = FRIEZE.sky[0] + rnd() * (FRIEZE.sky[1] - FRIEZE.sky[0]);
+    const n = 3 + Math.floor(rnd() * 3);
+    for (let k = 0; k < n; k++) {
+      flights.push({
+        x: vx + k * (36 + rnd() * 26),
+        y: vy + (k % 2 ? -1 : 1) * (5 + rnd() * 9),
+        len: 60 + rnd() * 34,
+        tilt: -0.04 + rnd() * 0.12
+      });
+    }
+  }
+
+  const inked = (dx: number, dy: number, fill: string) => {
+    g.save();
+    g.translate(dx, dy);
+    g.fillStyle = fill;
+    g.strokeStyle = fill;
+    const { line, poly } = pen(g);
+
+    borders(g);
+
+    for (const a of flights) {
+      // an arrow that runs off the right edge is finished on the left
+      for (const ox of a.x + a.len + 12 > W ? [0, -W] : [0]) {
+        g.save();
+        g.translate(a.x + ox, a.y);
+        g.rotate(a.tilt);
+        line(0, 0, a.len, 0, 2.6);
+        poly(a.len + 10, 0, a.len - 2, -5.5, a.len - 2, 5.5);
+        for (const d of [0, 7, 14]) {
+          line(d, 0, d - 8, -6, 1.8);
+          line(d, 0, d - 8, 6, 1.8);
+        }
+        g.restore();
+      }
+    }
+
+    deploy(g, host, K);
+
+    g.restore();
+  };
+
+  inked(1.5, 1.6, SHINE);
+  inked(0, 0, `rgba(${INK}, 0.9)`);
+
+  return cv;
+}
+
+export function paintBoss(size = 448): HTMLCanvasElement {
+  const cv = document.createElement('canvas');
+  cv.width = size;
+  cv.height = size;
+  const g = cv.getContext('2d');
+  if (!g) return cv;
+  g.lineCap = 'round';
+  g.lineJoin = 'round';
+
+  const c = size / 2;
+  const R = size / 2 - 3;
+  const rnd = seeded(404);
+
+  /* the disc: lit from its centre, so it can turn */
+  g.save();
+  g.beginPath();
+  g.arc(c, c, R, 0, TAU);
+  g.clip();
+  const dome = g.createRadialGradient(c, c, R * 0.05, c, c, R);
+  dome.addColorStop(0, '#f8dd92');
+  dome.addColorStop(0.5, GOLD[1]);
+  dome.addColorStop(0.82, GOLD[2]);
+  dome.addColorStop(1, '#95681f');
+  g.fillStyle = dome;
+  g.fillRect(0, 0, size, size);
+  for (let i = 0; i < 70; i++) {
+    const a = rnd() * TAU;
+    const d = rnd() * R;
+    const r = 18 + rnd() * 60;
+    const tone = rnd() < 0.55 ? '112, 70, 18' : '255, 236, 170';
+    const blot = g.createRadialGradient(c + Math.cos(a) * d, c + Math.sin(a) * d, 0, c + Math.cos(a) * d, c + Math.sin(a) * d, r);
+    blot.addColorStop(0, `rgba(${tone}, ${0.04 + rnd() * 0.07})`);
+    blot.addColorStop(1, `rgba(${tone}, 0)`);
+    g.fillStyle = blot;
+    g.fillRect(0, 0, size, size);
+  }
+  g.restore();
+
+  const inked = (dx: number, dy: number, fill: string) => {
+    g.save();
+    g.translate(dx, dy);
+    g.fillStyle = fill;
+    g.strokeStyle = fill;
+    const { ring, poly } = pen(g);
+
+    // its own border, bent into a circle: a rule, arrowheads pointing in, a finer rule
+    ring(c, c, R - 9, 2.4);
+    const teeth = 44;
+    for (let k = 0; k < teeth; k++) {
+      const a = (k / teeth) * TAU;
+      const w = (TAU / teeth) * 0.36;
+      const p = (r: number, t: number) => [c + Math.cos(t) * r, c + Math.sin(t) * r];
+      poly(...p(R - 13, a - w), ...p(R - 13, a + w), ...p(R - 23, a));
+    }
+    g.globalAlpha = 0.55;
+    ring(c, c, R - 28, 1.4);
+    g.globalAlpha = 1;
+
+    chakra(g, c, c, R * 0.66);
+    g.restore();
+  };
+
+  inked(1.5, 1.6, SHINE);
+  inked(0, 0, `rgba(${INK}, 0.9)`);
+
+  // the pale, polished rim — the strip's
+  g.strokeStyle = '#ffe9b4';
+  g.lineWidth = 4;
+  g.beginPath();
+  g.arc(c, c, R - 1, 0, TAU);
+  g.stroke();
 
   return cv;
 }

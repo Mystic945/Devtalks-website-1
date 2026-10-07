@@ -132,7 +132,7 @@ export function Venue() {
       <div className="wrap">
         <div className="sec__head">
           <p className="eyebrow" data-reveal>
-            <em>04</em> Getting there
+            <em>05</em> Getting there
           </p>
           <ScrollReveal
             as="h2"

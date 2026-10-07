@@ -1,17 +1,21 @@
 /* ============================================================
-   DEVTALKS — THE REVEAL FOOTER
+   DEVTALKS — THE FOOTER
    ------------------------------------------------------------
-   It sits behind the page and is uncovered as the content scrolls
-   off the end; useFooterReveal pins it and adds exactly enough
-   scroll for it to clear. If it does not fit inside the viewport
-   — the common case on a phone — it stays in normal flow and the
-   effect simply does not happen.
+   The lower half of the page's closing block. The venue is the
+   upper half (it is the last section inside <main>); the army band
+   is the seam between them, and it is the first thing in here, so
+   the two halves read as one block on one ground with a band of
+   gold run through it.
 
-   `.foot__huge` is the giant wordmark useScrollAnimations
-   parallaxes behind the columns.
+   It used to be pinned behind the page and uncovered as the content
+   scrolled away. Joined to the venue it is simply the end of the
+   page: there is nothing above it left to scroll off.
+
+   `.foot__huge` is hidden, and kept: useScrollAnimations looks for
+   it and would otherwise have nothing to hold.
    ============================================================ */
 
-import { forwardRef } from 'react';
+import { ArmyBand } from '@/components/ArmyBand';
 import { linkProps, socialLinks } from '@/lib/links';
 import { SITE } from '@/data/site';
 
@@ -33,11 +37,12 @@ const COLUMNS = [
   }
 ] as const;
 
-export const Footer = forwardRef<HTMLElement>((_props, ref) => {
+export function Footer() {
   const socials = socialLinks();
 
   return (
-    <footer className="foot" id="siteFoot" ref={ref}>
+    <footer className="foot foot--joined" id="siteFoot">
+      <ArmyBand />
       <div className="foot__glow" aria-hidden="true" />
 
       <div className="wrap">
@@ -97,6 +102,4 @@ export const Footer = forwardRef<HTMLElement>((_props, ref) => {
       </div>
     </footer>
   );
-});
-
-Footer.displayName = 'Footer';
+}

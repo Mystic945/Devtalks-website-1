@@ -5,8 +5,6 @@
    numbers are only as good as the page was when it measured, and
    on this page the height moves twice after the sections mount:
 
-     • useFooterReveal gives <main> a bottom margin the size of
-       the footer, which is several hundred pixels
      • the loop and the run of show only become tall once their
        own effects have measured, and the photos land late
 

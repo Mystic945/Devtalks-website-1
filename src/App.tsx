@@ -5,17 +5,16 @@
    markup and its own state; this file owns only the things that
    span the whole document.
 
+   HOW IT ENDS
+   The venue is the last section in <main> and the footer follows
+   it directly: one closing block, joined by the army band at the
+   top of the footer. Nothing is pinned or revealed any more.
+
    WHY THE HOOKS ARE IN THIS ORDER
    Effects run children-first, so by the time any hook here runs
-   every section is in the DOM. Within this component they run top
-   to bottom, and two of them care:
-
-     useFooterReveal   changes <main>'s bottom margin, which
-                       changes the height of the document
-     useScrollFlow     caches every card's document-space top
-
-   so the footer has to be settled before the flow measures, or
-   the first scroll measures against a page that has since grown.
+   every section is in the DOM. useScrollFlow caches every card's
+   document-space top, and useScrollTriggerSync, last, re-measures
+   everything once the page has reached its real height.
 
    THE INTRO HANDOFF
    The boot screen (components/Boot) hands over with `ready`, which is
@@ -31,7 +30,6 @@ import { useHeroIntro } from '@/hooks/useHeroIntro';
 import { useScrollAnimations } from '@/hooks/useScrollAnimations';
 import { useScrollTriggerSync } from '@/hooks/useScrollTriggerSync';
 import { useScrollFlow } from '@/hooks/useScrollFlow';
-import { useFooterReveal } from '@/hooks/useFooterReveal';
 import { useSmoothAnchors } from '@/hooks/useSmoothAnchors';
 import { useMagnetic } from '@/hooks/useMagnetic';
 import { useParallax } from '@/hooks/useParallax';
@@ -50,15 +48,12 @@ import TicketsPage from './components/tickets/TicketsPage';
 import { Sponsors } from '@/components/Sponsors';
 import { Venue } from '@/components/Venue';
 import { Faq } from '@/components/Faq';
-import { FinalCta } from '@/components/FinalCta';
 import { Footer } from '@/components/Footer';
 
 import { SITE } from '@/data/site';
 
 function MainApp() {
   const heroRef = useRef<HTMLElement>(null);
-  const mainRef = useRef<HTMLElement>(null);
-  const footRef = useRef<HTMLElement>(null);
   const sparkRef = useRef<HTMLCanvasElement>(null);
 
   const [ready, setReady] = useState(false);
@@ -87,7 +82,6 @@ function MainApp() {
   useMagnetic();
   useClickSpark(sparkRef);
   useParallax();
-  useFooterReveal(footRef, mainRef);
   useScrollFlow();
 
   useHeroIntro(heroRef, ready);
@@ -102,7 +96,7 @@ function MainApp() {
       <SiteNav />
       <EdgeTab />
 
-      <main id="top" ref={mainRef}>
+      <main id="top">
         <LandingPage />
 
         {/* Everything after the landing page travels as one opaque sheet.
@@ -116,16 +110,17 @@ function MainApp() {
           <Speakers />
           <Schedule />
           <Sponsors />
-          <Venue />
           {/* The reel goes back in here after the event, once there is footage:
               import { Reel } from '@/components/Reel' and render <Reel />. The
               component, its viewer and its styles are all still in the repo. */}
           <Faq />
-          <FinalCta />
+          {/* Last: the venue is the top half of the closing block, and the
+              footer below it is the other half. */}
+          <Venue />
         </div>
       </main>
 
-      <Footer ref={footRef} />
+      <Footer />
 
       {/* Last in the tree and fixed over everything, so a spark is never
           clipped by a section's own stacking context. */}

@@ -2,7 +2,8 @@
 
 The event site for DevTalks 2026 — The Developers Club, D.Y. Patil Institute of
 Technology, Pimpri. One page: landing, the loop, line-up, run of show, partners,
-venue, FAQ — plus the pass on its own page at `/tickets`.
+FAQ, then the venue and footer as one closing block — plus the pass on its
+own page at `/tickets`.
 
 Built with **Vite + React + TypeScript**. All the motion is GSAP and plain
 `requestAnimationFrame`; there is no UI framework and no component library, so
@@ -107,8 +108,8 @@ Two related habits, for the same reason:
 The site ships two generations of motion, kept apart on purpose:
 
 - **The original build's**, ported unchanged — card tilt, scroll registration,
-  parallax, reveal footer. (Its door intro has been replaced; see *The boot
-  screen* below.)
+  parallax. (Its door intro has been replaced, see *The boot screen* below;
+  its pinned "reveal" footer is gone, see *The closing block*.)
 - **The layer added afterwards**, adapted from
   [syahrilarfianalmazril.my.id](https://www.syahrilarfianalmazril.my.id/).
   All of its CSS is in `src/styles/animations.css` and nothing in it edits the
@@ -127,9 +128,39 @@ The site ships two generations of motion, kept apart on purpose:
 | Typed lines | Section sub-lines | `ui/TextType` |
 | Pinned horizontal timeline (`horizontal-timeline`) | The run of show | `useHorizontalTimeline` |
 
-One of the reference's signature effects was **not** added, because the site
-already does it: the reveal footer is the same slide-over the reference uses
-for its closing CTA.
+#### The closing block
+
+The page ends on one block: the **venue** on top, the **footer** underneath,
+on the same black ground with no rule or gap between them, and the **army
+band** run edge to edge through the middle as the seam
+([`ArmyBand.tsx`](src/components/ArmyBand.tsx), styles in `animations.css`
+§14). The band is the strip's gold and the strip's figures, but its own
+composition, and deliberately not the strip laid flat:
+
+- **No words.** With the whole height to itself the army is drawn nearly
+  twice the size, and the tall things — chariots, elephants, standards — fall
+  wherever they fall instead of waiting for a gap.
+- **Two hosts.** The left half is an army marching right; the right half is
+  the same painting in a mirror, so a second army marches left to meet it.
+  Volleys of arrows fly overhead, each the way its host is marching.
+- **The boss.** Where they would meet, a round shield of the same gold with
+  the chakra cut into it sits over the band, taller than the band, like the
+  buckle on a belt joining the two halves of the page. It turns, slowly.
+
+The artwork is `paintFrieze` and `paintBoss` in `lib/kurukshetraBand.ts`,
+beside the strip's own `paintBand`; they share the metal, the border and the
+figures.
+
+Each half is two copies of one image in a row, slid by one copy's width for
+ever, so the hosts walk in under the boss and are never seen to arrive. Only
+transforms move. Nothing is painted until the footer is within a screen of
+the viewport, and it moves only while it is on screen; under reduced motion
+it is painted and stands still.
+
+The footer used to be pinned behind the page and uncovered as the content
+scrolled off (`useFooterReveal`), with a "Come build with us" section above
+it. Both are gone: joined to the venue, the footer is simply the end of the
+page. The FAQ moved up above the venue to make that possible.
 
 #### The run of show, sideways
 
@@ -145,9 +176,8 @@ Two decisions worth keeping:
 
 - **Sticky, not ScrollTrigger's `pin`.** GSAP can pin for you, but it does it
   by wrapping the element in a generated container and swapping in a spacer.
-  On a page that already has a sticky card deck, a pinned WebGL loop and a
-  fixed reveal footer, that is one more thing rewriting layout behind
-  everyone's back. Sticky is the browser's own pin and it is what the
+  On a page that already has a sticky card deck and a pinned WebGL loop, that
+  is one more thing rewriting layout behind everyone's back. Sticky is the browser's own pin and it is what the
   reference uses; the hook only measures and moves.
 - **The track's distance is derived; the scroll it takes is fixed.**
   `distance = track.scrollWidth − stage.clientWidth + tailPad` is how far the

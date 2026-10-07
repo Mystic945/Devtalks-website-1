@@ -1665,3 +1665,159 @@ html:not(.paper-edition) .page-body .venue__map--live{
   .venue__tiles{ transition: none; }
   .venue__marker i::after{ animation: none; }
 }
+
+/* ============================================================
+   14 · THE CLOSING BLOCK — VENUE, THE ARMY BAND, FOOTER
+   ------------------------------------------------------------
+   The venue and the footer are one block: the same black ground,
+   no rule and no gap between them, and a band of the strip's gold
+   run edge to edge through the middle as the seam. Markup is in
+   components/Venue, ArmyBand and Footer.
+   ============================================================ */
+
+/* The venue gives up most of its bottom padding: what follows is not
+   another section but the other half of this one. */
+.sec--venue{
+  padding-bottom: clamp(44px, 6vw, 88px);
+}
+
+/* The footer loses everything that made it a separate object arriving from
+   below — the rounded shoulders, the hairline along its top, its own top
+   padding — because the band is its top edge now. */
+.foot.foot--joined{
+  /* the band's height sets everything: its image is sixteen times as wide
+     as tall. Declared here so the glow under the band can use it too. */
+  --army-h: clamp(88px, 11vw, 164px);
+  padding-top: 0;
+  border-radius: 0;
+  /* The boss on the band is taller than the band and overhangs the venue
+     above it. So the footer may not clip, and it has to sit over <main>,
+     which is otherwise the layer on top. */
+  overflow: visible;
+  z-index: 2;
+}
+.foot.foot--joined::before{ content: none; }
+.foot.foot--joined > .wrap{
+  padding-top: clamp(40px, 5.5vw, 72px);
+}
+
+/* ---- the band ---- */
+.army{
+  position: relative;
+  z-index: 1;
+  height: var(--army-h);
+  /* the metal's own colours, so the band is gold before its image arrives */
+  background: linear-gradient(180deg, #b58530 0%, #efcb76 30%, #deae58 60%, #a97a2b 100%);
+}
+/* the strip's pale rim, top and bottom, over the hosts and under the boss */
+.army::before,
+.army::after{
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  z-index: 1;
+  background: #ffe2a0;
+  pointer-events: none;
+}
+.army::before{ top: 0; }
+.army::after{ bottom: 0; }
+
+/* Two hosts. Each half clips its own row; the right one is the left one in
+   a mirror, which turns its army round to face the other. */
+.army__half{
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 50%;
+  overflow: hidden;
+}
+.army__half--l{ left: 0; }
+.army__half--r{ right: 0; transform: scaleX(-1); }
+
+/* Where the band runs in under the boss it falls into the boss's shadow.
+   The inner end of each half is the right-hand end — in the mirrored half
+   too, because the mirror turns this with it. */
+.army__half::after{
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  width: calc(var(--army-h) * 1.5);
+  background: linear-gradient(to left, rgba(24, 12, 2, 0.62), rgba(24, 12, 2, 0));
+  pointer-events: none;
+}
+
+.army__row{
+  display: flex;
+  width: max-content;
+  height: 100%;
+  /* one copy's width, toward the middle, for ever */
+  animation: army-march 104s linear infinite;
+  animation-play-state: paused;
+  will-change: transform;
+}
+/* out of step with the other host, or the two are too plainly one drawing */
+.army__half--r .army__row{ animation-delay: -43s; }
+.army.is-marching .army__row{ animation-play-state: running; }
+.army__row img{
+  flex: none;
+  display: block;
+  height: 100%;
+  width: calc(var(--army-h) * 16);
+  -webkit-user-select: none;
+  user-select: none;
+}
+@keyframes army-march{
+  from{ transform: translate3d(-50%, 0, 0); }
+  to  { transform: translate3d(0, 0, 0); }
+}
+
+/* The boss: a shield of the same gold, taller than the band, over its middle. */
+.army__boss{
+  --boss: calc(var(--army-h) * 1.74);
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 2;
+  width: var(--boss);
+  height: var(--boss);
+  margin: calc(var(--boss) / -2) 0 0 calc(var(--boss) / -2);
+  border-radius: 50%;
+  /* gold before its image arrives, as the band is */
+  background: radial-gradient(circle, #f8dd92 0%, #efcb76 50%, #deae58 82%, #95681f 100%);
+  /* it stands off the band: a shadow under it, and a little of its light
+     on the black above and below */
+  box-shadow:
+    0 calc(var(--army-h) * 0.1) calc(var(--army-h) * 0.3) rgba(0, 0, 0, 0.62),
+    0 0 calc(var(--army-h) * 0.5) rgba(239, 203, 118, 0.2);
+}
+.army__boss img{
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  animation: army-turn 90s linear infinite;
+  animation-play-state: paused;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.army.is-marching .army__boss img{ animation-play-state: running; }
+@keyframes army-turn{
+  to{ transform: rotate(360deg); }
+}
+
+/* The light the gold throws on the black beneath it, where the footer used
+   to have an orange cast off its top edge. */
+.foot.foot--joined .foot__glow{
+  top: var(--army-h);
+  height: 62%;
+  background: radial-gradient(60% 100% at 50% 0%, rgba(239, 203, 118, 0.16), transparent 70%);
+}
+
+@media (prefers-reduced-motion: reduce){
+  .army__row{ animation: none; transform: translate3d(-50%, 0, 0); }
+  .army__boss img{ animation: none; }
+}
