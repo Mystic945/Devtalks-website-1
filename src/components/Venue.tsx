@@ -102,7 +102,6 @@ function VenueMap() {
 
       <div className="venue__marker" aria-hidden="true">
         <i />
-        <span>DevTalks</span>
       </div>
 
       {/* The whole map is the link. It sits over the tiles and under the
