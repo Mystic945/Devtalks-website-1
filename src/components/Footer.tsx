@@ -31,7 +31,7 @@ const COLUMNS = [
   {
     head: 'Attend',
     links: [
-      { href: '/tickets', label: 'Tickets' },
+      { href: SITE.registerUrl, label: 'Tickets' },
       { href: '#faq', label: 'FAQ' }
     ]
   }
@@ -48,11 +48,11 @@ export function Footer() {
       <div className="wrap">
         <div className="foot__head">
           <a href="#top" className="foot__mark">
-            DEV<span>TALKS</span>
+            KURUKSHETRA
             <b>26</b>
           </a>
           <p className="foot__legal">
-            &copy; {new Date().getFullYear()} DevTalks. All rights reserved.
+            &copy; {new Date().getFullYear()} Kurukshetra. All rights reserved.
           </p>
         </div>
 
@@ -98,7 +98,7 @@ export function Footer() {
       </div>
 
       <div className="foot__huge" aria-hidden="true">
-        DEVTALKS
+        KURUKSHETRA
       </div>
     </footer>
   );

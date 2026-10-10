@@ -46,7 +46,7 @@ export const SITE: Site = {
   mapLng: 73.8221362,
   club: 'The Developers Club',
   college: 'D.Y. Patil Institute of Technology, Pimpri',
-  registerUrl: '#tickets',
+  registerUrl: 'https://www.kurukshetradypdpu.in/login',
   sponsorMail: 'mailto:devtalks@dypit.ac.in?subject=DevTalks%202026%20Sponsorship',
   contactMail: 'mailto:devtalks@dypit.ac.in',
   /* Instagram and LinkedIn only. The footer and the mobile menu both print
@@ -202,36 +202,29 @@ export const SPONSORS: SponsorTier[] = [
 
 export const FAQS: Faq[] = [
   {
-    q: 'Who can attend DevTalks?',
-    a: 'Anyone. Students from any college, working professionals, and alumni are all welcome. You do not need to be from the host college and you do not need to code.'
+    q: 'Who can participate?',
+    a: 'Students interested in technology, innovation, and building new ideas are welcome to participate.'
   },
   {
-    q: 'Only three speakers — why so few?',
-    a: 'Because twenty-five minutes plus a real Q&A beats eight rushed slots. Fewer speakers means each one can actually go deep, and you get to ask them something afterwards.'
+    q: 'How do I register?',
+    a: "Click the Register or Get Tickets button on the website and follow the registration steps."
   },
   {
-    q: 'Can I transfer my pass?',
-    a: "Yes. Mail us at least 48 hours before the event with the new attendee's name and we'll update the list."
-  },
-  {
-    q: 'Will the talks be recorded?',
-    a: 'Yes. Every talk is recorded and published on our YouTube channel roughly three weeks after the event. Pass holders get the links first.'
+    q: 'What should I bring?',
+    a: 'Bring your college ID, registration confirmation, and any essentials needed for the event.'
   },
   {
     q: 'Is food included?',
-    a: 'Lunch and two chai breaks are included with every pass. Vegetarian and Jain options are available — mention it on the registration form.'
+    a: 'Yes, food will be provided during the hackathon. Snacks, dinner and brunch is included with every pass.'
   },
   {
     q: 'How do I get to the venue?',
     a: 'The venue is a short auto ride from Nigdi and Akurdi stations. Parking is available on campus. The full map link is in the venue section above.'
   },
+  
   {
-    q: 'Can my company sponsor?',
-    a: "Yes. We have title, gold, silver and community tiers, plus booth-only options. Mail us and we'll send the deck within a day."
-  },
-  {
-    q: 'Be honest. Is it just for the free food?',
-    a: "Yes. We know that's why you're coming. Lunch is at 12:35, it's genuinely good, and the talks either side of it are worth staying awake for."
+    q: "What's in it for me?",
+    a: "New ideas, meaningful connections, and an experience beyond the usual college day. And yes, food too."
   }
 ];
 
