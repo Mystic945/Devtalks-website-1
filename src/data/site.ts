@@ -219,7 +219,7 @@ export const FAQS: Faq[] = [
   },
   {
     q: 'How do I get to the venue?',
-    a: 'The venue is a short auto ride from Nigdi and Akurdi stations. Parking is available on campus. The full map link is in the venue section above.'
+    a: 'The venue is a short auto ride from Nigdi and Akurdi stations. Parking is available on campus. The full map link is in the venue section below.'
   },
   
   {
