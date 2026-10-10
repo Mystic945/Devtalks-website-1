@@ -97,13 +97,11 @@ function MainApp() {
       <EdgeTab />
 
       <main id="top">
-        <LandingPage />
+        <LandingPage ready={ready} />
 
-        {/* Everything after the landing page travels as one opaque sheet.
-            It has to be one element with one ground: the landing page is
-            stuck to the top of <main>, so any section left transparent
-            would show it through — which is exactly what happened when
-            these were loose siblings. */}
+        {/* Everything after the landing page travels as one sheet with one
+            ground. The landing ends on that same black (its stage is veiled
+            before it is let go), so the two meet without a seam. */}
         <div className="page-body">
           <Loop />
           <Ribbons />

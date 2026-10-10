@@ -23,3 +23,6 @@ node_modules/
 
 # Build output
 dist/
+
+# Superdesign working files (repo analysis, drafts state, temp HTML)
+.superdesign/

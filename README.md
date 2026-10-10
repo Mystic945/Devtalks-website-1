@@ -229,6 +229,44 @@ Two things to know if you paste in more shadcn-style components:
 - Tailwind's preflight is off, so a pasted component needs `border-solid` on
   anything bordered and `m-0` on bare headings and paragraphs.
 
+### The landing
+
+The first screen speaks only as **Kurukshetra** — the event this site belongs
+to — in black and gold: the wordmark in both scripts, *The Battle of Infinite
+Possibilities*, when and where, and one button to the main site. Its words are
+`KURUKSHETRA` in `site.ts`, kept apart from `SITE` so the sections below are
+not changed by editing them. The nav wordmark and the lanyard read from it too.
+
+Behind the type is the **Chakravyuha**, the spiral battle formation, seen from
+above — [`landing/vyuha.ts`](src/components/landing/vyuha.ts), three.js. Seven
+rings of soldiers turn against each other, each with one gate, so the way to
+the centre keeps opening and closing; a chakra turns at the eye; now and then
+a volley of arrows crosses. Every ring is one instanced mesh, so the whole
+army is seven draw calls. The knobs are `FIELD` and `VIEW` at the top of that
+file. Phones and four-core machines get a thinner army.
+
+**It is a pinned scene.** The section is taller than the screen by a runway
+(`--run` in [`landing.css`](src/components/landing/landing.css)) and scrolling
+it drops the view into the eye: the type and the lanyard clear, the rings go
+past, and the stage is veiled to flat black before it is let go — so the
+landing ends by becoming the loop's background rather than at a seam.
+[`LandingPage.tsx`](src/components/landing/LandingPage.tsx) reads the scroll
+once a frame, tells the scene, and writes the same number to `--dive`, which
+is what the stylesheet fades everything else by. Under reduced motion there
+is no runway and the formation is drawn once, standing still.
+
+Round the edge are the heads-up pieces taken from
+[scrollthroughdoom.netlify.app](https://scrollthroughdoom.netlify.app/): the
+diamond chapter rail, the place name and ring counter in the corners, the row
+of line glyphs and the reticle scroll cue.
+
+**The lanyard** is the same swinging pass as before, on the left, repainted
+in [`lanyard/badge.ts`](src/components/landing/lanyard/badge.ts) as a gold
+warrior's pass. Its medallion is the footer's (`paintBoss`).
+
+The orange *Registrations open* tab on the page edge stays off this screen and
+comes in once the landing has scrolled away.
+
 ### The loop
 
 Straight after the landing page, where the bento grid was, is a Möbius strip
@@ -297,8 +335,8 @@ ride.
 
 ### The dark edition
 
-The landing page Siya added is black ground / paper ink / orange spot, and
-section 10 of `animations.css` carries that through the rest of the site.
+The sections under the landing are black ground / paper ink / orange spot;
+section 10 of `animations.css` is what makes them so.
 
 It is about a dozen lines, because `paper.css` is consistent about its tokens:
 `--black` always means *the ink*, `--paper` always means *the ground*, and a
@@ -309,7 +347,7 @@ those two words point at and restating the derived inks for a dark ground.
 exactly.**
 
 The landing page is unaffected either way: `landing.css` scopes its own
-`--black` / `--paper` to `.landing-page`.
+tokens to `.kl`.
 
 Two things invert rather than darken: the ticket and the footer were black
 blocks on paper, so they are now light blocks on dark. That is coherent — they

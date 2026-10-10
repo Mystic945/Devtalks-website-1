@@ -14,6 +14,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useStickyNav } from '@/hooks/useStickyNav';
 import { lockScroll, pad2 } from '@/lib/dom';
 import { socialLinks, ticketProps } from '@/lib/links';
+import { KURUKSHETRA } from '@/data/site';
 
 /** The bar's links. The mobile menu adds Venue, which the bar has no room for. */
 const NAV_LINKS = [
@@ -61,8 +62,7 @@ export function SiteNav() {
     <>
       <header className="nav" id="nav" ref={navRef}>
         <a href="#top" className="nav__logo" data-magnetic>
-          DEV<span>TALKS</span>
-          <b>26</b>
+          {KURUKSHETRA.name}
         </a>
 
         <nav className="nav__links" aria-label="Primary">

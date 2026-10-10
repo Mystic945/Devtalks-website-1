@@ -1,5 +1,5 @@
 /* ============================================================
-   DEVTALKS — LANDING LANYARD (loader)
+   KURUKSHETRA — LANDING LANYARD (loader)
    ------------------------------------------------------------
    The badge on the landing page. This file is the small part that
    ships in the main bundle; everything heavy — three.js, the Rapier

@@ -10,6 +10,10 @@
    Pointing at a thing the visitor is already looking at is noise,
    and the tab would otherwise sit on top of the pass.
 
+   It also stays off the landing page: that screen speaks only as
+   Kurukshetra, in black and gold, and its one button goes to the
+   main site. The tab comes in once the landing has scrolled away.
+
    Desktop only — styles/animations.css hides it under 1180px,
    where there is no margin beside the content to put it in and
    the nav's own button is a thumb away.
@@ -20,20 +24,31 @@ import { ticketProps } from '@/lib/links';
 
 export function EdgeTab() {
   const ref = useRef<HTMLAnchorElement>(null);
-  const [hidden, setHidden] = useState(false);
+  // The landing is the first thing on screen, so it starts out of the way.
+  const [hidden, setHidden] = useState(true);
 
   useEffect(() => {
-    const target = document.getElementById('tickets');
-    if (!target || !('IntersectionObserver' in window)) return;
+    if (!('IntersectionObserver' in window)) return;
+    const targets = [document.getElementById('tickets'), document.querySelector('.landing-page')].filter(
+      (el): el is HTMLElement => el instanceof HTMLElement
+    );
+    if (!targets.length) return;
 
+    const onScreen = new Set<Element>();
     const io = new IntersectionObserver(
-      ([entry]) => setHidden(entry.isIntersecting),
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) onScreen.add(entry.target);
+          else onScreen.delete(entry.target);
+        }
+        setHidden(onScreen.size > 0);
+      },
       // A sliver of the section counts: the tab should be gone before the
       // pass has finished arriving, not after.
-      { threshold: 0.12 }
+      { threshold: [0, 0.12] }
     );
 
-    io.observe(target);
+    targets.forEach((t) => io.observe(t));
     return () => io.disconnect();
   }, []);
 

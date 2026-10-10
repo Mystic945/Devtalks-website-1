@@ -698,52 +698,57 @@
 }
 
 /* ------------------------------------------------------------
-   9b · THE WORDMARK FLOATS
-   It was dead still in the middle of a moving field, which read as
-   a placeholder. The keyframe carries the -2deg the title already
-   has: transform is one property, so a float that forgot the
-   rotation would straighten the word out.
+   9b · THE NAV SPEAKS AS KURUKSHETRA
+   The wordmark is the landing page's: the same inscriptional
+   capitals, in gold, at every scroll position. The links are set
+   as labels, and the button is the landing's gold, square.
+   Everything else about the bar — where it sits, when it turns
+   solid — is unchanged.
    ------------------------------------------------------------ */
-@keyframes landing-float {
-  0%,
-  100% {
-    transform: rotate(-2deg) translate3d(0, 0, 0);
-  }
-  50% {
-    transform: rotate(-2deg) translate3d(0, -15px, 0);
-  }
+.nav .nav__logo,
+.nav.is-stuck .nav__logo {
+  font-family: 'Cinzel', 'Trajan Pro', 'Times New Roman', serif;
+  font-weight: 800;
+  font-size: 1.12rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #deae58;
 }
-
-.landing-title {
-  animation: landing-float 7s ease-in-out infinite;
-  will-change: transform;
+.nav .nav__links a {
+  font-family: var(--mono);
+  font-size: 0.74rem;
+  font-weight: 400;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
 }
-
-/* The stamp drifts with it, a beat behind, so the two read as one
-   object breathing rather than two things moving. */
-@keyframes landing-float-soft {
-  0%,
-  100% {
-    transform: translate3d(0, 0, 0);
-  }
-  50% {
-    transform: translate3d(0, -8px, 0);
-  }
+.nav .nav__links a::after {
+  background: #deae58;
+  height: 1px;
 }
-
-.landing-stamp {
-  animation: landing-float-soft 7s ease-in-out infinite;
-  animation-delay: -1.6s;
+.nav .nav__cta {
+  --bg: #efcb76;
+  --fg: #0b0b0b;
+  border-radius: 0;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  box-shadow: none;
+}
+.nav .nav__cta::before {
+  border-radius: 0;
+  background: #ffe9b4;
+}
+.nav .nav__cta:hover {
+  color: #0b0b0b;
 }
 
 /* ------------------------------------------------------------
-   9c · THE LANDING IS PART OF THE PAGE
-   It used to be stuck to the top while the rest of the site slid
-   over it. On the reference that works because the two have
-   different grounds, so the cover reads as a cover. Here both are
-   the same black, so all you saw was the wordmark frozen and then
-   sliced in half by a hard horizontal seam — a rendering fault,
-   not an effect. It scrolls with everything else now.
+   9c · THE LANDING ENDS ON THE PAGE'S OWN BLACK
+   The landing is a pinned scene (components/landing): its stage
+   is veiled to flat black before it is let go, so what scrolls
+   away is the same ground the page body arrives on.
 
    .page-body keeps its ground regardless: it is what stops a
    transparent section showing whatever is behind <main>.
@@ -752,14 +757,6 @@
   position: relative;
   z-index: 1;
   background: var(--paper);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .landing-title,
-  .landing-stamp {
-    animation: none;
-  }
-
 }
 
 /* ============================================================

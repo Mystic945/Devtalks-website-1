@@ -57,6 +57,23 @@ export const SITE: Site = {
   }
 };
 
+/* The landing page, the nav wordmark and the lanyard speak only as
+   KURUKSHETRA — the event this site belongs to. Its details are the main
+   site's (mainSite), which is also where the landing's button goes; they are
+   kept apart from SITE so the sections further down the page are not
+   changed by editing them. */
+export const KURUKSHETRA = {
+  name: 'Kurukshetra',
+  devanagari: 'कुरुक्षेत्र',
+  tagline: 'The Battle of Infinite Possibilities',
+  year: '2026',
+  dateLabel: 'Friday, 16 October 2026',
+  dateShort: '16 OCT 2026',
+  venue: 'DYP Auditorium, DPU Pimpri, Pune',
+  venueShort: 'DPU Pimpri · Pune',
+  mainSite: 'https://mobius-weld.vercel.app/'
+} as const;
+
 /** Hero marquee strip. */
 export const MARQUEE: string[] = [
   '3 SPEAKERS',

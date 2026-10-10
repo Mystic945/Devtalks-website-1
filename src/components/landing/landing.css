@@ -1,725 +1,629 @@
-/* =========================================================
-   DEVTALKS LANDING PAGE
-   Comic / editorial hero
-   ========================================================= */
-@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
+/* ============================================================
+   KURUKSHETRA — THE LANDING PAGE
+   ------------------------------------------------------------
+   Near-black, and gold rationed: the formation, the wordmark,
+   one button, hairlines and small marks. Square corners.
 
-.landing-page {
-  --black: #0b0b0b;
-  --paper: #f3eee4;
-  --orange: #ff5a1f;
-  --grey: #77736b;
-  --line: #393732;
+     1 · tokens and the pinned stage
+     2 · the scene and its shade
+     3 · the type
+     4 · the heads-up display: rail, corner labels, cue
+     5 · the dive (everything that answers to --dive)
+     6 · arrival
+     7 · small screens, short screens, reduced motion
+
+   --dive is written by LandingPage.tsx: 0 at rest, 1 when the
+   view has fallen into the eye of the formation.
+   ============================================================ */
+
+/* ------------------------------------------------------------
+   1 · TOKENS AND THE PINNED STAGE
+   ------------------------------------------------------------ */
+.kl {
+  --ground: #0b0b0b;
+  --umber: #17100d;
+  --umber-2: #24140f;
+  --gold-lit: #efcb76;
+  --gold: #deae58;
+  --gold-deep: #b58530;
+  --gold-dark: #a97a2b;
+  --shine: #ffe9b4;
+  --bone: #f3eee4;
+  --ash: #a29d94;
+  --hair: #393732;
+
+  --kl-serif: 'Cinzel', 'Trajan Pro', 'Times New Roman', serif;
+  --kl-text: 'EB Garamond', Georgia, 'Times New Roman', serif;
+  --kl-deva: 'Tiro Devanagari Sanskrit', 'Noto Serif Devanagari', 'Nirmala UI', serif;
+  --kl-mono: 'JetBrains Mono', ui-monospace, Menlo, monospace;
+  --kl-ease: cubic-bezier(0.19, 1, 0.22, 1);
+  --kl-gut: clamp(18px, 5vw, 72px);
+
+  /* How much scrolling the fall into the formation takes. */
+  --run: 90svh;
+  --dive: 0;
 
   position: relative;
+  height: calc(100svh + var(--run));
+  background: var(--ground);
+  color: var(--bone);
+}
 
-  /*
-    FULL SCREEN
-    The navbar sits on top of this.
-  */
-  width: 100%;
-  height: 100vh;
-  min-height: 700px;
-
+.kl__stage {
+  position: sticky;
+  top: 0;
+  height: 100svh;
   overflow: hidden;
-
-  background: var(--black);
-  color: var(--paper);
-
   isolation: isolate;
+  /* What is here before the scene is, and all there is without WebGL. */
+  background: radial-gradient(ellipse 72% 64% at 36% 62%, var(--umber-2) 0%, var(--umber) 34%, var(--ground) 74%);
 }
 
-
-/* =========================================================
-   HALFTONE BACKGROUND
-   ========================================================= */
-
-.landing-page::before {
-  content: "";
-
+/* ------------------------------------------------------------
+   2 · THE SCENE AND ITS SHADE
+   ------------------------------------------------------------ */
+.kl__scene {
   position: absolute;
   inset: 0;
-
-  background-image:
-    radial-gradient(
-      rgba(243, 238, 228, 0.22) 1px,
-      transparent 1px
-    );
-
-  background-size: 10px 10px;
-
-  opacity: 0.20;
-
-  pointer-events: none;
-
-  z-index: 0;
-}
-
-
-/* subtle centre glow */
-
-.landing-page::after {
-  content: "";
-
-  position: absolute;
-  inset: 0;
-
-  background:
-    radial-gradient(
-      ellipse at 50% 43%,
-      rgba(255, 90, 31, 0.07),
-      transparent 38%
-    );
-
-  pointer-events: none;
-
-  z-index: 0;
-}
-
-
-/* =========================================================
-   MAIN CONTENT
-   ========================================================= */
-
-.landing-inner {
-  position: relative;
-
-  z-index: 5;
-
+  display: block;
   width: 100%;
   height: 100%;
-
-  padding:
-    90px
-    clamp(35px, 5vw, 90px)
-    35px;
-
-  box-sizing: border-box;
+  opacity: 0;
+  transition: opacity 1.9s ease;
 }
-
-
-/* =========================================================
-   REMOVE / HIDE KICKER
-   ========================================================= */
-
-.landing-kicker {
+.kl.is-in .kl__scene {
+  opacity: 1;
+}
+.kl.is-flat .kl__scene {
   display: none;
 }
 
-
-/* =========================================================
-   TITLE AREA
-   ========================================================= */
-
-.landing-title-wrap {
-  position: absolute;
-
-  top: 47%;
-  left: 50%;
-
-  transform: translate(-50%, -50%);
-
-  width: min(1200px, 92vw);
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  z-index: 5;
-}
-
-
-/* =========================================================
-   MAIN TITLE
-   ========================================================= */
-.landing-title {
-  margin: 0;
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-
-  font-family: "Bebas Neue", sans-serif;
-
-  font-size: clamp(150px, 21vw, 330px);
-
-  line-height: 0.68;
-
-  letter-spacing: 0.015em;
-
-  transform: rotate(-2deg);
-
-  text-align: center;
-
-  white-space: nowrap;
-
-  z-index: 5;
-}
-
-
-
-
-/* =========================================================
-   DEV
-   ========================================================= */
-.landing-title span:first-child {
-  display: block;
-
-  color: var(--paper);
-
-  text-shadow:
-    7px 7px 0 rgba(243, 238, 228, 0.06);
-}
-
-
-/* =========================================================
-   TALKS
-   ========================================================= */
-.landing-title span:last-child {
-  display: block;
-
-  color: var(--orange);
-
-  text-shadow:
-    7px 7px 0 rgba(255, 90, 31, 0.08);
-}
-
-
-/* =========================================================
-   LEFT SIDE — TECH COMMUNITY
-   ========================================================= */
-
-.landing-side-word {
-  position: absolute;
-
-  left: -3%;
-
-  top: 37%;
-
-  font-family: "DM Mono", monospace;
-
-  font-size: 11px;
-
-  line-height: 1.8;
-
-  color: #77736b;
-
-  transform: rotate(-4deg);
-
-  z-index: 4;
-}
-
-.landing-side-word::after {
-  content: "";
-
-  display: block;
-
-  width: 90px;
-
-  margin-top: 5px;
-
-  border-top: 2px solid var(--orange);
-}
-
-
-/* =========================================================
-   IDEAS / CODE / PEOPLE / IMPACT CIRCLE
-   ========================================================= */
-
-.landing-stamp {
-  position: absolute;
-
-  right: -2%;
-
-  top: 31%;
-
-  width: 125px;
-  height: 125px;
-
-  border: 1px solid var(--orange);
-
-  border-radius: 50%;
-
-  display: flex;
-
-  flex-direction: column;
-
-  align-items: center;
-  justify-content: center;
-
-  gap: 2px;
-
-  color: var(--orange);
-
-  font-family: "DM Mono", monospace;
-
-  font-size: 10px;
-
-  line-height: 1.35;
-
-  text-align: center;
-
-  transform: rotate(7deg);
-
-  z-index: 4;
-}
-
-.landing-stamp::before {
-  content: "✦";
-
-  position: absolute;
-
-  top: -25px;
-  left: 0;
-
-  color: var(--orange);
-
-  font-size: 25px;
-}
-
-
-/* =========================================================
-   BOTTOM CONTENT
-   ========================================================= */
-
-.landing-bottom {
-  position: absolute;
-
-  left: clamp(35px, 5vw, 90px);
-  right: clamp(35px, 5vw, 90px);
-
-  bottom: 65px;
-
-  display: flex;
-
-  align-items: flex-end;
-
-  justify-content: space-between;
-
-  padding-top: 20px;
-
-  z-index: 6;
-}
-
-
-/* =========================================================
-   TECHNOLOGY UNFILTERED
-   ========================================================= */
-
-.landing-manifesto {
-  margin: 0 0 10px;
-
-  font-family: "Bebas Neue", sans-serif;
-
-  font-size: clamp(28px, 3vw, 44px);
-
-  line-height: 0.85;
-
-  letter-spacing: 0.01em;
-
-  color: var(--paper);
-}
-
-.landing-manifesto em {
-  font-style: normal;
-
-  color: var(--orange);
-}
-
-
-/* =========================================================
-   DESCRIPTION
-   ========================================================= */
-
-.landing-description {
-  margin: 0;
-
-  max-width: 430px;
-
-  color: #a29d94;
-
-  font-family: "DM Mono", monospace;
-
-  font-size: 11px;
-
-  line-height: 1.55;
-}
-
-
-/* =========================================================
-   EVENT INFO
-   ========================================================= */
-
-.landing-event-info {
-  display: flex;
-
-  flex-direction: column;
-
-  align-items: flex-end;
-
-  gap: 7px;
-
-  font-family: "DM Mono", monospace;
-
-  font-size: 9px;
-
-  color: #77736b;
-
-  text-align: right;
-}
-
-/* =========================================================
-   DOODLE FIELD
-   ========================================================= */
-
-.landing-doodle-field {
+/* The dawn is on the left, so the right of the field is in shadow — and that
+   is where the type stands. Then a darker pool right under the type, a little
+   weight under the nav, and the fall to flat ground at the foot. */
+.kl__shade {
   position: absolute;
   inset: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 2;
+  z-index: 1;
   pointer-events: none;
-  opacity: 0.32;
-  overflow: hidden;
+  background:
+    radial-gradient(ellipse 40% 44% at 72% 49%, rgba(11, 11, 11, 0.72) 0%, rgba(11, 11, 11, 0.4) 55%, rgba(11, 11, 11, 0) 100%),
+    linear-gradient(90deg, rgba(11, 11, 11, 0) 34%, rgba(11, 11, 11, 0.62) 52%, rgba(11, 11, 11, 0.86) 100%),
+    linear-gradient(180deg, rgba(11, 11, 11, 0.72) 0%, rgba(11, 11, 11, 0) 17%),
+    linear-gradient(180deg, rgba(11, 11, 11, 0) 70%, rgba(11, 11, 11, 0.9) 100%);
 }
 
-
-/* =========================================================
-   INDIVIDUAL DOODLES
-   ========================================================= */
-
-.landing-doodle {
+/* ------------------------------------------------------------
+   3 · THE TYPE
+   The lanyard owns the left third; the type starts just past the
+   middle and runs to the gutter. Sizes are in vw so the wordmark
+   always fits the column it has.
+   ------------------------------------------------------------ */
+.kl__copy {
   position: absolute;
-  display: block;
-  will-change: margin-left, margin-top;
+  z-index: 5;
+  left: 46vw;
+  right: var(--kl-gut);
+  top: 50%;
+  transform: translateY(-48%);
 }
-
-
-/* =========================================================
-   FLOATING MOTION
-   ========================================================= */
-
-.q1,
-.q5,
-.q9,
-.q13,
-.q17 {
-  animation: floatLeft 5.5s ease-in-out infinite;
-}
-
-.q3,
-.q7,
-.q11,
-.q15 {
-  animation: floatRight 6s ease-in-out infinite;
-}
-
-
-/* Different timing */
-
-.q1  { animation-delay: -1s; }
-.q3  { animation-delay: -3s; }
-.q5  { animation-delay: -2s; }
-.q7  { animation-delay: -4s; }
-.q9  { animation-delay: -1.5s; }
-.q11 { animation-delay: -3.5s; }
-.q13 { animation-delay: -2.5s; }
-.q15 { animation-delay: -4.5s; }
-.q17 { animation-delay: -0.5s; }
-
-
-/* LEFT FLOAT */
-
-@keyframes floatLeft {
-  0%,
-  100% {
-    margin-left: 0;
-    margin-top: 0;
-  }
-
-  50% {
-    margin-left: -8px;
-    margin-top: -10px;
-  }
-}
-
-
-/* RIGHT FLOAT */
-
-@keyframes floatRight {
-  0%,
-  100% {
-    margin-left: 0;
-    margin-top: 0;
-  }
-
-  50% {
-    margin-left: 8px;
-    margin-top: -12px;
-  }
-}
-
-
-/* =========================================================
-   DOODLE POSITIONS
-   ========================================================= */
-
-.q1 {
-  left: 5%;
-  top: 28%;
-  transform: rotate(-12deg);
-}
-
-.q2 {
-  left: 17%;
-  top: 19%;
-  transform: rotate(15deg);
-}
-
-.q3 {
-  left: 29%;
-  top: 25%;
-  transform: rotate(-7deg);
-}
-
-.q4 {
-  left: 5%;
-  top: 66%;
-  transform: rotate(8deg);
-}
-
-.q5 {
-  left: 20%;
-  top: 73%;
-  transform: rotate(-14deg);
-}
-
-.q6 {
-  left: 36%;
-  top: 77%;
-  transform: rotate(10deg);
-}
-
-.q7 {
-  left: 43%;
-  top: 16%;
-  transform: rotate(-5deg);
-  font-size: 18px;
-}
-
-.q9 {
-  right: 8%;
-  top: 26%;
-  transform: rotate(-12deg);
-}
-
-.q10 {
-  right: 18%;
-  top: 59%;
-  transform: rotate(13deg);
-}
-
-.q11 {
-  right: 5%;
-  top: 72%;
-  transform: rotate(-8deg);
-}
-
-.q12 {
-  left: 8%;
-  top: 46%;
-  transform: rotate(-8deg);
-}
-
-.q13 {
-  right: 35%;
-  top: 80%;
-  transform: rotate(5deg);
-}
-
-.q14 {
-  right: 5%;
-  top: 48%;
-  transform: rotate(4deg);
-}
-
-.q15 {
-  left: 29%;
-  top: 65%;
-  transform: rotate(-12deg);
-}
-
-.q16 {
-  right: 14%;
-  top: 12%;
-  transform: rotate(18deg);
-}
-
-.q17 {
-  right: 31%;
-  top: 29%;
-  transform: rotate(-9deg);
-}
-
-.q18 {
-  left: 48%;
-  top: 89%;
-  transform: rotate(4deg);
-}
-
-
-/* =========================================================
-   ORANGE ACCENTS
-   ========================================================= */
-
-.q4,
-.q8,
-.q12,
-.q16 {
-  color: var(--orange);
-  opacity: 0.7;
-}
-
-
-/* =========================================================
-   SCROLL
-   ========================================================= */
-
-.landing-scroll {
-  /* button reset — this is a real button now (it scrolls the page), not
-     decoration, so it needs to give up the browser's default chrome */
-  appearance: none;
-  background: none;
-  border: 0;
+.kl__copy > * {
   margin: 0;
-  padding: 6px 10px;
-  cursor: pointer;
+}
 
-  position: absolute;
+.kl__deva {
+  font-family: var(--kl-deva);
+  font-size: clamp(18px, 1.75vw, 28px);
+  line-height: 1.3;
+  color: var(--gold);
+}
 
-  z-index: 10;
+.kl__mark {
+  width: max-content;
+  margin-top: 0.06em;
+  font-family: var(--kl-serif);
+  font-weight: 900;
+  font-size: min(5.1vw, 100px);
+  line-height: 1.02;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  /* struck metal: lit from above, shadowed at the foot */
+  background: linear-gradient(180deg, var(--shine) 0%, var(--gold-lit) 36%, var(--gold) 62%, var(--gold-dark) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 0 18px rgba(239, 203, 118, 0.22));
+}
 
-  left: 50%;
-  bottom: 15px;
+.kl__tag {
+  margin-top: clamp(12px, 1.5vw, 24px);
+  font-family: var(--kl-text);
+  font-weight: 500;
+  font-size: clamp(17px, 2.1vw, 36px);
+  line-height: 1.12;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--bone);
+}
+.kl__tag em {
+  font-style: italic;
+  color: var(--gold);
+}
 
-  transform: translateX(-50%);
-
+.kl__glyphs {
   display: flex;
+  gap: clamp(14px, 1.6vw, 24px);
+  margin-top: clamp(18px, 2.1vw, 32px);
+  padding: 0;
+  list-style: none;
+}
+.kl__glyphs svg {
+  display: block;
+  width: clamp(20px, 1.7vw, 26px);
+  height: auto;
+  fill: none;
+  stroke: var(--gold);
+  stroke-width: 1.25;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
 
-  flex-direction: column;
-
+.kl__date {
+  display: flex;
+  flex-wrap: wrap;
   align-items: center;
-
-  gap: 2px;
-
-  font-family: "DM Mono", monospace;
-
-  font-size: 8px;
-
-  color: #77736b;
-
-  transition: color 0.2s ease;
+  gap: 6px 16px;
+  margin-top: clamp(18px, 2.1vw, 32px);
+  font-family: var(--kl-mono);
+  font-size: 12px;
+  line-height: 1.5;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ash);
+}
+.kl__date i {
+  font-style: normal;
+  font-size: 9px;
+  color: var(--gold);
 }
 
-.landing-scroll:hover,
-.landing-scroll:focus-visible {
-  color: var(--paper);
+.kl__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 22px 30px;
+  margin-top: clamp(26px, 3vw, 46px);
 }
 
-.landing-scroll b {
-  color: var(--orange);
-
-  font-size: 18px;
-
-  animation: landingBounce 1.5s ease-in-out infinite;
+.kl__btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.9em;
+  height: 54px;
+  padding: 0 30px;
+  border: 1px solid rgba(222, 174, 88, 0.45);
+  background: rgba(11, 11, 11, 0.4);
+  font-family: var(--kl-mono);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  text-decoration: none;
+  white-space: nowrap;
+  color: var(--bone);
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}
+.kl__btn b {
+  font-weight: 400;
+  transition: transform 0.4s var(--kl-ease);
+}
+.kl__btn:hover {
+  border-color: var(--gold);
+  background: rgba(222, 174, 88, 0.14);
+}
+.kl__btn:hover b {
+  transform: translateY(3px);
+}
+.kl__btn:focus-visible {
+  outline: 2px solid var(--shine);
+  outline-offset: 8px;
 }
 
-@keyframes landingBounce {
+/* The one gold control, in a second rule set just outside it. */
+.kl__btn--gold {
+  border-color: var(--gold-lit);
+  background: var(--gold-lit);
+  color: var(--ground);
+}
+.kl__btn--gold::after {
+  content: '';
+  position: absolute;
+  inset: -5px;
+  border: 1px solid var(--gold);
+  pointer-events: none;
+  transition: inset 0.4s var(--kl-ease), border-color 0.3s ease;
+}
+.kl__btn--gold:hover {
+  border-color: var(--shine);
+  background: var(--shine);
+}
+.kl__btn--gold:hover::after {
+  inset: -8px;
+  border-color: var(--gold-lit);
+}
+.kl__btn--gold:hover b {
+  transform: translate(3px, -3px);
+}
+
+/* ------------------------------------------------------------
+   4 · THE HEADS-UP DISPLAY
+   ------------------------------------------------------------ */
+.kl__rail {
+  position: absolute;
+  z-index: 4;
+  right: calc(var(--kl-gut) * 0.38);
+  top: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  transform: translateY(-50%);
+}
+.kl__rail::before,
+.kl__rail::after {
+  content: '';
+  width: 1px;
+  height: 42px;
+  background: var(--hair);
+}
+.kl__rail a {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+}
+.kl__rail a i {
+  width: 8px;
+  height: 8px;
+  border: 1px solid rgba(162, 157, 148, 0.75);
+  transform: rotate(45deg);
+  transition: background-color 0.3s ease, border-color 0.3s ease, transform 0.4s var(--kl-ease);
+}
+.kl__rail a[aria-current] i,
+.kl__rail a:hover i,
+.kl__rail a:focus-visible i {
+  border-color: var(--gold);
+  background: var(--gold);
+}
+.kl__rail a:hover i {
+  transform: rotate(45deg) scale(1.25);
+}
+.kl__rail a span {
+  position: absolute;
+  right: 30px;
+  top: 50%;
+  padding: 4px 8px;
+  background: rgba(11, 11, 11, 0.82);
+  font-family: var(--kl-mono);
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--gold);
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(8px, -50%);
+  transition: opacity 0.25s ease, transform 0.4s var(--kl-ease);
+}
+.kl__rail a:hover span,
+.kl__rail a:focus-visible span {
+  opacity: 1;
+  transform: translate(0, -50%);
+}
+.kl__rail a:focus-visible {
+  outline: 1px solid var(--shine);
+  outline-offset: 2px;
+}
+
+.kl__place,
+.kl__count {
+  position: absolute;
+  z-index: 4;
+  bottom: 30px;
+  margin: 0;
+  font-family: var(--kl-mono);
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+.kl__place {
+  left: var(--kl-gut);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  color: var(--gold);
+}
+.kl__place i {
+  width: 32px;
+  height: 1px;
+  background: var(--gold);
+}
+.kl__count {
+  right: var(--kl-gut);
+  color: var(--ash);
+}
+.kl__count b {
+  margin-left: 0.9em;
+  font-weight: 400;
+  color: var(--gold);
+}
+
+.kl__cue {
+  position: absolute;
+  z-index: 4;
+  left: 50%;
+  bottom: 22px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  transform: translateX(-50%);
+  font-family: var(--kl-mono);
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--ash);
+  transition: color 0.3s ease;
+}
+.kl__cue:hover {
+  color: var(--bone);
+}
+.kl__cue svg {
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: var(--gold);
+  stroke-width: 1.1;
+  animation: kl-reticle 3.2s ease-in-out infinite;
+}
+.kl__cue .kl__cue-dot {
+  fill: var(--gold-lit);
+  stroke: none;
+}
+.kl__cue i {
+  width: 1px;
+  height: 22px;
+  background: linear-gradient(180deg, var(--gold), rgba(222, 174, 88, 0));
+}
+.kl__cue:focus-visible {
+  outline: 1px solid var(--shine);
+  outline-offset: 6px;
+}
+@keyframes kl-reticle {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
   50% {
-    transform: translateY(5px);
+    transform: translateY(5px) rotate(45deg);
   }
 }
 
+/* ------------------------------------------------------------
+   5 · THE DIVE
+   The type goes first, then the lanyard and the marks round the
+   edge; the veil closes last, so the stage is flat black — the
+   Möbius section's own ground — before it is let go.
+   ------------------------------------------------------------ */
+.kl__copy {
+  opacity: calc(1 - var(--dive) * 3.4);
+  translate: 0 calc(var(--dive) * -70px);
+}
+.kl__rail,
+.kl__place,
+.kl__count,
+.kl__cue {
+  opacity: calc(1 - var(--dive) * 5);
+}
+.kl__shade {
+  opacity: calc(1 - var(--dive) * 1.6);
+}
+.kl .landing-lanyard.is-on {
+  opacity: calc(1 - (var(--dive) - 0.06) * 4);
+}
+/* Faded out is not the same as gone: nothing under the veil takes a click. */
+.kl.is-deep .kl__copy,
+.kl.is-deep .kl__rail,
+.kl.is-deep .kl__cue,
+.kl.is-deep .landing-lanyard {
+  visibility: hidden;
+}
 
-/* =========================================================
-   MOBILE
-   ========================================================= */
+.kl__veil {
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  background: var(--ground);
+  opacity: calc((var(--dive) - 0.7) * 3.7);
+  pointer-events: none;
+}
 
+/* ------------------------------------------------------------
+   6 · ARRIVAL
+   Once, when the page is handed over: the wordmark rises and
+   sharpens, and the rest follows a beat apart.
+   ------------------------------------------------------------ */
+.kl__copy > *,
+.kl__rail,
+.kl__place,
+.kl__count,
+.kl__cue {
+  animation: kl-rise 1s var(--kl-ease) both paused;
+}
+.kl.is-in .kl__copy > *,
+.kl.is-in .kl__rail,
+.kl.is-in .kl__place,
+.kl.is-in .kl__count,
+.kl.is-in .kl__cue {
+  animation-play-state: running;
+}
+.kl__copy > :nth-child(1) { animation-delay: 0.35s; }
+.kl__copy > :nth-child(2) { animation-delay: 0.45s; animation-name: kl-strike; animation-duration: 1.3s; }
+.kl__copy > :nth-child(3) { animation-delay: 0.62s; }
+.kl__copy > :nth-child(4) { animation-delay: 0.72s; }
+.kl__copy > :nth-child(5) { animation-delay: 0.8s; }
+.kl__copy > :nth-child(6) { animation-delay: 0.9s; }
+.kl__rail,
+.kl__place,
+.kl__count,
+.kl__cue {
+  animation-name: kl-fade;
+  animation-delay: 1.5s;
+}
+
+@keyframes kl-rise {
+  from {
+    opacity: 0;
+    translate: 0 18px;
+  }
+}
+@keyframes kl-fade {
+  from {
+    opacity: 0;
+  }
+}
+/* the wordmark comes out of a blur, like a casting cooling */
+@keyframes kl-strike {
+  from {
+    opacity: 0;
+    translate: 0 18px;
+    filter: blur(10px) drop-shadow(0 0 40px rgba(255, 233, 180, 0.6));
+  }
+}
+
+/* ------------------------------------------------------------
+   7 · SMALL SCREENS, SHORT SCREENS, REDUCED MOTION
+   ------------------------------------------------------------ */
+
+/* No lanyard here (LanyardLayer.tsx stops at the same width): the type takes
+   the middle and the formation sits under it. */
 @media (max-width: 700px) {
-
-  .landing-page {
-    height: 100svh;
-    min-height: 650px;
+  .kl {
+    --run: 70svh;
+    --kl-gut: 20px;
   }
-
-  .landing-inner {
-    padding:
-      80px
-      25px
-      25px;
+  .kl__stage {
+    background: radial-gradient(ellipse 110% 46% at 50% 74%, var(--umber-2) 0%, var(--umber) 40%, var(--ground) 80%);
   }
-
-  .landing-title-wrap {
-    width: 95vw;
-
-    height: 300px;
-
-    top: 43%;
+  .kl__shade {
+    background:
+      radial-gradient(ellipse 96% 36% at 50% 33%, rgba(11, 11, 11, 0.86) 0%, rgba(11, 11, 11, 0.55) 56%, rgba(11, 11, 11, 0) 100%),
+      linear-gradient(180deg, rgba(11, 11, 11, 0.72) 0%, rgba(11, 11, 11, 0) 14%),
+      linear-gradient(180deg, rgba(11, 11, 11, 0) 80%, var(--ground) 100%);
   }
-
-  .landing-title {
-    font-size: 25vw;
+  .kl__copy {
+    left: var(--kl-gut);
+    right: var(--kl-gut);
+    top: clamp(92px, 15svh, 150px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    transform: none;
   }
-
-  .landing-title span:first-child {
-    top: 20px;
+  .kl__mark {
+    font-size: min(10vw, 68px);
+    letter-spacing: 0.04em;
   }
-
-  .landing-title span:last-child {
-    top: 115px;
+  .kl__tag {
+    font-size: clamp(16px, 4.9vw, 24px);
   }
-
-  .landing-side-word {
-    left: 0;
-
-    top: 27%;
-
-    font-size: 8px;
+  .kl__date {
+    flex-direction: column;
+    gap: 4px;
+    font-size: 11px;
   }
-
-  .landing-stamp {
-    right: 0;
-
-    top: 25%;
-
-    width: 80px;
-    height: 80px;
-
-    font-size: 7px;
-  }
-
-  .landing-bottom {
-    left: 25px;
-    right: 25px;
-
-    bottom: 45px;
-
-    display: block;
-  }
-
-  .landing-manifesto {
-    font-size: 25px;
-  }
-
-  .landing-description {
-    font-size: 9px;
-  }
-
-  .landing-event-info {
+  .kl__date i {
     display: none;
   }
-
-  .landing-scroll {
+  .kl__actions {
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+    max-width: 340px;
+    gap: 18px;
+  }
+  .kl__btn {
+    justify-content: center;
+    height: 52px;
+    padding: 0 16px;
+    font-size: 12px;
+  }
+  .kl__rail,
+  .kl__count,
+  .kl__cue span {
     display: none;
+  }
+  .kl__place {
+    bottom: 22px;
+  }
+  .kl__cue {
+    left: auto;
+    right: var(--kl-gut);
+    bottom: 12px;
+    transform: none;
+  }
+}
+
+/* Under the width where the nav folds away there is no margin left for the
+   rail: it would sit on the end of the wordmark. The nav's menu does its job. */
+@media (max-width: 1100px) {
+  .kl__rail {
+    display: none;
+  }
+}
+
+/* A laptop with the window half-height: tighten, do not clip. */
+@media (max-height: 640px) and (min-width: 701px) {
+  .kl__copy {
+    transform: translateY(-44%);
+  }
+  .kl__glyphs {
+    display: none;
+  }
+  .kl__actions {
+    margin-top: 22px;
+  }
+  .kl__btn {
+    height: 46px;
+  }
+  .kl__cue span {
+    display: none;
+  }
+}
+
+/* Nothing moves, and nothing is lost: the stage is an ordinary screen that
+   scrolls away, with the formation drawn once and standing still. */
+@media (prefers-reduced-motion: reduce) {
+  .kl {
+    --run: 0svh;
+  }
+  .kl__stage {
+    position: relative;
+  }
+  .kl__scene {
+    transition: none;
+  }
+  .kl__copy > *,
+  .kl__rail,
+  .kl__place,
+  .kl__count,
+  .kl__cue,
+  .kl__cue svg {
+    animation: none;
   }
 }
